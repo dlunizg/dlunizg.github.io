@@ -4,186 +4,145 @@ layout: default
 
 <div>
 
-  These notes accompany the Stanford CS class <a href="http://cs231n.stanford.edu/">CS231n: Convolutional Neural Networks for Visual Recognition</a>. 
-  <br>
-  For questions/concerns/bug reports regarding contact <a href="http://cs.stanford.edu/people/jcjohns/">Justin Johnson</a> regarding the assignments, or contact <a href="cs.stanford.edu/people/karpathy/">Andrej Karpathy</a> regarding the course notes. You can also submit a pull request directly to our <a href="https://github.com/cs231n/cs231n.github.io">git repo</a>.
-  <br>
-  We encourage the use of the <a href="https://hypothes.is/">hypothes.is</a> extension to annote comments and discuss these notes inline.
-</div>
+<H3>
+O predmetu:
+</H3>
+  <p>
+  Duboko učenje je grana strojnog učenja
+  koja je posebno prikladna
+  za rješavanje problema
+  iz područja umjetne inteligencije.
+  Duboko učenje se temelji na predstavljanju podataka
+  složenim reprezentacijama do kojih se dolazi
+  slijedom naučenih nelinearnih transformacija.
+  Metode dubokog učenja svoju primjenu pronalaze u
+  izazovnim područjima gdje je dimenzionalnost
+  podataka iznimno velika: računalnom vidu,
+  obradi prirodnog jezika ili razumijevanju govora.
+  Ovaj predmet uvodi najvažnije
+  diskriminativne i generativne duboke modele
+  s posebnim naglaskom na praktične implementacije.
 
-<div class="home">
-  <div class="materials-wrap">
-    
-    <div class="module-header">Winter 2016 Assignments</div>
+  <p>
+  Prva cjelina daje pregled ključnih elemenata
+  klasičnih neuronskih mreža te uvodi
+  osnovne građevne elemente, tehnike regularizacije
+  i metode učenja koji su specifični za duboke modele.
+  Druga cjelina razmatra duboke konvolucijske modele
+  i ilustrira njihovu primjenu u klasifikaciji slika
+  i obradi prirodnog jezika.
+  Treća cjelina je posvećena generativnim dubokim modelima
+  i njihovim primjenama u računalnom vidu
+  i obradi prirodnog jezika.
+  Konačno, četvrta cjelina razmatra
+  modeliranje slijedova dubokim povratnim neuronskim mrežama
+  i ilustrira primjene u području obrade prirodnog jezika.
 
-    <div class="materials-item">
-      <a href="assignments2016/assignment1/">
-        Assignment #1: Image Classification, kNN, SVM, Softmax, Neural Network
-      </a>
-    </div>
+  <p>
+  Svi koncepti popraćeni su primjerima i zadatcima
+  u programskom jeziku Python.
+  Većina primjera biti će vezana uz
+  suvremeni aplikacijski okvir Tensorflow.
 
-    <div class="materials-item">
-      <a href="assignments2016/assignment2/">
-        Assignment #2: Fully-Connected Nets, Batch Normalization, Dropout,
-        Convolutional Nets
-      </a>
-    </div>
+  <p>
+  Predmet se sastoji od tri sata predavanja tjedno,
+  te laboratorijskih vježbi 
+  koje se kolokviraju jednom u svakom od četiri ciklusa.
+  Predmet za sada nema preduvjeta, ali pretpostavlja se
+  solidno znanje iz domena strojnog učenja, optimizacije,
+  vjerojatnosti i linearne algebre
+  stečena na prethodnim kolegijima.
+  
 
-    <div class="materials-item">
-      <a href="assignments2016/assignment3/">
-        Assignment #3: Recurrent Neural Networks, Image Captioning,
-        Image Gradients, DeepDream
-      </a>
-    </div>
+<H3>
+Predavanja
+</H3>
+  <ul>
+  <li>
+    0: Pregled klasičnih neuronskih mreža
+  <li>
+    1: Uvod u duboko učenje
+    <ul><li>
+      osnovni pojmovi
+    <li>
+      pregled programskih alata:
+      Python, numpy, scipy, Tensorflow
+    <li>
+      poteškoće pri učenju dubokih modela
+    <li>
+      tehnike učenja dubokih modela
+    </ul>
+  <li>
+    2: Diskriminativni duboki modeli za računalni vid
+    <ul><li>
+      konvolucijske mreže za klasifikaciju
+    <li>
+      potpuno konvolucijske mreže za segmentaciju
+    </ul>
+  <li>
+    3: Generativni duboki modeli
+    <ul><li>
+      Boltzmannovi strojevi i kontrastna divergencija
+    <li>
+      napredni autoenkoderi
+    </ul>
+  <li>
+    4: Duboke povratne neuronske mreže
+    <ul><li>
+      modeliranje slijedova
+    <li>
+      primjene u razumijevanju prirodnog jezika
+    </ul>
+  </ul>
 
-    <!--
-    <div class="module-header">Winter 2015 Assignments</div>
 
-    <div class="materials-item">
-      <a href="assignment1/">
-        Assignment #1: Image Classification, kNN, SVM, Softmax
-      </a>
-    </div>
+<H3>
+Preporučena literatura
+</H3>
+  <ol><li>
+    Ian Goodfellow and Yoshua Bengio and Aaron Courville.
+    Deep Learning.
+    MIT Press
+    (<a href="http://www.deeplearningbook.org/">html</a>)
+  <li>
+    Michael Nielsen.
+    Neural Networks and Deep Learning.
+    Determination press.
+    (<a href="http://neuralnetworksanddeeplearning.com/">html</a>)
+  </ol>
 
-    <div class="materials-item">
-      <a href="assignment2/">
-        Assignment #2: Neural Networks, ConvNets I
-      </a>
-    </div>
+<H3>
+Pomoćna literatura
+</H3>
+  <ol><li>
+    Zoran Kalafatić, Antonio Pošćić, Siniša Šegvić i Julijan Šribar.
+    Python za znatiželjne.
+    Element
+    (<a href="https://element.hr/artikli/639/python-za-znatizeljne">html</a>)
+  </ol>
 
-    <div class="materials-item">
-      <a href="assignment3/">
-        Assignment #3: ConvNets II, Transfer Learning, Visualization
-      </a>
-    </div>
-  -->
 
-    <div class="module-header">Module 0: Preparation</div>
+<H3>
+Laboratorijske vježbe
+</H3>
+  <ol><li>
+    Python, numpy, neuronske mreže:
+    <A href="./lab0.shtml">upute</A>.
+  <li>
+    Tensorflow, osnove dubokih mreža, MNIST:
+    <A href="./lab1.shtml">upute</A>;
+  <li>
+    Konvolucijske mreže, MNIST, CIFAR:
+    <A href="./lab2.shtml">upute</A>;
+  <li>
+    Generativni modeli:
+    <A href="./lab3.shtml">upute</A>.
+  <li>
+    Povratne mreže:
+    <A href="./lab4.shtml">upute</A>.
+  </ol>
 
-    <div class="materials-item">
-      <a href="python-numpy-tutorial/">
-        Python / Numpy Tutorial
-      </a>
-    </div>
 
-    <div class="materials-item">
-      <a href="ipython-tutorial/">
-        IPython Notebook Tutorial
-      </a>
-    </div>
-
-    <div class="materials-item">
-      <a href="terminal-tutorial/">
-        Terminal.com Tutorial
-      </a>
-    </div>
-
-    <div class="materials-item">
-      <a href="aws-tutorial/">
-        AWS Tutorial
-      </a>
-    </div>
-
-	 <!-- hardcoding items here to force a specific order -->
-    <div class="module-header">Module 1: Neural Networks</div>
-
-    <div class="materials-item">
-      <a href="classification/">
-        Image Classification: Data-driven Approach, k-Nearest Neighbor, train/val/test splits
-      </a>
-      <div class="kw">
-        L1/L2 distances, hyperparameter search, cross-validation
-      </div>
-    </div>
-
-    <div class="materials-item">
-      <a href="linear-classify/">
-         Linear classification: Support Vector Machine, Softmax
-      </a>
-      <div class="kw">
-        parameteric approach, bias trick, hinge loss, cross-entropy loss, L2 regularization, web demo
-      </div>
-    </div>
-
-    <div class="materials-item">
-      <a href="optimization-1/">
-        Optimization: Stochastic Gradient Descent
-      </a>
-      <div class="kw">
-        optimization landscapes, local search, learning rate, analytic/numerical gradient
-      </div>
-    </div>
-
-    <div class="materials-item">
-      <a href="optimization-2/">
-        Backpropagation, Intuitions
-      </a>
-      <div class="kw">
-        chain rule interpretation, real-valued circuits, patterns in gradient flow
-      </div>
-    </div>
-
-    <div class="materials-item">
-      <a href="neural-networks-1/">
-          Neural Networks Part 1: Setting up the Architecture
-      </a>
-      <div class="kw">
-        model of a biological neuron, activation functions, neural net architecture, representational power
-      </div>
-    </div>
-
-    <div class="materials-item">
-      <a href="neural-networks-2/">
-          Neural Networks Part 2: Setting up the Data and the Loss
-      </a>
-      <div class="kw">
-          preprocessing, weight initialization, batch normalization, regularization (L2/dropout), loss functions
-      </div>
-    </div>
-
-    <div class="materials-item">
-      <a href="neural-networks-3/">
-        Neural Networks Part 3: Learning and Evaluation
-      </a>
-      <div class="kw">
-        gradient checks, sanity checks, babysitting the learning process, momentum (+nesterov), second-order methods, Adagrad/RMSprop, hyperparameter optimization, model ensembles
-      </div>
-    </div>
-
-    <div class="materials-item">
-      <a href="neural-networks-case-study/">
-          Putting it together: Minimal Neural Network Case Study
-      </a>
-      <div class="kw">
-        minimal 2D toy data example
-      </div>
-    </div>
-
-    <div class="module-header">Module 2: Convolutional Neural Networks</div>
-
-    <div class="materials-item">
-      <a href="convolutional-networks/">
-        Convolutional Neural Networks: Architectures, Convolution / Pooling Layers
-      </a>
-      <div class="kw">
-          layers, spatial arrangement, layer patterns, layer sizing patterns, AlexNet/ZFNet/VGGNet case studies, computational considerations
-      </div>
-    </div>
-
-    <div class="materials-item">
-      <a href="understanding-cnn/">
-        Understanding and Visualizing Convolutional Neural Networks
-      </a>
-      <div class="kw">
-        tSNE embeddings, deconvnets, data gradients, fooling ConvNets, human comparisons
-      </div>
-    </div>
-
-    <div class="materials-item">
-      <a href="transfer-learning/">
-        Transfer Learning and Fine-tuning Convolutional Neural Networks
-      </a>
-    </div>
- 
-  </div>
-</div>
+<H3>
+Zanimljivi sadržaji
+</H3>
