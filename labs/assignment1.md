@@ -1,90 +1,160 @@
 ---
 layout: page
 mathjax: true
-permalink: /labs/lab2/
+permalink: /lab2/
 ---
 
-In this assignment you will practice putting together a simple image classification pipeline, based on the k-Nearest Neighbor or the SVM/Softmax classifier. The goals of this assignment are as follows:
+Sadržaj:
 
-- understand the basic **Image Classification pipeline** and the data-driven approach (train/predict stages)
-- understand the train/val/test **splits** and the use of validation data for **hyperparameter tuning**.
-- develop proficiency in writing efficient **vectorized** code with numpy
-- implement and apply a k-Nearest Neighbor (**kNN**) classifier
-- implement and apply a Multiclass Support Vector Machine (**SVM**) classifier
-- implement and apply a **Softmax** classifier
-- implement and apply a **Two layer neural network** classifier
-- understand the differences and tradeoffs between these classifiers
-- get a basic understanding of performance improvements from using **higher-level representations** than raw pixels (e.g. color histograms, Histogram of Gradient (HOG) features)
+- [Konvolucijska neuronska mreža](#cnn)
+- [ConvNet Layers](#layers)
+  - [Convolutional Layer](#conv)
 
-## Setup
-You can work on the assignment in one of two ways: locally on your own machine, or on a virtual machine through Terminal.com. 
 
-### Working in the cloud on Terminal
+<a name='cnn'></a>
 
-Terminal has created a separate subdomain to serve our class, [www.stanfordterminalcloud.com](https://www.stanfordterminalcloud.com). Register your account there. The Assignment 1 snapshot can then be found [here](https://www.stanfordterminalcloud.com/snapshot/49f5a1ea15dc424aec19155b3398784d57c55045435315ce4f8b96b62819ef65). If you're registered in the class you can contact the TA (see Piazza for more information) to request Terminal credits for use on the assignment. Once you boot up the snapshot everything will be installed for you, and you'll be ready to start on your assignment right away. We've written a small tutorial on Terminal [here](/terminal-tutorial).
+## Konvolucijska neuronska mreža (CNN)
 
-### Working locally
-Get the code as a zip file [here](http://vision.stanford.edu/teaching/cs231n/winter1516_assignment1.zip). As for the dependencies:
+U ovoj vježbi bavimo se konvolucijskim neuronskim mrežama. Konvolucijske mreže zamišljene
+su za obradu podataka koji imaju posebnu topologiju gdje je osobito važno ostvariti
+invarijantnost na translaciju (problem miješanja dimenzija u podacima).
+Dobar primjer takvih podataka su slike gdje se obično isti objekt može pojaviti na bilo kojem
+mjestu unutar slike. Ako bismo takvu sliku poslali na ulaz potpuno povezanog sloja tada bi
+jedan neuron vidio sve piksele slike. Takav pristup bi omogućio svim neuronima da se
+specijaliziraju za značajke objekta u djelovima slike u kojem se objekt pojavio što bi
+na kraju rezultiralo prenaučenosti i model bi loše generalizirao.
+Osim toga dodatni problem je što slike obično sadrže puno piksela. Na primjer, prosječne dimenzije
+slike iz poznatog dataseta ImageNet iznose 3x200x200 što znači da bi u tom slučaju jedan
+neuron u prvom sloju morao imati 3\*200\*200=120,000 težina. S većim brojem neurona bismo
+jako brzo ostali bez memorije.
 
-**[Option 1] Use Anaconda:**
-The preferred approach for installing all the assignment dependencies is to use [Anaconda](https://www.continuum.io/downloads), which is a Python distribution that includes many of the most popular Python packages for science, math, engineering and data analysis. Once you install it you can skip all mentions of requirements and you're ready to go directly to working on the assignment.
+Vidimo da bismo bili u puno boljoj situaciji ako bismo ostvarili da svaki neuron
+djeluje lokalno na samo jedan dio slike. Na taj način bi neuron imao rijetku povezanost
+sa slikom što bi uvelike smanjilo broj težina. Ideja je da neuroni imaju jako
+mala receptivna polja što znači da bi u prvom sloju mogli opisivati samo značajke jako
+niske razine poput linija i rubova. Kasniji slojevi bi imali sve veće receptivno polje
+što bi omogućilo da hijerarhijski grade kompleksnije značajke na temelju jednostavnijih.
+Dodatno, budući da želimo postići invarijantnost na translacije unutar slike
+i dalje želimo da svaki neuron djeluje nad čitavom slikom. To možemo ostvariti tako da
+za svaki neuron umjesto jednog izlaza kao do sada imamo više izlaza. Svaki izlaz tada
+bi odgovarao odzivu na drugom položaju u slici. Ovime smo postigli da se parametri jednog neurona
+dijele preko čitave slike.
+Neurone u konvolucijskim slojevima mreže obično nazivamo i filteri.
+Konvolucijske mreže koriste tri važne ideje: rijetku povezanost, dijeljenje parametara i
+ekvivarijantnost reprezentacije.
 
-**[Option 2] Manual install, virtual environment:**
-If you'd like to (instead of Anaconda) go with a more manual and risky installation route you will likely want to create a [virtual environment](http://docs.python-guide.org/en/latest/dev/virtualenvs/) for the project. If you choose not to use a virtual environment, it is up to you to make sure that all dependencies for the code are installed globally on your machine. To set up a virtual environment, run the following:
+Dimenzije jednog filtera su obično jako male. 
 
-```bash
-cd assignment1
-sudo pip install virtualenv      # This may already be installed
-virtualenv .env                  # Create a virtual environment
-source .env/bin/activate         # Activate the virtual environment
-pip install -r requirements.txt  # Install dependencies
-# Work on the assignment for a while ...
-deactivate                       # Exit the virtual environment
-```
+**Convolution Demo**. Below is a running demo of a CONV layer. Since 3D volumes are hard to visualize, all the volumes (the input volume (in blue), the weight volumes (in red), the output volume (in green)) are visualized with each depth slice stacked in rows. The input volume is of size \\(W_1 = 5, H_1 = 5, D_1 = 3\\), and the CONV layer parameters are \\(K = 2, F = 3, S = 2, P = 1\\). That is, we have two filters of size \\(3 \times 3\\), and they are applied with a stride of 2. Therefore, the output volume size has spatial size (5 - 3 + 2)/2 + 1 = 3. Moreover, notice that a padding of \\(P = 1\\) is applied to the input volume, making the outer border of the input volume zero. The visualization below iterates over the output activations (green), and shows that each element is computed by elementwise multiplying the highlighted input (blue) with the filter (red), summing it up, and then offsetting the result by the bias.
 
-**Download data:**
-Once you have the starter code, you will need to download the CIFAR-10 dataset.
-Run the following from the `assignment1` directory:
+<div class="fig figcenter fighighlight">
+  <iframe src="/assets/conv-demo/index.html" width="100%" height="700px;" style="border:none;"></iframe>
+  <div class="figcaption"></div>
+</div>
 
-```bash
-cd cs231n/datasets
-./get_datasets.sh
-```
+- izvod backward pass za l2 regularizacija, relu, cross entropy
 
-**Start IPython:**
-After you have the CIFAR-10 data, you should start the IPython notebook server from the
-`assignment1` directory. If you are unfamiliar with IPython, you should read our
-[IPython tutorial](/ipython-tutorial).
+## Vježba
 
-**NOTE:** If you are working in a virtual environment on OSX, you may encounter
-errors with matplotlib due to the [issues described here](http://matplotlib.org/faq/virtualenv_faq.html). You can work around this issue by starting the IPython server using the `start_ipython_osx.sh` script from the `assignment1` directory; the script assumes that your virtual environment is named `.env`.
+Kod za prva dva zadatka nalazi se [ovdje](https://github.com/dlunizg/lab2).
+U datoteci `layers.py` izvedeni su osnovni slojevi od kojih se sastoji CNN.
+Svaki sloj sadrži dvije metode potrebne za izvođenje backpropagation algoritma.
+Metoda `forward` izvodi unaprijedni prolazak kroz sloj i vraća rezultat.
+Metode `backward_inputs` i `backward_params` izvode unazadni prolazak.
+Metoda `backward_inputs` računa gradijent s obzirom na ulazne podatke (\\( \frac{∂L}{∂\mathbf{x}} \\) gdje je \\(\mathbf{x}\\) ulaz u sloj).
+Metoda  `backward_params` računa gradijent s obzirom na parametre sloja (\\( \frac{∂L}{∂\mathbf{w}} \\) gdje vektor \\(\mathbf{w}\\) vektor predstavlja sve parametre sloja)).
 
-### Submitting your work:
-Whether you work on the assignment locally or using Terminal, once you are done
-working run the `collectSubmission.sh` script; this will produce a file called
-`assignment1.zip`. Upload this file to your dropbox on
-[the coursework](https://coursework.stanford.edu/portal/site/W16-CS-231N-01/)
-page for the course.
+### 1. zadatak
+Dovršite implementacije potpuno povezanog sloja, sloja nelinearnosti 
+te funkcije gubitka u razredima `FC`, `ReLU` i `SoftmaxCrossEntropyWithLogits`.
+Podsjetimo se, funkcija cilja unakrsne entropije računa udaljenost između
+točne distribucije i distribucije koju predviđa model i definirana je kao:
 
-### Q1: k-Nearest Neighbor classifier (20 points)
+$$
+L = - \sum_{i=1}^{C} y_i log(s_j(\mathbf{x})) \\
+$$
 
-The IPython Notebook **knn.ipynb** will walk you through implementing the kNN classifier.
+gdje je C broj razreda, \\( \mathbf{x} \\) ulazni primjer u vektorkom obliku,
+\\( \mathbf{y} \\) točna distribucija preko svih razreda za dani primjer (najčešće one-hot vektor), a \\( s_j(\mathbf{x}) \\)
+izlaz Softmax funkcije za razred \\(j\\).
+Da biste izveli unazadni prolazak kroz sloj potrebno je najprije izračunati
+gradijent ove funkcije s obzirom na ulaz \frac{∂L}{∂\mathbf{x}}.
+Postupak derivacije možemo pojednostavniti tako da uvrstimo definiciju Softmax funkcije:
 
-### Q2: Training a Support Vector Machine (25 points)
+$$
+log(s_i(x)) = log \left(\frac{e^{x_i}}{\sum_{j=1}^{C} e^{x_j}}\right) = x_i - log \sum_{j=1}^{C} e^{x_j} \\
+L = - \sum_{i=1}^{C} y_i \left(x_i - log \sum_{j=1}^{C} e^{x_j}\right) = - \sum_{i=1}^{C} y_i x_i + log \left(\sum_{j=1}^{C} e^{x_j}\right) \sum_{i=1}^{C} y_i \;\; ; \;\;\;\; \sum_{i=1}^{C} y_i = 1 \\
+L = log \left(\sum_{j=1}^{C} e^{x_j}\right) - \sum_{i=1}^{C} y_i x_i \\
+\sum_{i=1}^{C} y_i log(s_j(x)) \\
+L = log \left(\sum_{j=1}^{C} e^{x_j}\right) - \sum_{i=1}^{C} y_i x_i \\
+$$
 
-The IPython Notebook **svm.ipynb** will walk you through implementing the SVM classifier.
 
-### Q3: Implement a Softmax classifier (20 points)
+Sada možemo jednostavno izračunati derivaciju funkcije cilja s obzirom na ulazni skalar \\( x_k \\):
 
-The IPython Notebook **softmax.ipynb** will walk you through implementing the Softmax classifier.
+$$
+\frac{∂L}{∂x_k} = \frac{∂L}{∂x_k} log \left(\sum_{j=1}^{C} e^{x_j}\right) - \frac{∂L}{∂x_k} \sum_{i=1}^{C} y_i x_i \\
+\frac{∂L}{∂x_k} log \left(\sum_{j=1}^{C} e^{x_j}\right) = \frac{1}{\sum_{j=1}^{C} e^{x_j}} \cdot e^{x_k} = s_k(\mathbf{x}) \\
+\frac{∂L}{∂x_k} = s_k(\mathbf{x}) - y_k \\
+$$
 
-### Q4: Two-Layer Neural Network (25 points)
-The IPython Notebook **two\_layer\_net.ipynb** will walk you through the implementation of a two-layer neural network classifier.
+Konačno, gradijent s obzirom na sve ulazne podatke dobijemo tako da izračunamo razliku između vektora distribucije iz modela i
+točne distribucije:
 
-### Q5: Higher Level Representations: Image Features (10 points)
+$$
+\frac{∂L}{∂\mathbf{x}} = s(\mathbf{x}) - \mathbf{y} \\
+$$
 
-The IPython Notebook **features.ipynb** will walk you through this exercise, in which you will examine the improvements gained by using higher-level representations as opposed to using raw pixel values.
+Kako biste bili sigurni da je kod svih slojeva ispravan testirajte gradijente pozivom skripte `check_grads.py`.
+Zadovoljavajuća relativna greška bi trebala biti manja od \\(10^{-5}\\) ako vaši tenzori imaju dvostruku preciznost.
+Napokon, pokrenite učenje modela pozivom skripte `train.py`. Napomena: najprije postavite odgovarajuće puteve u varijable
+`DATA_DIR` i `SAVE_DIR`;
 
-### Q6: Cool Bonus: Do something extra! (+10 points)
+### 2. zadatak
+Dovršite implementaciju `L2Regularizer` i `RegularizedLoss` slojeva.
 
-Implement, investigate or analyze something extra surrounding the topics in this assignment, and using the code you developed. For example, is there some other interesting question we could have asked? Is there any insightful visualization you can plot? Or anything fun to look at? Or maybe you can experiment with a spin on the loss function? If you try out something cool we'll give you up to 10 extra points and may feature your results in the lecture.
+
+Dodajte L2 regularizaciju konvolucijskom i potpuno povezanom sloju.
+Minimalno je potrebno izmijeniti update\_params metode.
+Dodajte novi sloj L2Loss koji na ulazu forward metode prima tenzor težine te
+implementirajte odgovarajući unaprijedni i unazadni prolazak.
+Dodajte novi sloj MultiLoss koji na ulaz prima listu funkcija cilja te računa njihov zbroj.
+Konačna funkcija cilja je sada MultiLoss koji u našem slučaju na ulazu treba dobiti
+listu u kojoj se nalazi funkcija cilja unakrsne entropije i L2 regularizacije težina
+konvolucijskih i potpuno povezanih slojeva.
+
+
+### 3. zadatak Usporedba s Tensorflow
+U Tensorflowu definirajte i naučite model koji je ekvivalentan modelu iz 2. zadatka.
+Korisite identičnu arhitekturu i parametre učenja.
+Kako biste u graf dodali operaciju konvolucije koristite `tf.nn.conv2d` ili `tf.contrib.layers.convolution2d`.
+Prije toga proučite dio dokumentacije vezan za konvoluciju https://www.tensorflow.org/versions/master/api_docs/python/nn.html#convolution.
+
+- dodajte jos jedan sloj
+- usporedite s i bez BN
+- dodajte
+
+
+### 4. zadatak - CIFAR-10
+
+- vizualizirajte filtre
+- prikažite N slučajno odabranih netočno klasificiranih slika i ispod ispisite top 3 klase
+  te vjerojtnosti koje su im pridjeljene.
+
+
+
+### Bonus zadatak - Multiclass hinge-loss
+
+
+
+<a name='add'></a>
+
+### Additional Resources
+
+Additional resources related to implementation:
+
+- [Soumith benchmarks for CONV performance](https://github.com/soumith/convnet-benchmarks)
+- [ConvNetJS CIFAR-10 demo](http://cs.stanford.edu/people/karpathy/convnetjs/demo/cifar10.html) allows you to play with ConvNet architectures and see the results and computations in real time, in the browser.
+- [Caffe](http://caffe.berkeleyvision.org/), one of the popular ConvNet libraries.
+- [State of the art ResNets in Torch7](http://torch.ch/blog/2016/02/04/resnets.html)
+
