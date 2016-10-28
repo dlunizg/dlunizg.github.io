@@ -137,9 +137,15 @@ Prije toga proučite dio dokumentacije vezan za konvoluciju https://www.tensorfl
 
 ### 4. zadatak - CIFAR-10
 
-- vizualizirajte filtre
+Napišite funkciju `eval(Y,Y_)` koja na temelju predviđenih i točnih indeksa razreda određuje pokazatelje klasifikacijske performanse:
+ukupnu točnost klasifikacije, matricu zabune (engl. confusion matrix) u kojoj retci odgovaraju točnim razredima a stupci predikcijama te vektore preciznosti
+i odziva pojedinih razreda. U implementaciji prvo izračunajte matricu zabune, a onda sve ostale pokazatelje na temelju nje.
+
+- vizualizirajte filtre u prvom sloju
+- plotajte train validation loss i accuracy po epohi
 - prikažite N slučajno odabranih netočno klasificiranih slika i ispod ispisite top 3 klase
   te vjerojtnosti koje su im pridjeljene.
+- provjerite graf u tensofboardu?
 
 
 
