@@ -4,11 +4,13 @@ mathjax: true
 permalink: /lab2/
 ---
 
-Sadržaj:
-
 - [Konvolucijska neuronska mreža](#cnn)
-- [ConvNet Layers](#layers)
-  - [Convolutional Layer](#conv)
+- [Vježba](#vjezba)
+  - [1. zadatak](#zad1)
+  - [2. zadatak](#zad2)
+  - [3. zadatak](#zad3)
+  - [4. zadatak](#zad4)
+- [Dodatni materijali](#add)
 
 
 <a name='cnn'></a>
@@ -53,6 +55,8 @@ ekvivarijantnost reprezentacije.
 
 - izvod backward pass za l2 regularizacija, relu, cross entropy
 
+<a name='vjezba'></a>
+
 ## Vježba
 
 Kod za prva dva zadatka nalazi se [ovdje](https://github.com/dlunizg/lab2).
@@ -62,6 +66,8 @@ Metoda `forward` izvodi unaprijedni prolazak kroz sloj i vraća rezultat.
 Metode `backward_inputs` i `backward_params` izvode unazadni prolazak.
 Metoda `backward_inputs` računa gradijent s obzirom na ulazne podatke (\\( \frac{∂L}{∂\mathbf{x}} \\) gdje je \\(\mathbf{x}\\) ulaz u sloj).
 Metoda  `backward_params` računa gradijent s obzirom na parametre sloja (\\( \frac{∂L}{∂\mathbf{w}} \\) gdje vektor \\(\mathbf{w}\\) vektor predstavlja sve parametre sloja)).
+
+<a name='1zad'></a>
 
 ### 1. zadatak
 Dovršite implementacije potpuno povezanog sloja, sloja nelinearnosti 
@@ -84,9 +90,12 @@ $$
 log(s_i(x)) = log \left(\frac{e^{x_i}}{\sum_{j=1}^{C} e^{x_j}}\right) = x_i - log \sum_{j=1}^{C} e^{x_j} \\
 L = - \sum_{i=1}^{C} y_i \left(x_i - log \sum_{j=1}^{C} e^{x_j}\right) = - \sum_{i=1}^{C} y_i x_i + log \left(\sum_{j=1}^{C} e^{x_j}\right) \sum_{i=1}^{C} y_i \;\; ; \;\;\;\; \sum_{i=1}^{C} y_i = 1 \\
 L = log \left(\sum_{j=1}^{C} e^{x_j}\right) - \sum_{i=1}^{C} y_i x_i \\
+$$
+
+<!---
 \sum_{i=1}^{C} y_i log(s_j(x)) \\
 L = log \left(\sum_{j=1}^{C} e^{x_j}\right) - \sum_{i=1}^{C} y_i x_i \\
-$$
+-->
 
 
 Sada možemo jednostavno izračunati derivaciju funkcije cilja s obzirom na ulazni skalar \\( x_k \\):
@@ -109,6 +118,8 @@ Zadovoljavajuća relativna greška bi trebala biti manja od \\(10^{-5}\\) ako va
 Napokon, pokrenite učenje modela pozivom skripte `train.py`. Napomena: najprije postavite odgovarajuće puteve u varijable
 `DATA_DIR` i `SAVE_DIR`;
 
+<a name='2zad'></a>
+
 ### 2. zadatak
 Dovršite implementaciju `L2Regularizer` i `RegularizedLoss` slojeva.
 
@@ -123,6 +134,8 @@ listu u kojoj se nalazi funkcija cilja unakrsne entropije i L2 regularizacije te
 konvolucijskih i potpuno povezanih slojeva.
 
 
+<a name='3zad'></a>
+
 ### 3. zadatak Usporedba s Tensorflow
 U Tensorflowu definirajte i naučite model koji je ekvivalentan modelu iz 2. zadatka.
 Korisite identičnu arhitekturu i parametre učenja.
@@ -133,6 +146,8 @@ Prije toga proučite dio dokumentacije vezan za konvoluciju https://www.tensorfl
 - usporedite s i bez BN
 - dodajte
 
+
+<a name='4zad'></a>
 
 ### 4. zadatak - CIFAR-10
 
@@ -151,15 +166,10 @@ i odziva pojedinih razreda. U implementaciji prvo izračunajte matricu zabune, a
 ### Bonus zadatak - Multiclass hinge-loss
 
 
-
 <a name='add'></a>
 
-### Additional Resources
+### Dodatni materijali
 
 Additional resources related to implementation:
 
-- [Soumith benchmarks for CONV performance](https://github.com/soumith/convnet-benchmarks)
-- [ConvNetJS CIFAR-10 demo](http://cs.stanford.edu/people/karpathy/convnetjs/demo/cifar10.html) allows you to play with ConvNet architectures and see the results and computations in real time, in the browser.
-- [Caffe](http://caffe.berkeleyvision.org/), one of the popular ConvNet libraries.
-- [State of the art ResNets in Torch7](http://torch.ch/blog/2016/02/04/resnets.html)
-
+- [CS231n Convolutional Neural Networks for Visual Recognition](http://cs231n.github.io)
