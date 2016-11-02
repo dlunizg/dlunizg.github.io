@@ -170,6 +170,4 @@ i odziva pojedinih razreda. U implementaciji prvo izračunajte matricu zabune, a
 
 ### Dodatni materijali
 
-Additional resources related to implementation:
-
 - [CS231n Convolutional Neural Networks for Visual Recognition](http://cs231n.github.io)
