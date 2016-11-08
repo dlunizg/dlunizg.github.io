@@ -138,7 +138,7 @@ U ovom zadatku trebate dodati podršku za L2 regularizaciju parametara.
 Dovršite implementaciju `L2Regularizer` sloja te naučite regularizirani model iz
 prethodnog zadatka koji se nalazi u `train_l2reg.py`.
 Igrajte se s regularizacijskim parametrom tako da naučite
-tri različite mreže \\( \lambda = 1e{-3}, \lambda=1e^{-2}, \lambda=1e^{-1} \\)
+tri različite mreže \\( \lambda = 1e^{-3}, \lambda=1e^{-2}, \lambda=1e^{-1} \\)
 te usporedite naučene filtre u prvom sloju i dobivenu točnost.
 
 <!---
@@ -154,7 +154,7 @@ konvolucijskih i potpuno povezanih slojeva.
 <div class="fig figcenter fighighlight">
   <img src="/assets/lab2/filters1_big.png" width="100%">
   <img src="/assets/lab2/filters2_big.png" width="100%">
-  <div class="figcaption">Slučajno inicijalizirani filtri u prvom sloju na početku učenja (iznad) i naučeni filtri (ispod) s regularizacijom \\( \lambda=1e{-2} \\).</div>
+  <div class="figcaption">Slučajno inicijalizirani filtri u prvom sloju na početku učenja (iznad) i naučeni filtri (ispod) s regularizacijom \\( \lambda=1e^{-2} \\).</div>
 </div>
 
 <a name='3zad'></a>
