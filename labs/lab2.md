@@ -15,7 +15,7 @@ permalink: /lab2/
 
 <a name='cnn'></a>
 
-## Konvolucijska neuronska mreža (CNN)
+## 2. vježba: konvolucijske neuronske mreže (CNN)
 
 U ovoj vježbi bavimo se konvolucijskim neuronskim mrežama. Konvolucijske mreže zamišljene
 su za obradu podataka koji imaju posebnu topologiju gdje je osobito važno ostvariti
