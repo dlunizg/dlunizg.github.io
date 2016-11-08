@@ -247,8 +247,23 @@ valid_x = (valid_x - data_mean) / data_std
 test_x = (test_x - data_mean) / data_std
 ```
 
-Vaš zadatak je da u Tensorflowu naučite CNN i reproducirate naše rezulate na ovom skupu.
-Arhitektura mreže treba biti sljedeća: TODO
+Vaš zadatak je da u Tensorflowu naučite CNN na ovom skupu.
+U nastavku je prijedlog jednostavne mreže s kojom biste trebali dobiti prosječnu preciznost oko 60%:
+
+```
+conv(16,5) -> pool(3,2) -> conv(32,5) -> pool(3,2) -> fc(256) -> fc(128) -> fc(10)
+```
+gdje conv(16,5) predstavlja konvoluciju sa 16 mapa te dimenzijom filtra 5x5,
+a pool(3,2) max-pooling sloj s oknom veličine 3x3 i pomakom (stride) 2.
+
+Ukoliko imate GPU, možda će vam biti zanimljivo pokušati dobiti bolje rezultate s moćnijom
+arhitekturom. U tom slučaju [ovdje](http://rodrigob.github.io/are_we_there_yet/build/classification_datasets_results.html#43494641522d3130)
+možete pronaći pregled članaka koji imaju najbolje rezultate na ovom skupu.
+Kao što vidite trenutni SOTA je oko 96%, ali 
+Dva važna trika koje koriste najbolje arhitekture su skaliranje slika na veću rezoluciju
+kako bi omogućili da prvi konvolucijski slojevi uče značajke jako niske razine
+te proširivanje skupa za učenje raznim modificiranjem slika (data jittering).
+Bez ovih trikova izazov bi trebao biti preći preko 80% prosječne preciznosti.
 
 <div class="fig figcenter fighighlight">
   <img src="/assets/lab2/training_plot.png" width="100%">
