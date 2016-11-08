@@ -276,7 +276,7 @@ funkcije gubitka, stopu učenja, prosječnu klasifikacijsku preciznost te prosje
 
 <div class="fig figcenter fighighlight">
   <img src="/assets/lab2/training_plot.png" width="100%">
-  <div class="figcaption">.</div>
+  <div class="figcaption">Primjer kako bi trebao izgledati dobar graf tijekom učenja.</div>
 </div>
 
 Vizualizirajte naučene filtre u prvom sloju. Možete se poslužiti kodom za vizualizaciju
