@@ -351,4 +351,5 @@ for epoch_num in range(1, num_epochs + 1):
 
 ### Dodatni materijali
 
+- [Deep learning book](http://www.deeplearningbook.org/contents/convnets.html)
 - [CS231n Convolutional Neural Networks for Visual Recognition](http://cs231n.github.io)
