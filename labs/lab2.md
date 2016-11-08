@@ -265,10 +265,6 @@ kako bi omogućili da prvi konvolucijski slojevi uče značajke jako niske razin
 te proširivanje skupa za učenje raznim modificiranjem slika (*data jittering*).
 Bez ovih trikova izazov bi trebao biti preći preko 80% prosječne preciznosti.
 
-<div class="fig figcenter fighighlight">
-  <img src="/assets/lab2/training_plot.png" width="100%">
-  <div class="figcaption">.</div>
-</div>
 
 Napišite funkciju `evaluate(y,yt)` koja na temelju predviđenih i točnih indeksa razreda određuje pokazatelje klasifikacijske performanse:
 ukupnu točnost klasifikacije, matricu zabune (engl. confusion matrix) u kojoj retci odgovaraju točnim razredima a stupci predikcijama te mjere preciznosti
@@ -278,15 +274,20 @@ Tijekom učenja pozivajte funkciju `evaluate` nakon svake epohe na skupu za uče
 validacijskom skupu te na grafu pratite sljedeće vrijednosti: prosječnu vrijednost
 funkcije gubitka, stopu učenja, prosječnu klasifikacijsku preciznost te prosječni odziv.
 
+<div class="fig figcenter fighighlight">
+  <img src="/assets/lab2/training_plot.png" width="100%">
+  <div class="figcaption">.</div>
+</div>
+
 Vizualizirajte naučene filtre u prvom sloju. Možete se poslužiti kodom za vizualizaciju
 iz prve vježbe no morate ga izmijeniti tako da 3 kanala u prvom sloju kodirate kao RGB
 boje slike.
 
-Prikažite 20 netočno klasificiranih slika s najvećim gubitkom i ispod slike ispišite njihov točan razred
+Prikažite 20 netočno klasificiranih slika s najvećim gubitkom te ispišite njihov točan razred
 i top-3 razreda za koje je mreža dala najveću vjerojatnost.
 
 
-Ispod se nalazi kod koji možete iskoristiti za crtanje grafova.
+Ispod se nalazi kod koji možete iskoristiti za crtanje grafova:
 
 ```
 def plot_training_progress(save_dir, data):
