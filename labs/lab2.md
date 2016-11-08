@@ -125,7 +125,7 @@ $$
 Kako biste bili sigurni da ste ispravno napisali sve slojeva testirajte gradijente pozivom skripte `check_grads.py`.
 Zadovoljavajuća relativna greška bi trebala biti manja od \\(10^{-5}\\) ako vaši tenzori imaju dvostruku preciznost.
 Napokon, pokrenite učenje modela pozivom skripte `train.py`. Napomena: najprije postavite odgovarajuće puteve u varijable
-`DATA_DIR` i `SAVE_DIR`;
+`DATA_DIR` i `SAVE_DIR` te prevedite Cython modul `im2col_cython.pyx` tako da izvršite `python setup.py build_ext --inplace`.
 
 Tijekom učenja možete promatrati vizualizaciju filtara koji se spremaju u `SAVE_DIR` direktorij.
 Budući da svaka težina odgovara jednom pikselu slike u vašem pregledniku isključite automatsko glađenje slike da biste mogli bolje vidjeti.
@@ -161,7 +161,7 @@ konvolucijskih i potpuno povezanih slojeva.
 
 ### 3. zadatak - usporedba s Tensorflowom
 U Tensorflowu definirajte i naučite model koji je ekvivalentan regulariziranom modelu iz 2. zadatka.
-Korisite identičnu arhitekturu i parametre učenja da biste reproducirali rezutlate.
+Korisite identičnu arhitekturu i parametre učenja da biste reproducirali rezultate.
 Tijekom učenja vizualizirajte filtre u prvom sloju kao u prethodnoj vježbi.
 Kako biste u graf dodali operaciju konvolucije koristite `tf.nn.conv2d` ili `tf.contrib.layers.convolution2d`.
 Prije toga proučite službenu dokumentaciju vezanu za [konvoluciju](https://www.tensorflow.org/versions/master/api_docs/python/nn.html#convolution).
