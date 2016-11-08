@@ -173,7 +173,8 @@ napraviti tako da konvoluciji zadate `tf.contrib.layers.batch_norm`
 kao parametar normalizacije kako je prikazano ispod:
 -->
 
-Primjer korištenja konvolucije iz `tf.contrib` paketa.
+Primjer korištenja konvolucije iz `tf.contrib` paketa:
+
 ```
 import tensorflow.contrib.layers as layers
 
