@@ -138,7 +138,7 @@ U ovom zadatku trebate dodati podršku za L2 regularizaciju parametara.
 Dovršite implementaciju `L2Regularizer` sloja te naučite regularizirani model iz
 prethodnog zadatka koji se nalazi u `train_l2reg.py`.
 Igrajte se s regularizacijskim parametrom tako da naučite
-tri različite mreže \\( \lambda = 0, \lambda=1e^{-3}, \lambda=1e^{-1} \\)
+tri različite mreže \\( \lambda = 1e{-3}, \lambda=1e^{-2}, \lambda=1e^{-1} \\)
 te usporedite naučene filtre u prvom sloju i dobivenu točnost.
 
 <!---
@@ -160,8 +160,9 @@ konvolucijskih i potpuno povezanih slojeva.
 <a name='3zad'></a>
 
 ### 3. zadatak - usporedba s Tensorflowom
-U Tensorflowu definirajte i naučite model koji je ekvivalentan modelu iz 2. zadatka.
-Korisite identičnu arhitekturu i parametre učenja.
+U Tensorflowu definirajte i naučite model koji je ekvivalentan regulariziranom modelu iz 2. zadatka.
+Korisite identičnu arhitekturu i parametre učenja da biste reproducirali rezutlate.
+Tijekom učenja vizualizirajte filtre u prvom sloju kao u prethodnoj vježbi.
 Kako biste u graf dodali operaciju konvolucije koristite `tf.nn.conv2d` ili `tf.contrib.layers.convolution2d`.
 Prije toga proučite službenu dokumentaciju vezanu za [konvoluciju](https://www.tensorflow.org/versions/master/api_docs/python/nn.html#convolution).
 
@@ -172,37 +173,22 @@ napraviti tako da konvoluciji zadate `tf.contrib.layers.batch_norm`
 kao parametar normalizacije kako je prikazano ispod:
 -->
 
+Primjer korištenja konvolucije iz `tf.contrib` paketa.
 ```
 import tensorflow.contrib.layers as layers
 
 ...
 
 def build_model(inputs, labels, num_classes, is_training):
-  weight_decay = 1e-3
-  bn_params = {
-      # Decay for the moving averages.
-      'decay': 0.999,
-      'center': True,
-      'scale': True,
-      # epsilon to prevent 0s in variance.
-      'epsilon': 0.001,
-      # None to force the updates during train_op
-      'updates_collections': None,
-      'is_training': is_training
-  }
-
+  ...
   with tf.contrib.framework.arg_scope([layers.convolution2d],
-      kernel_size=3, stride=1, padding='SAME', activation_fn=tf.nn.relu,
-      normalizer_fn=layers.batch_norm, normalizer_params=bn_params,
+      kernel_size=5, stride=1, padding='SAME', activation_fn=tf.nn.relu,
       weights_initializer=layers.variance_scaling_initializer(),
       weights_regularizer=layers.l2_regularizer(weight_decay)):
 
     net = layers.convolution2d(inputs, conv1sz, scope='conv1')
     ...
 ```
-
-Usporedite nove i stare rezulate. Batch normalization bi trebao
-poboljšati propagaciju gradijenata te ubrzati konvergenciju.
 
 
 <a name='4zad'></a>
