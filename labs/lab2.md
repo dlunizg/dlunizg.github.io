@@ -154,7 +154,7 @@ konvolucijskih i potpuno povezanih slojeva.
 <div class="fig figcenter fighighlight">
   <img src="/assets/lab2/filters1_big.png" width="90%">
   <img src="/assets/lab2/filters2_big.png" width="90%">
-  <div class="figcaption">Slučajno inicijalizirani filtri u prvom sloju na početku učenja (iznad) i naučeni filtri (ispod).</div>
+  <div class="figcaption">Slučajno inicijalizirani filtri u prvom sloju na početku učenja (iznad) i naučeni filtri (ispod) s regularizacijom \\( \lambda=1e{-2} \\).</div>
 </div>
 
 <a name='3zad'></a>
