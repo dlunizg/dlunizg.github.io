@@ -197,7 +197,7 @@ def build_model(inputs, labels, num_classes, is_training):
 ### 4. zadatak - Klasifikacija na CIFAR-10 skupu
 [CIFAR-10](https://www.cs.toronto.edu/~kriz/cifar.html) dataset sastoji se od 50000 slika za učenje i validaciju te 10000 slika za
 testiranje dimenzija 32x32 podijeljenih u 10 razreda.
-Najprije skinite dataset pripremljen za Python [ovdje](https://www.cs.toronto.edu/~kriz/cifar-100-python.tar.gz).
+Najprije skinite dataset pripremljen za Python [ovdje](https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz).
 Iskorisite sljedeći kod kako biste učitali podatke i pripremili ih.
 
 ```
@@ -360,7 +360,7 @@ for epoch_num in range(1, num_epochs + 1):
 ```
 
 
-### Bonus zadatak - Multiclass hinge-loss
+### Bonus zadatak - Multiclass hinge loss
 
 Pokušajte u zadnjem zadatku unakrsnu entropiju zamijeniti s multiclass hinge lossom te
 usporedite rezultate. Proučite u Tensorflow dokumentaciji osnovne operacije nad tenzorima kako biste pronašli najlakši način
