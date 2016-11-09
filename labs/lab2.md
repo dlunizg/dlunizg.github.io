@@ -311,8 +311,7 @@ def plot_training_progress(save_dir, data):
            linewidth=linewidth, linestyle='-', label='learning_rate')
   ax3.legend(loc='upper left', fontsize=legend_size)
 
-  #save_path = os.path.join(save_dir, 'training_plot.pdf')
-  save_path = os.path.join(save_dir, 'training_plot.png')
+  save_path = os.path.join(save_dir, 'training_plot.pdf')
   print('Plotting in: ', save_path)
   plt.savefig(save_path)
 ```
@@ -328,13 +327,14 @@ for epoch_num in range(1, num_epochs + 1):
   train_x, train_y = shuffle_data(train_x, train_y)
   for step in range(num_batches):
     offset = step * batch_size 
+    # s ovim kodom pazite da je broj primjera djeljiv s batch_size
     batch_x = train_x[offset:(offset + batch_size), ...]
     batch_y = train_y[offset:(offset + batch_size)]
     feed_dict = {node_x: batch_x, node_y: batch_y}
     start_time = time.time()
-    run_ops = [train_op, loss, logits, global_step, lr]
+    run_ops = [train_op, loss, logits]
     ret_val = sess.run(run_ops, feed_dict=feed_dict)
-    _, loss_val, logits_val, _, lr_val = ret_val
+    _, loss_val, logits_val = ret_val
     duration = time.time() - start_time
     if (step+1) % 50 == 0:
       sec_per_batch = float(duration)
