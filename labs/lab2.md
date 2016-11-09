@@ -262,7 +262,7 @@ ukupnu točnost klasifikacije, matricu zabune (engl. confusion matrix) u kojoj r
 i odziva pojedinih razreda. U implementaciji prvo izračunajte matricu zabune, a onda sve ostale pokazatelje na temelju nje.
 Tijekom učenja pozivajte funkciju `evaluate` nakon svake epohe na skupu za učenje i
 validacijskom skupu te na grafu pratite sljedeće vrijednosti: prosječnu vrijednost
-funkcije gubitka, stopu učenja te prosječnu klasifikacijsku preciznost.
+funkcije gubitka, stopu učenja te ukupnu točnost klasifikacije.
 Preporuka je da funkciji proslijedite podatke i potrebne Tensorflow operacije kako bi mogli izvesti
 samo unaprijedni prolazak kroz dane primjere i pritom izracunati matricu zabune.
 Pazite da slučajno ne pozovete i operaciju koja provodi učenje tijekom evaluacije.
