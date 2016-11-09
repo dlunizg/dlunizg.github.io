@@ -248,7 +248,7 @@ test_x = (test_x - data_mean) / data_std
 ```
 
 Vaš zadatak je da u Tensorflowu naučite CNN na ovom skupu.
-U nastavku je prijedlog jednostavne mreže s kojom biste trebali dobiti prosječnu preciznost oko 60%:
+U nastavku je prijedlog jednostavne mreže s kojom biste trebali dobiti ukupnu točnost oko 60%:
 
 ```
 conv(16,5) -> pool(3,2) -> conv(32,5) -> pool(3,2) -> fc(256) -> fc(128) -> fc(10)
@@ -356,11 +356,11 @@ for epoch_num in range(1, num_epochs + 1):
 Ukoliko imate GPU, možda će vam biti zanimljivo pokušati dobiti bolje rezultate s moćnijom
 arhitekturom. U tom slučaju [ovdje](http://rodrigob.github.io/are_we_there_yet/build/classification_datasets_results.html#43494641522d3130)
 možete pronaći pregled članaka koji imaju najbolje rezultate na ovom skupu.
-Kao što vidite trenutni *state of the art* je oko 96%.
+Kao što vidite trenutni *state of the art* je oko 96% ukupne točnosti.
 Dva važna trika koje koriste najbolje arhitekture su skaliranje slika na veću rezoluciju
 kako bi omogućili da prvi konvolucijski slojevi uče značajke jako niske razine
 te proširivanje skupa za učenje raznim modificiranjem slika (*data jittering*).
-Bez ovih trikova izazov bi trebao biti preći preko 80% prosječne preciznosti.
+Bez ovih trikova izazov bi trebao biti preći preko 80% ukupne točnosti.
 
 
 ### Bonus zadatak - Multiclass hinge loss
