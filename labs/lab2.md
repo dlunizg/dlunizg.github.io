@@ -256,23 +256,17 @@ conv(16,5) -> pool(3,2) -> conv(32,5) -> pool(3,2) -> fc(256) -> fc(128) -> fc(1
 gdje `conv(16,5)` predstavlja konvoluciju sa 16 mapa te dimenzijom filtra 5x5,
 a `pool(3,2)` max-pooling sloj s oknom veličine 3x3 i pomakom (*stride*) 2.
 
-Ukoliko imate GPU, možda će vam biti zanimljivo pokušati dobiti bolje rezultate s moćnijom
-arhitekturom. U tom slučaju [ovdje](http://rodrigob.github.io/are_we_there_yet/build/classification_datasets_results.html#43494641522d3130)
-možete pronaći pregled članaka koji imaju najbolje rezultate na ovom skupu.
-Kao što vidite trenutni *state of the art* je oko 96%.
-Dva važna trika koje koriste najbolje arhitekture su skaliranje slika na veću rezoluciju
-kako bi omogućili da prvi konvolucijski slojevi uče značajke jako niske razine
-te proširivanje skupa za učenje raznim modificiranjem slika (*data jittering*).
-Bez ovih trikova izazov bi trebao biti preći preko 80% prosječne preciznosti.
 
-
-Napišite funkciju `evaluate(y,yt)` koja na temelju predviđenih i točnih indeksa razreda određuje pokazatelje klasifikacijske performanse:
+Napišite funkciju `evaluate` koja na temelju predviđenih i točnih indeksa razreda određuje pokazatelje klasifikacijske performanse:
 ukupnu točnost klasifikacije, matricu zabune (engl. confusion matrix) u kojoj retci odgovaraju točnim razredima a stupci predikcijama te mjere preciznosti
 i odziva pojedinih razreda. U implementaciji prvo izračunajte matricu zabune, a onda sve ostale pokazatelje na temelju nje.
-
 Tijekom učenja pozivajte funkciju `evaluate` nakon svake epohe na skupu za učenje i
 validacijskom skupu te na grafu pratite sljedeće vrijednosti: prosječnu vrijednost
-funkcije gubitka, stopu učenja, prosječnu klasifikacijsku preciznost te prosječni odziv.
+funkcije gubitka, stopu učenja te prosječnu klasifikacijsku preciznost.
+Preporuka je da funkciji proslijedite podatke i potrebne Tensorflow operacije kako bi mogli izvesti
+samo unaprijedni prolazak kroz dane primjere i pritom izracunati matricu zabune.
+Pazite da slučajno ne pozovete i operaciju koja provodi učenje tijekom evaluacije.
+Na kraju funkcije možete izračunati ostale pokazatelje te ih isprintati.
 
 <div class="fig figcenter fighighlight">
   <img src="/assets/lab2/training_plot.png" width="100%">
@@ -348,9 +342,9 @@ for epoch_num in range(1, num_epochs + 1):
       print(format_str % (epoch_num, step+1, num_batches, loss_val, sec_per_batch))
 
   print('Train error:')
-  train_loss, train_acc = evaluate(logits_eval, loss_eval, train_x, train_y)
+  train_loss, train_acc = evaluate(logits, loss, train_x, train_y)
   print('Validation error:')
-  valid_loss, valid_acc = evaluate(logits_eval, loss_eval, valid_x, valid_y)
+  valid_loss, valid_acc = evaluate(logits, loss, valid_x, valid_y)
   plot_data['train_loss'] += [train_loss]
   plot_data['valid_loss'] += [valid_loss]
   plot_data['train_acc'] += [train_acc]
@@ -358,6 +352,15 @@ for epoch_num in range(1, num_epochs + 1):
   plot_data['lr'] += [lr.eval(session=sess)]
   plot_training_progress(SAVE_DIR, plot_data)
 ```
+
+Ukoliko imate GPU, možda će vam biti zanimljivo pokušati dobiti bolje rezultate s moćnijom
+arhitekturom. U tom slučaju [ovdje](http://rodrigob.github.io/are_we_there_yet/build/classification_datasets_results.html#43494641522d3130)
+možete pronaći pregled članaka koji imaju najbolje rezultate na ovom skupu.
+Kao što vidite trenutni *state of the art* je oko 96%.
+Dva važna trika koje koriste najbolje arhitekture su skaliranje slika na veću rezoluciju
+kako bi omogućili da prvi konvolucijski slojevi uče značajke jako niske razine
+te proširivanje skupa za učenje raznim modificiranjem slika (*data jittering*).
+Bez ovih trikova izazov bi trebao biti preći preko 80% prosječne preciznosti.
 
 
 ### Bonus zadatak - Multiclass hinge loss
