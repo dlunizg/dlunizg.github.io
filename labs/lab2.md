@@ -251,7 +251,7 @@ Vaš zadatak je da u Tensorflowu naučite CNN na ovom skupu.
 U nastavku je prijedlog jednostavne mreže s kojom biste trebali dobiti ukupnu točnost oko 60%:
 
 ```
-conv(16,5) -> pool(3,2) -> conv(32,5) -> pool(3,2) -> fc(256) -> fc(128) -> fc(10)
+conv(16,5) -> relu() -> pool(3,2) -> conv(32,5) -> relu() -> pool(3,2) -> fc(256) -> relu() -> fc(128) -> relu() -> fc(10)
 ```
 gdje `conv(16,5)` predstavlja konvoluciju sa 16 mapa te dimenzijom filtra 5x5,
 a `pool(3,2)` max-pooling sloj s oknom veličine 3x3 i pomakom (*stride*) 2.
