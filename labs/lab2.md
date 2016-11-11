@@ -266,7 +266,7 @@ test_x = (test_x - data_mean) / data_std
 ```
 
 Vaš zadatak je da u Tensorflowu naučite CNN na ovom skupu.
-U nastavku je prijedlog jednostavne mreže s kojom biste trebali dobiti ukupnu točnost oko 60%:
+U nastavku je prijedlog jednostavne mreže s kojom biste trebali dobiti ukupnu točnost oko 70%:
 
 ```
 conv(16,5) -> relu() -> pool(3,2) -> conv(32,5) -> relu() -> pool(3,2) -> fc(256) -> relu() -> fc(128) -> relu() -> fc(10)
