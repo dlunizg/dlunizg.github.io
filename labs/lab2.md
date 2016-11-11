@@ -125,7 +125,7 @@ $$
 Kako biste bili sigurni da ste ispravno napisali sve slojeva testirajte gradijente pozivom skripte `check_grads.py`.
 Zadovoljavajuća relativna greška bi trebala biti manja od \\(10^{-5}\\) ako vaši tenzori imaju dvostruku preciznost.
 Napokon, pokrenite učenje modela pozivom skripte `train.py`. Napomena: najprije postavite odgovarajuće puteve u varijable
-`DATA_DIR` i `SAVE_DIR` te prevedite Cython modul `im2col_cython.pyx` tako da izvršite `python setup.py build_ext --inplace`.
+`DATA_DIR` i `SAVE_DIR` te prevedite Cython modul `im2col_cython.pyx` tako da izvršite `python setup_cython.py build_ext --inplace`.
 
 Tijekom učenja možete promatrati vizualizaciju filtara koji se spremaju u `SAVE_DIR` direktorij.
 Budući da svaka težina odgovara jednom pikselu slike u vašem pregledniku isključite automatsko glađenje slike da biste mogli bolje vidjeti.
@@ -180,15 +180,34 @@ import tensorflow.contrib.layers as layers
 
 ...
 
-def build_model(inputs, labels, num_classes, is_training):
+def build_model(inputs, labels, num_classes):
   ...
+  weight_decay = ...
+  conv1sz = ...
+  fc3sz = ...
   with tf.contrib.framework.arg_scope([layers.convolution2d],
       kernel_size=5, stride=1, padding='SAME', activation_fn=tf.nn.relu,
       weights_initializer=layers.variance_scaling_initializer(),
       weights_regularizer=layers.l2_regularizer(weight_decay)):
 
     net = layers.convolution2d(inputs, conv1sz, scope='conv1')
+    # ostatak konvolucijskih i pooling slojeva
     ...
+
+  with tf.contrib.framework.arg_scope([layers.fully_connected],
+      activation_fn=tf.nn.relu,
+      weights_initializer=layers.variance_scaling_initializer(),
+      weights_regularizer=layers.l2_regularizer(weight_decay)):
+
+    # sada definiramo potpuno povezane slojeve
+    # ali najprije prebacimo 4D tenzor u matricu
+    net = layers.flatten(inputs)
+    net = layers.fully_connected(net, fc3sz, scope='fc3')
+
+  logits = layers.fully_connected(net, num_classes, activation_fn=None, scope='logits')
+  loss = ...
+
+  return logits, loss
 ```
 
 
