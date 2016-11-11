@@ -237,17 +237,18 @@ def unpickle(file):
 
 DATA_DIR = '/path/to/data/'
 
+
 train_x = np.ndarray((0, img_height * img_width * num_channels), dtype=np.float32)
 train_y = []
 for i in range(1, 6):
   subset = unpickle(os.path.join(DATA_DIR, 'data_batch_%d' % i))
   train_x = np.vstack((train_x, subset['data']))
   train_y += subset['labels']
-train_x = train_x.reshape((-1, img_height, img_width, num_channels))
+train_x = train_x.reshape((-1, img_height, img_width, num_channels), order='F')
 train_y = np.array(train_y, dtype=np.int32)
 
 subset = unpickle(os.path.join(DATA_DIR, 'test_batch'))
-test_x = subset['data'].reshape((-1, img_height, img_width, num_channels)).astype(np.float32)
+test_x = subset['data'].reshape((-1, img_height, img_width, num_channels), order='F').astype(np.float32)
 test_y = np.array(subset['labels'], dtype=np.int32)
 
 valid_size = 5000
