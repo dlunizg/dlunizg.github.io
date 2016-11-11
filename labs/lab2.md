@@ -297,9 +297,9 @@ boje slike.
 
 Prikažite 20 netočno klasificiranih slika s najvećim gubitkom te ispišite njihov točan razred
 i top-3 razreda za koje je mreža dala najveću vjerojatnost.
-
 Da biste prikazali sliku, morate najprije poništiti normalizaciju srednje vrijednosti i
 varijance:
+
 ```
 def draw_image(img, mean, std):
   img *= std
