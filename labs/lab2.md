@@ -392,7 +392,7 @@ Kao što vidite trenutni *state of the art* je oko 96% ukupne točnosti.
 Dva važna trika koje koriste najbolje arhitekture su skaliranje slika na veću rezoluciju
 kako bi omogućili da prvi konvolucijski slojevi uče značajke jako niske razine
 te proširivanje skupa za učenje raznim modificiranjem slika (*data jittering*).
-Bez ovih trikova izazov bi trebao biti preći preko 80% ukupne točnosti.
+Bez ovih trikova je jako teško preći preko 90% ukupne točnosti.
 
 
 ### Bonus zadatak - Multiclass hinge loss
