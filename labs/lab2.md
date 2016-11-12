@@ -153,8 +153,8 @@ konvolucijskih i potpuno povezanih slojeva.
 -->
 
 <div class="fig figcenter fighighlight">
-  <img src="/assets/lab2/filters1_big.png" width="100%">
-  <img src="/assets/lab2/filters2_big.png" width="100%">
+  <img src="/assets/lab2/filters1_big.png" width="80%">
+  <img src="/assets/lab2/filters2_big.png" width="80%">
   <div class="figcaption">Slučajno inicijalizirani filtri u prvom sloju na početku učenja (iznad) i naučeni filtri (ispod) s regularizacijom lambda = 0.01.</div>
 </div>
 
@@ -289,7 +289,7 @@ Na kraju funkcije možete izračunati ostale pokazatelje te ih isprintati.
 
 <div class="fig figcenter fighighlight">
   <img src="/assets/lab2/training_plot.png" width="100%">
-  <div class="figcaption">Primjer kako bi trebao izgledati dobar graf tijekom učenja.</div>
+  <div class="figcaption figcenter">Primjer kako bi trebao izgledati dobar graf tijekom učenja.</div>
 </div>
 
 Vizualizirajte naučene filtre u prvom sloju. U nastavku se nalazi kod koji možete
@@ -320,9 +320,9 @@ def draw_conv_filters(epoch, step, weights, save_dir):
 ```
 
 <div class="fig figcenter fighighlight">
-  <img src="/assets/lab2/cifar_filters1.png" width="100%">
-  <img src="/assets/lab2/cifar_filters2.png" width="100%">
-  <div class="figcaption">CIFAR-10: slučajno inicijalizirani filtri u prvom sloju na početku učenja (iznad) i naučeni filtri (ispod) s regularizacijom lambda = 0.0001.</div>
+  <img src="/assets/lab2/cifar_filters1.png" width="80%">
+  <img src="/assets/lab2/cifar_filters2.png" width="80%">
+  <div class="figcaption figcenter">CIFAR-10: slučajno inicijalizirani filtri u prvom sloju na početku učenja (iznad) i naučeni filtri (ispod) s regularizacijom lambda = 0.0001.</div>
 </div>
 
 Prikažite 20 netočno klasificiranih slika s najvećim gubitkom te ispišite njihov točan razred
