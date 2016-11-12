@@ -292,9 +292,38 @@ Na kraju funkcije možete izračunati ostale pokazatelje te ih isprintati.
   <div class="figcaption">Primjer kako bi trebao izgledati dobar graf tijekom učenja.</div>
 </div>
 
-Vizualizirajte naučene filtre u prvom sloju. Možete se poslužiti kodom za vizualizaciju
-iz prve vježbe no morate ga izmijeniti tako da 3 kanala u prvom sloju kodirate kao RGB
-boje slike.
+Vizualizirajte naučene filtre u prvom sloju. U nastavku se nalazi kod koji možete
+koristiti za vizualizaciju:
+
+```
+def draw_conv_filters(epoch, step, weights, save_dir):
+  w = weights.copy()
+  num_filters = w.shape[3]
+  num_channels = w.shape[2]
+  k = w.shape[0]
+  assert w.shape[0] == w.shape[1]
+  w = w.reshape(k, k, num_channels, num_filters)
+  w -= w.min()
+  w /= w.max()
+  border = 1
+  cols = 8
+  rows = math.ceil(num_filters / cols)
+  width = cols * k + (cols-1) * border
+  height = rows * k + (rows-1) * border
+  img = np.zeros([height, width, num_channels])
+  for i in range(num_filters):
+    r = int(i / cols) * (k + border)
+    c = int(i % cols) * (k + border)
+    img[r:r+k,c:c+k,:] = w[:,:,:,i]
+  filename = 'epoch_%02d_step_%06d.png' % (epoch, step)
+  ski.io.imsave(os.path.join(save_dir, filename), img)
+```
+
+<div class="fig figcenter fighighlight">
+  <img src="/assets/lab2/cifar_filters1.png" width="100%">
+  <img src="/assets/lab2/cifar_filters2.png" width="100%">
+  <div class="figcaption">CIFAR-10: slučajno inicijalizirani filtri u prvom sloju na početku učenja (iznad) i naučeni filtri (ispod) s regularizacijom lambda = 0.0001.</div>
+</div>
 
 Prikažite 20 netočno klasificiranih slika s najvećim gubitkom te ispišite njihov točan razred
 i top-3 razreda za koje je mreža dala najveću vjerojatnost.
