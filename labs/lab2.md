@@ -292,7 +292,8 @@ Na kraju funkcije možete izračunati ostale pokazatelje te ih isprintati.
   <div class="figcaption figcenter">Primjer kako bi trebao izgledati dobar graf tijekom učenja.</div>
 </div>
 
-Vizualizirajte naučene filtre u prvom sloju. Da biste dohvatili varijablu u kojoj se
+Vizualizirajte slučajno inicijalizirane i naučene filtre u prvom sloju.
+Da biste dohvatili varijablu u kojoj se
 nalaze težine prvog konvolucijskog sloja možete pozvati metodu
 `tf.contrib.framework.get_variables` kojoj kao argument predate *scope* pod kojim se
 varijabla nalazi u vašem modelu. Ispod je primjer kako to može izgledati gdje će
