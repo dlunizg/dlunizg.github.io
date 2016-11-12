@@ -292,7 +292,22 @@ Na kraju funkcije možete izračunati ostale pokazatelje te ih isprintati.
   <div class="figcaption figcenter">Primjer kako bi trebao izgledati dobar graf tijekom učenja.</div>
 </div>
 
-Vizualizirajte naučene filtre u prvom sloju. U nastavku se nalazi kod koji možete
+Vizualizirajte naučene filtre u prvom sloju. Da biste dohvatili varijablu u kojoj se
+nalaze težine prvog konvolucijskog sloja možete pozvati metodu
+`tf.contrib.framework.get_variables` kojoj kao argument predate *scope* pod kojim se
+varijabla nalazi u vašem modelu. Ispod je primjer kako to može izgledati gdje će
+*scope* u vašem slučaju ovisiti o tome kako ste ga nazvali tijekom definiranja grafa.
+
+```
+sess = tf.Session()
+sess.run(tf.initialize_all_variables())
+
+conv1_var = tf.contrib.framework.get_variables('model/conv1_1/weights:0')[0]
+conv1_weights = conv1_var.eval(session=sess)
+draw_conv_filters(0, 0, conv1_weights, SAVE_DIR)
+```
+
+U nastavku se nalazi kod koji možete
 koristiti za vizualizaciju:
 
 ```
