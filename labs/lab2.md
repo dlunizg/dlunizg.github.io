@@ -69,7 +69,7 @@ The visualization below iterates over the output activations (green), and shows 
 ## Vježba
 
 Kod za prva dva zadatka nalazi se [ovdje](https://github.com/ivankreso/fer-deep-learning/tree/master/lab2).
-Biblioteke koje su vam potrebne za ovu vježbu su Tensorflow, NumPy [matplotlib](http://matplotlib.org/) i [scikit-image](http://scikit-image.org/).
+Biblioteke koje su vam potrebne za ovu vježbu su Tensorflow, NumPy, [Cython](http://cython.org), [matplotlib](http://matplotlib.org/) i [scikit-image](http://scikit-image.org/).
 U datoteci `layers.py` nalaze se slojevi od kojih se tipično sastoji CNN.
 Svaki sloj sadrži dvije metode potrebne za izvođenje backpropagation algoritma.
 Metoda `forward` izvodi unaprijedni prolazak kroz sloj i vraća rezultat.
