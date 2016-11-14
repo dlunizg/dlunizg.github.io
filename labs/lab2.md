@@ -449,8 +449,8 @@ usporedite rezultate. Objašnjenje multiclass hinge lossa možete pronaći [ovdj
 Proučite u Tensorflow dokumentaciji osnovne operacije nad tenzorima kako biste pronašli najlakši način
 da to ostvarite. Pomoć: jedna opcija kako to možete izvesti je da razdvojite logite
 (izlazi iz zadnjeg potpuno povezanog sloja) na matricu logita netočnih razreda i vektor
-logita na mjestima točnih razreda unutar jednog batcha.
-To možete izvesto pomoću operacija `tf.dynamic_partition` i `tf.one_hot`.
+logita na mjestima točnih razreda.
+To možete izvesti pomoću operacija `tf.dynamic_partition` i `tf.one_hot`.
 Zatim unutar `tf.maximum` računate razliku između matrice logita na netočnim
 razredima i vektora logita na točnim razredima. To možete napisati kao običnu razliku jer za
 tenzore različitih dimenzija Tensorflow po defaultu napravi *broadcasting* ako je to
