@@ -444,10 +444,17 @@ Bez ovih trikova je jako teško preći preko 90% ukupne točnosti.
 ### Bonus zadatak - Multiclass hinge loss
 
 Pokušajte u zadnjem zadatku unakrsnu entropiju zamijeniti s multiclass hinge lossom te
-usporedite rezultate. Proučite u Tensorflow dokumentaciji osnovne operacije nad tenzorima kako biste pronašli najlakši način
-da to ostvarite.
+usporedite rezultate. Objašnjenje multiclass hinge lossa možete pronaći [ovdje](http://cs231n.github.io/linear-classify/#svm).
 
-Objašnjenje multiclass hinge lossa možete pronaći [ovdje](http://cs231n.github.io/linear-classify/#svm).
+Proučite u Tensorflow dokumentaciji osnovne operacije nad tenzorima kako biste pronašli najlakši način
+da to ostvarite. Pomoć: jedna opcija kako to možete izvesti je da razdvojite logite
+(izlazi iz zadnjeg potpuno povezanog sloja) na matricu logita netočnih razreda i vektor
+logita na mjestima točnih razreda unutar jednog batcha.
+To možete izvesto pomoću operacija `tf.dynamic_partition` i `tf.one_hot`.
+Zatim unutar `tf.maximum` računate razliku između matrice logita na netočnim
+razredima i vektora logita na točnim razredima. To možete napisati kao običnu razliku jer za
+tenzore različitih dimenzija Tensorflow po defaultu napravi *broadcasting* ako je to
+moguće.
 
 <a name='add'></a>
 
