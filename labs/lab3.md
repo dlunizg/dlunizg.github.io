@@ -371,7 +371,8 @@ def update(self, dU, dW, db, dV, dc,
 
 ```
 
-Implementacija kostura petlje za kontrolu toka podataka te iteriranja optimizacijskog procesa bi mogla izgledati kao u nastavku
+Implementacija kostura petlje za kontrolu toka podataka te iteriranja optimizacijskog procesa bi mogla izgledati kao u nastavku:
+
 ```python
 # ...
 # code not necessarily nested in class definition
@@ -430,6 +431,7 @@ Unutar okvira laboratorijske vježbe nećemo ulaziti u dubinu uzorkovanja nizova
 6. Vratite uzorkovan niz podataka do duljine `n_sample` - `len(seed)`
 
 Kostur funkcije za uzorkovanje bi mogao (ali ne mora) izgledati kao u nastavku:
+
 
 ```python
 # ...
