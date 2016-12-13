@@ -25,7 +25,7 @@ Povratne neuronske mreže su problemima izračunljivosti i rijetkosti doskočile
 Zadatak u laboratorijskoj vježbi je naučiti jezični model na domeni dijaloga iz filmova. Originalni skup podataka možete skinuti [ovdje](https://www.cs.cornell.edu/~cristian/Cornell_Movie-Dialogs_Corpus.html), dok je verzija koju ćete koristiti u laboratorijskoj vježbi podskup ukupnog dataseta. Primjeri filmova iz podskupa su u nastavku:
 
 <p align="center">
-<img src ="assets/lv3/movie_covers.png" width="50%"/>
+<img src ="/assets/lv3/movie_covers.png" width="50%"/>
 </p>
 
 Primjer teksta dijaloga iz filmova u formatu iz skupa podataka:
@@ -95,7 +95,7 @@ Pri podjeli u minibatcheve naš skup podataka razdvajamo u parove `x, y` veliči
 Primjer ovoga vidjljiv je na idućoj slici (preuzeto s [*"The Unreasonable Effectiveness of Recurrent Neural Networks"*](http://karpathy.github.io/2015/05/21/rnn-effectiveness/)):
 
 <p align="center">
-<img src ="assets/lv3/charseq.jpeg" width="50%"/>
+<img src ="/assets/lv3/charseq.jpeg" width="50%"/>
 </p>
 
 Prema tome, vaš zadatak u ovom koraku je implementirati funkciju koja će na temelju postojećeg dataseta pretvorenog u niz id-jeva taj dataset pretvoriti u niz batcheva veličine `batch_size` te duljine `sequence_length`. Kostur ove funkcije bi mogao izgledati kao u nastavku:
@@ -142,8 +142,8 @@ def next_minibatch(self):
 Kao što smo spomenuli u uvodu laboratorijske vježbe, povratne neuronske mreže su specijalizirane za procesiranje usmjerenih nizova - no još nismo dotaknuli na koji način funkcioniraju. Rad neuronskih mreža najlakše je predočiti s iduća dva grafa:
 
 <p align="center">
-<img src ="assets/lv3//rnn_recurrence.png" width="20%"/>
-<img src ="assets/lv3//rnn_unrolled.png" width="50%"/>
+<img src ="/assets/lv3//rnn_recurrence.png" width="20%"/>
+<img src ="/assets/lv3//rnn_unrolled.png" width="50%"/>
 </p>
 
 U prvom grafu povratna neuronska mreža je zapisana kompaktno uz povratnu vezu s vremenskim odmakom (crni kvadrat simbolizira korištenje vrijednosti iz prošlog vremenskog koraka), dok je u drugom grafu prikazana tzv. razmotana *(engl. unrolled)* povratna mreža. Bitna stvar za primjetiti je da su težinske matrice (U, W, V) **neovisne** o vremenskom koraku!
