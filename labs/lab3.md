@@ -1,3 +1,10 @@
+---
+layout: page
+mathjax: true
+permalink: /lab3/
+---
+
+
 ## 3. vježba: modeliranje nizova povratnim neuronskim mrežama 
 
 U trećoj laboratorijskoj vježbi bavimo se povratnim neuronskim mrežama i problemom modeliranja jezika na razini slova.
