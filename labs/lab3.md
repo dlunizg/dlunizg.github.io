@@ -162,9 +162,11 @@ Matematički zapis izraza koji se izvode u grafovima je u nastavku:
 $$
  \mathbf{h}^{(t)} = tanh(\mathbf{Wh}^{(t-1)} + \mathbf{Ux}^{(t)} + \mathbf{b})
 $$
+\\
 $$
  \mathbf{o^{(t)}} = \mathbf{Vh}^{(t)} + c
 $$
+\\
 $$
  \mathbf{\hat{y}^{(t)}} = softmax(\mathbf{o^{(t)}})
 $$
