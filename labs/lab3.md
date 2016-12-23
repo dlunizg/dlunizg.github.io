@@ -46,7 +46,7 @@ Primjer teksta dijaloga iz filmova u formatu iz skupa podataka:
 Svi razgovori u skupu podataka će pratiti navedeni format - ime osobe napisano tiskanim slovima praćeno s dvotočkom i simbolom novog reda, te tekst koji 
 osoba izgovara praćen s dva simbola novog reda. Dijalozi različitih filmova i scena nisu odvojeni na poseban način.
 
-Uz podskup skupa podataka dostupna je i skripta `select_preprocess.py` koja iz cijelog skupa podataka odabire podskup naslova naveden u kontrolnoj tekstualnoj datoteci, te odrađuje predprocesiranje i zapisivanje dijaloga iz podskupa naslova.
+Uz podskup skupa podataka dostupna je i skripta `select_preprocess.py` koja iz cijelog skupa podataka odabire podskup naslova naveden u kontrolnoj tekstualnoj datoteci, te odrađuje predprocesiranje i zapisivanje dijaloga iz podskupa naslova. Skriptu možete naći [ovdje](https://github.com/dlunizg/dlunizg.github.io/tree/master/code/lab3).
 
 Predprocesiranje koje se provodi nad podacima je odbacivanje svih znakova osim alfanumeričkih te interpunkcije. Znakovi koji ostaju nakon predprocesiranja su:
 
@@ -73,7 +73,7 @@ Za predprocesiranje podataka potrebno je implementirati funkciju koja za zadani 
 
 def preprocess(self, input_file):
     with open(input_file, "r") as f:
-        data = f.read().decode("utf-8")
+        data = f.read().decode("utf-8") # python 2
 
     # count and sort most frequent characters
 
@@ -82,7 +82,7 @@ def preprocess(self, input_file):
     # reverse the mapping
     self.id2char = {k:v for v,k in self.char2id.items()}
     # convert the data to ids
-    self.x = np.array(map(self.char2id.get, data))
+    self.x = np.array(list(map(self.char2id.get, data)))
 
 def encode(self, sequence):
     # returns the sequence encoded as integers
@@ -223,8 +223,8 @@ def __init__(self, hidden_size, sequence_length, vocab_size, learning_rate):
     self.c = None # ... output bias
 
     # memory of past gradients - rolling sum of squares for Adagrad
-    self.memory_U, self.memory_W, self.memory_V = np.zeros_like(U), np.zeros_like(W), np.zeros_like(V)
-    self.memory_b, self.memory_c = np.zeros_like(b), np.zeros_like(c)
+    self.memory_U, self.memory_W, self.memory_V = np.zeros_like(self.U), np.zeros_like(self.W), np.zeros_like(self.V)
+    self.memory_b, self.memory_c = np.zeros_like(self.b), np.zeros_like(self.c)
 
 ```
 
@@ -299,7 +299,7 @@ def rnn_step_backward(self, grad_next, cache):
     # hyperbolic tangent function and use it to compute the gradient
     # with respect to the remaining parameters
 
-    return dprev_h, dWx, dWh, db
+    return dh_prev, dU, dW, db
 
 
 def rnn_backward(self, dh, cache):
