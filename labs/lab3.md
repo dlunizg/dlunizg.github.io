@@ -456,6 +456,6 @@ def sample(seed, n_sample):
 
 ### Zadatak 3: višeslojna povratna neuronska mreža u tensorflowu
 
-TBA
+U duhu blagdana, kod riješenog 3. zadatka će biti dostupan uskoro za eksperimentiranje, te se zadatak neće bodovati!
 
 
