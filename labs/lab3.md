@@ -340,15 +340,15 @@ def output_loss_and_grads(self, h, V, c, y):
     #     the dimensionality of h is (batch size x sequence length x hidden size (the initial state is irrelevant for the output)
     # V - the output projection matrix of dimension hidden size x vocabulary size
     # c - the output bias of dimension vocabulary size x 1
-    # y - the true class distribution - a one-hot vector of dimension 
-    #     vocabulary size x 1 - you need to do this conversion prior to
+    # y - the true class distribution - a tensor of dimension 
+    #     batch_size x sequence_length x vocabulary size - you need to do this conversion prior to
     #     passing the argument. A fast way to create a one-hot vector from
     #     an id could be something like the following code:
 
-    #   y[timestep] = np.zeros((vocabulary_size, 1))
-    #   y[timestep][batch_y[timestep]] = 1
+    #   y[batch_id][timestep] = np.zeros((vocabulary_size, 1))
+    #   y[batch_id][timestep][batch_y[timestep]] = 1
 
-    #     where y might be a dictionary.
+    #     where y might be a list or a dictionary.
 
     loss, dh, dV, dc = None, None, None, None
     # calculate the output (o) - unnormalized log probabilities of classes
@@ -424,7 +424,7 @@ def run_language_model(dataset, max_epochs, hidden_size=100, sequence_length=30,
 
 ```
 
-Funkcija `step` kojoj kostur nije opisan sadržava logiku pokretanja jednog prolaza unaprijed i unatrag povratne neuronske mreže. Kao ulaze prima vektor početnog stanja skrivenog sloja, ohe-hot kodirane ulaze i izlaze dimenzija TxV, pri čemu je T broj vremenskih koraka a V veličina vokabulara. Kao izlaze dobivamo gubitak u tom koraku te skriveno stanje iz **zadnjeg koraka**, koje spremamo kao novo početno stanje. 
+Funkcija `step` kojoj kostur nije opisan sadržava logiku pokretanja jednog prolaza unaprijed i unatrag povratne neuronske mreže. Kao ulaze prima vektor početnog stanja skrivenog sloja, ohe-hot kodirane ulaze i izlaze dimenzija BxTxV, pri čemu je B veličina minibatcha, T broj vremenskih koraka a V veličina vokabulara. Kao izlaze dobivamo gubitak u tom koraku te skriveno stanje iz **zadnjeg koraka**, koje spremamo kao novo početno stanje. 
 
 #### 2.2: Uzorkovanje podataka na temelju naučene mreže
 
