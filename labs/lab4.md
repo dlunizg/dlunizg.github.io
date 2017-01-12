@@ -234,7 +234,7 @@ def draw_weights(W, shape, N, interpolation="bilinear"):
     plt.figure(figsize=(10, 14))
     plt.imshow(image, interpolation=interpolation)
     
-def draw_reconstructions(ins, outs, state_prob, states, shape_in, shape_state, Nh):
+def draw_reconstructions(ins, outs, states, shape_in, shape_state):
     """Vizualizacija ulaza i pripadajućih rekonstrkcija i stanja skrivenog sloja
     ins -- ualzni vektori
     outs -- rekonstruirani vektori
@@ -248,20 +248,12 @@ def draw_reconstructions(ins, outs, state_prob, states, shape_in, shape_state, N
         plt.subplot(20, 4, 4*i + 1)
         plt.imshow(ins[i].reshape(shape_in), vmin=0, vmax=1, interpolation="nearest")
         plt.title("Test input")
-        plt.axis('off')
         plt.subplot(20, 4, 4*i + 2)
         plt.imshow(outs[i][0:784].reshape(shape_in), vmin=0, vmax=1, interpolation="nearest")
         plt.title("Reconstruction")
-        plt.axis('off')
         plt.subplot(20, 4, 4*i + 3)
-        plt.imshow(state_prob[i][0:Nh].reshape(shape_state), vmin=0, vmax=1, interpolation="nearest")
-        plt.title("Probabilities")
-        plt.axis('off')
-        plt.colorbar()
-        plt.subplot(20, 4, 4*i + 4)
-        plt.imshow(states[i][0:Nh].reshape(shape_state), vmin=0, vmax=1, interpolation="nearest")
+        plt.imshow(states[i][0:(shape_state[0] * shape_state[1])].reshape(shape_state), vmin=0, vmax=1, interpolation="nearest")
         plt.title("States")
-        plt.axis('off')
     plt.tight_layout()
 
 Nv = 784
@@ -336,7 +328,7 @@ with tf.Session(graph=g1) as sess:
 draw_weights(w1s, v_shape, Nh) 
 
 # vizualizacija rekonstrukcije i stanja
-draw_reconstructions(teX, vr, h1_probs, h1s, v_shape, h1_shape, Nh)
+draw_reconstructions(teX, vr, h1s, v_shape, h1_shape)
 ```
 
 <a name='2zad'></a>
@@ -431,7 +423,7 @@ with tf.Session(graph=g2) as sess:
 draw_weights(w2s, h1_shape, Nh2, interpolation="nearest")
 
 # vizualizacija rekonstrukcije i stanja
-draw_reconstructions(teX, vr2, h3_probs, h3s, v_shape, h2_shape, Nh2)
+draw_reconstructions(teX, vr2, h3s, v_shape, h2_shape)
 ```
 
 Kako bi se dodatno poboljšala generativna svojstva DBN-a, može se provesti generativni fine-tuning parametara mreže. U 2. zadatku, prilikom rekonstruiranja korištene su iste težine i pomaci u prolascima prema dolje i prema gore. Kod fine-tuninga, parametri koji vežu sve slojeve osim dva najgornja, razdvajaju se u dva skupa. Matrice težina između nižih slojeva dijele se na: $$\mathbf W'_n$$ za prolaz prema gore i $$\mathbf R_n$$ za prolaz prema dolje. Inicijalno su obje matrice jednake originalnoj matrici $$\mathbf W_n$$. Kod prolaza prema gore (faza budnosti - wake phase) određuju se nova stanja viših skrivenih slojeva $$\mathbf s^{(n)}$$ iz nižih stanja $$\mathbf s^{(n-1)}$$ pomoću matrica $$\mathbf W'$$ postupkom uzorkovanja ($$sample \left(\sigma \left(\mathbf W'_n \mathbf s^{(n-1)} + \mathbf b_n\right)\right) \to \mathbf s^{(n)}$$) . Pri prolasku prema dolje (faza spavanja - sleep phase) određuju se "rekonstrukcije" nižih stanja $$\mathbf s^{(n-1)}$$ iz $$\mathbf s^{(n)}$$ i matrica $$\mathbf R$$ ($$sample \left( \sigma \left(\mathbf R_n \mathbf s^{(n)} + \mathbf b_{n-1} \right) \right) \to \mathbf s^{(n-1)}$$). Najgornja dva sloja su klasični RBM i dijele istu matricu težina za prolaske u oba smjera, a modificiranje tih težina provodi se na isti način kao u 1.zadatku.
@@ -804,6 +796,28 @@ n_hidden_gener_2=200 # 2 sloj dekodera
 n_z=2 # broj skrivenih varijabli
 n_input=784 # MNIST data input (img shape: 28*28)
 
+def draw_reconstructions(ins, outs, states, shape_in, shape_state):
+    """Vizualizacija ulaza i pripadajućih rekonstrkcija i stanja skrivenog sloja
+    ins -- ualzni vektori
+    outs -- rekonstruirani vektori
+    states -- vektori stanja skrivenog sloja
+    shape_in -- dimezije ulaznih slika npr. (28,28)
+    shape_state -- dimezije za 2D prikaz stanja (npr. za 100 stanja (10,10)
+    """
+    plt.figure(figsize=(8, 12*4))
+    for i in range(20):
+
+        plt.subplot(20, 4, 4*i + 1)
+        plt.imshow(ins[i].reshape(shape_in), vmin=0, vmax=1, interpolation="nearest")
+        plt.title("Test input")
+        plt.subplot(20, 4, 4*i + 2)
+        plt.imshow(outs[i][0:784].reshape(shape_in), vmin=0, vmax=1, interpolation="nearest")
+        plt.title("Reconstruction")
+        plt.subplot(20, 4, 4*i + 3)
+        plt.imshow(states[i][0:(shape_state[0] * shape_state[1])].reshape(shape_state), interpolation="nearest")
+        plt.colorbar()
+        plt.title("States")
+    plt.tight_layout()
 
 def weight_variable(shape, name):
     """Kreiranje težina"""
@@ -927,7 +941,7 @@ train_writer.close()
 x_sample = mnist.test.next_batch(100)[0]
 x_reconstruct, z_out = sess.run([x_reconstr_mean_out, z], feed_dict={x: x_sample})
 
-draw_reconstructions(x_sample, x_reconstruct, z_out, (28, 28), (4,5), 20)
+draw_reconstructions(x_sample, x_reconstruct, z_out, (28, 28), (4,5))
 
 # Vizualizacija raspored testnih uzoraka u 2D prostoru skrivenih varijabli - 1. način
 x_sample, y_sample = mnist.test.next_batch(5000)
