@@ -703,7 +703,7 @@ $$
 (p_{\mathbf{\theta
 }}(\mathbf{x}^{(i)}\vert \mathbf{z}))\right]\approx
 \frac{1}{K}\sum _{k=1}^{K}\log \left(p_{\mathbf{\theta
-}}(\mathbf{x}^{(i)}\vert \mathbf{z}^{(i,k)})\right)\approx \sum
+}}(\mathbf{x}^{(i)}\vert \mathbf{z}^{(i,k)})\right)\approx -\sum
 _{j}{\frac{1}{2}\log (\sigma _{x_{j}}^{(i,k)2})+\frac{(x_{j}^{(i)}-\mu
 _{x_{j}}^{(i,k)})^{2}}{2\sigma _{x_{j}}^{(i,k)2}}}
 $$
