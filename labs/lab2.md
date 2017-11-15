@@ -178,7 +178,7 @@ kao parametar normalizacije kako je prikazano ispod:
 Primjer korištenja konvolucije iz `tf.contrib` paketa nalazi se ispod.
 Ako želite koristiti `tf.nn.conv2d` onda će vam od pomoći biti službeni [tutorial](https://www.tensorflow.org/versions/master/tutorials/mnist/pros/index.html#build-a-multilayer-convolutional-network).
 
-```
+```python
 import tensorflow.contrib.layers as layers
 
 def build_model(inputs, labels, num_classes):
@@ -219,7 +219,7 @@ testiranje dimenzija 32x32 podijeljenih u 10 razreda.
 Najprije skinite dataset pripremljen za Python [ovdje](https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz).
 Iskorisite sljedeći kod kako biste učitali podatke i pripremili ih.
 
-```
+```python
 import os
 import pickle
 import numpy as np
@@ -300,7 +300,7 @@ nalaze težine prvog konvolucijskog sloja možete pozvati metodu
 varijabla nalazi u vašem modelu. Ispod je primjer kako to može izgledati gdje će
 *scope* u vašem slučaju ovisiti o tome kako ste ga nazvali tijekom definiranja grafa.
 
-```
+```python
 sess = tf.Session()
 sess.run(tf.initialize_all_variables())
 
@@ -312,7 +312,7 @@ draw_conv_filters(0, 0, conv1_weights, SAVE_DIR)
 U nastavku se nalazi kod koji možete
 koristiti za vizualizaciju:
 
-```
+```python
 def draw_conv_filters(epoch, step, weights, save_dir):
   w = weights.copy()
   num_filters = w.shape[3]
@@ -347,7 +347,7 @@ i top-3 razreda za koje je mreža dala najveću vjerojatnost.
 Da biste prikazali sliku, morate najprije poništiti normalizaciju srednje vrijednosti i
 varijance:
 
-```
+```python
 import skimage as ski
 import skimage.io
 
@@ -361,7 +361,7 @@ def draw_image(img, mean, std):
 
 Ispod se nalazi kod koji možete iskoristiti za crtanje grafova:
 
-```
+```python
 def plot_training_progress(save_dir, data):
   fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(16,8))
 
@@ -394,7 +394,7 @@ def plot_training_progress(save_dir, data):
   plt.savefig(save_path)
 ```
 
-```
+```python
 plot_data = {}
 plot_data['train_loss'] = []
 plot_data['valid_loss'] = []
