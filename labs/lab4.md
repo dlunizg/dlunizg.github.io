@@ -72,8 +72,8 @@ Prema odabranoj energetskoj funkciji i Boltzmanovoj distribuciji određena je vj
 
 $$
 p(x_{j}=1)=\frac{1}{1+e^{-\sum
-_{i=1}^{N}w_{\mathit{ji}}x_{i}-b_{i}}}=\sigma \left(\sum
-_{i=1}^{N}w_{\mathit{ji}}x_{i}+b_{i}\right)
+_{i=1}^{N}w_{\mathit{ji}}x_{i}-b_{j}}}=\sigma \left(\sum
+_{i=1}^{N}w_{\mathit{ji}}x_{i}+b_{j}\right)
 $$
 
 BM ima dodatne skrivene varijable $$h$$ kako bi se istom energetskom funkcijom mogle opisati korelacije višeg reda, odnosno kompleksnije međusobne veze pojedinih elemenata vektora podataka. Stvarne podatke nazivamo vidljivim slojem i označavamo s $$\mathbf v$$, dok skrivene varijable čine skriveni sloj $$\mathbf h$$.
@@ -105,7 +105,7 @@ _{i=1}^{N}w_{\mathit{ji}}v_{i}+b_{j}\right)$$ za skriveni sloj
 
 Uzorkovanje vrijednosti pojedine varijable provodi se prema gornje dvije jednadžbe i generatora slučajnih brojeva.
 
-```
+```python
 def sample_prob(probs):
     """Uzorkovanje vektora x prema vektoru vjerojatnosti p(x=1) = probs"""
     return tf.nn.relu(
@@ -182,7 +182,7 @@ Ulazne varijable tada možemo tretirati kao stohastičke binarne varjable s [Ber
 
 Implementirajte RBM koji koristi CD-1 za učenje. Ulazni podaci neka su MNIST brojevi. Vidljivi sloj tada mora imati 784 elementa, a u skriveni sloj neka ima 100 elemenata. Vizualizirajte težine $$\mathbf W$$ ostvarene treniranjem te pokušajte interpretirati ostvarene težine pojedinih skrivenih neurona. Prikažite i rezultate rekonstrukcije prvih 20 testnih uzoraka MNIST baze. Kao rezultat rekonstukcije koji ćete prikazati, koristite $$p(v_{i}=1)=\sigma \left(\sum_{j=1}^{N}w_{\mathit{ji}}h_{j}+a_{i}\right)$$, umjesto binarnih vrijednosti dobivenih uzorkovanjem. Pokušajte interpretirati ostvarene težine pojedinih skrivenih neurona. Kako su vrijednosti ulaznih uzoraka (slika) realne u rasponu [0 1], oni mogu poslužiti kao $$p(v_i = 1)$$ pa za inicijalne vrijednosti vidljivog sloja trebate provesti uzorkovanje. Koristitie mini grupe veličine 100 uzoraka, a treniranje neka ima 100 epoha.
 
-Dodatni podzadaci: 
+Podzadaci: 
 
 - Preskočiti inicijalno uzorkovanje/binarizaciju na temelju ulaznih uzoraka, već ulazne uzorke (realne u rasponu [0 1]) koristiti kao ualzne vektore $$\mathbf v$$ 
 - Povećajte broj Gibsovih uzorkovanja k u CD-k
@@ -191,7 +191,7 @@ Dodatni podzadaci:
 
 Koristite slijedeći predložak s pomoćnom datotekom [utils.py](/assets/lab4/utils.py):
 
-```
+```python
 import tensorflow as tf
 import numpy as np
 from tensorflow.examples.tutorials.mnist import input_data
@@ -199,7 +199,6 @@ from PIL import Image
 from utils import tile_raster_images
 import math
 import matplotlib.pyplot as plt
-%matplotlib inline
 
 
 mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
@@ -235,7 +234,7 @@ def draw_weights(W, shape, N, interpolation="bilinear"):
     plt.figure(figsize=(10, 14))
     plt.imshow(image, interpolation=interpolation)
     
-def draw_reconstructions(ins, outs, states, shape_in, shape_state, Nh):
+def draw_reconstructions(ins, outs, states, shape_in, shape_state):
     """Vizualizacija ulaza i pripadajućih rekonstrkcija i stanja skrivenog sloja
     ins -- ualzni vektori
     outs -- rekonstruirani vektori
@@ -253,7 +252,7 @@ def draw_reconstructions(ins, outs, states, shape_in, shape_state, Nh):
         plt.imshow(outs[i][0:784].reshape(shape_in), vmin=0, vmax=1, interpolation="nearest")
         plt.title("Reconstruction")
         plt.subplot(20, 4, 4*i + 3)
-        plt.imshow(states[i][0:Nh].reshape(shape_state), vmin=0, vmax=1, interpolation="nearest")
+        plt.imshow(states[i][0:(shape_state[0] * shape_state[1])].reshape(shape_state), vmin=0, vmax=1, interpolation="nearest")
         plt.title("States")
     plt.tight_layout()
 
@@ -318,18 +317,18 @@ with tf.Session(graph=g1) as sess:
         err, _ = sess.run([err_sum1, out1], feed_dict={X1: batch})
         
         if i%(int(total_batch/10)) == 0:
-            print i, err
+            print "Batch count: ", i, "  Avg. reconstruction error: ", err
     
     w1s = w1.eval()
     vb1s = vb1.eval()
     hb1s = hb1.eval()
-    vr, h1s = sess.run([v1_prob, h1], feed_dict={X1: teX[0:2,:]})
+    vr, h1_probs, h1s = sess.run([v1_prob, h1_prob, h1], feed_dict={X1: teX[0:2,:]})
 
 # vizualizacija težina
 draw_weights(w1s, v_shape, Nh) 
 
 # vizualizacija rekonstrukcije i stanja
-draw_reconstructions(teX, vr, h1s, v_shape, h1_shape, Nh)
+draw_reconstructions(teX, vr, h1s, v_shape, h1_shape)
 ```
 
 <a name='2zad'></a>
@@ -338,7 +337,7 @@ draw_reconstructions(teX, vr, h1s, v_shape, h1_shape, Nh)
 
 Deep beleif Network (DBN) je duboka mreža koja se dobije slaganjem više RBM-ova jednog na drugi, pri čemu se svaki slijedeć RBM pohlepno trenira pomoću skrivenog ("izlaznog") sloja prethodnog RBM-a (osim prvog RBM-a koji se trenira direktno s ulaznim uzorcima). Teoretski tako izgrađen DBN trebao bi povećati $$p(\mathbf v)$$ što nam je i cilj. Korištenje DBN, odnosno rekonstrukcija ulaznog uzorka provodi se prema donjoj shemi. U prolazu prema gore određuju se skriveni slojevi iz vidljivog sloja dok se ne dođe do najgornjeg RBM-a, zatim se na njemu provede CD-k algoritam, nakon čega se, u prolasku prema dolje, određuju niži skriveni slojevi dok se ne dođe do rekonstruiranog vidljivog sloja. Težine između pojedinih slojeva su iste u prolazu gore kao i u prolazu prema dolje. Implementirajte troslojni DBN koji se sastoji od dva pohlepno pretrenirana RBM-a. Prvi RBM neka je isit kao i u 1. zadatku, a drugi RBM neka ima skriveni sloj od 100 elemenata.  Vizualizirajte težine $$\mathbf W_1$$ i $$\mathbf W_2$$ ostvarene treniranjem te rezultate rekonstrukcije prvih 20 testnih uzoraka MNIST baze. Komentirajte rezultate.
 
-Dodatni podzadaci:
+Podzadaci:
 
 - Postavite broj skrivenih varijabli gornjeg RBM-a jednak broju elemenata vidljivog sloja donjeg RBM-a, a inicijalne težine $$\mathbf W_2$$ postavite na $$\mathbf W_1^T$$. Koji su efekti promjene? Vizualizirajte uzorke krovnog skrivenog sloja kao matrice 28x28.
 
@@ -348,7 +347,7 @@ Dodatni podzadaci:
 
 Koristite slijedeći predložak uz prtedložak 1. zadatka:
 
-```
+```python
 Nh2 = 100
 h2_shape = (10,10) 
 
@@ -415,16 +414,16 @@ with tf.Session(graph=g2) as sess:
         #...
         
         if i%(int(total_batch/10)) == 0:
-            print i, err
+            print "Batch count: ", i, "  Avg. reconstruction error: ", err
             
     w2s, vb2s, hb2s = sess.run([w2, vb2, hb2], feed_dict={X2: batch})
-    vr2, h3s = sess.run([v4_prob, h3], feed_dict={X2: teX[0:50,:]})
+    vr2, h3_probs, h3s = sess.run([v5_prob, h3_prob, h3], feed_dict={X2: teX[0:50,:]})
 
 # vizualizacija težina
 draw_weights(w2s, h1_shape, Nh2, interpolation="nearest")
 
 # vizualizacija rekonstrukcije i stanja
-draw_reconstructions(teX, vr2, h3s, v_shape, h2_shape, Nh2)
+draw_reconstructions(teX, vr2, h3s, v_shape, h2_shape)
 ```
 
 Kako bi se dodatno poboljšala generativna svojstva DBN-a, može se provesti generativni fine-tuning parametara mreže. U 2. zadatku, prilikom rekonstruiranja korištene su iste težine i pomaci u prolascima prema dolje i prema gore. Kod fine-tuninga, parametri koji vežu sve slojeve osim dva najgornja, razdvajaju se u dva skupa. Matrice težina između nižih slojeva dijele se na: $$\mathbf W'_n$$ za prolaz prema gore i $$\mathbf R_n$$ za prolaz prema dolje. Inicijalno su obje matrice jednake originalnoj matrici $$\mathbf W_n$$. Kod prolaza prema gore (faza budnosti - wake phase) određuju se nova stanja viših skrivenih slojeva $$\mathbf s^{(n)}$$ iz nižih stanja $$\mathbf s^{(n-1)}$$ pomoću matrica $$\mathbf W'$$ postupkom uzorkovanja ($$sample \left(\sigma \left(\mathbf W'_n \mathbf s^{(n-1)} + \mathbf b_n\right)\right) \to \mathbf s^{(n)}$$) . Pri prolasku prema dolje (faza spavanja - sleep phase) određuju se "rekonstrukcije" nižih stanja $$\mathbf s^{(n-1)}$$ iz $$\mathbf s^{(n)}$$ i matrica $$\mathbf R$$ ($$sample \left( \sigma \left(\mathbf R_n \mathbf s^{(n)} + \mathbf b_{n-1} \right) \right) \to \mathbf s^{(n-1)}$$). Najgornja dva sloja su klasični RBM i dijele istu matricu težina za prolaske u oba smjera, a modificiranje tih težina provodi se na isti način kao u 1.zadatku.
@@ -454,7 +453,7 @@ HINT: pseudokod za treniranje četveroslojnog DBN-a nalazi se u dodacima ovog [�
 
 Implementirajte postupak generativnog fine-tuninga na DBN iz 2. zadatka. Vizualizirajte konačne varijante matrica $$\mathbf W'$$ i $$\mathbf R$$ kao  i rezultate rekonstrukcije prvih 20 testnih uzoraka MNIST baze. ZA treniranje gronjeg RBM-a koristite CD-2.
 
-Dodatni podzadaci:
+Podzadaci:
 
 - Provedite generiranje uzoraka tako da slučajno inicijalizirate krovni skriveni sloj, na njemu provedete CD-4 i rekonstruirajte izlazni sloj. Vizualizirajte rezultate.
 
@@ -464,7 +463,7 @@ Dodatni podzadaci:
 
 Koristite slijedeći predložak, kao i predloške 1. i 2. zadatka.
 
-```
+```python
 #
 beta = 0.01
 
@@ -539,7 +538,7 @@ with tf.Session(graph=g3) as sess:
         err, _ = sess.run([err_sum3, out3], feed_dict={X3: batch})
         
         if i%(int(total_batch/10)) == 0:
-            print i, err
+            print "Batch count: ", i, "  Avg. reconstruction error: ", err
     
     w2ss, w1_ups, w1_downs, hb2ss, hb1_ups, hb1_downs, vb1_downs = sess.run(
         [w2a, w1_up, w1_down, hb2a, hb1_up, hb1_down, vb1_down], feed_dict={X3: batch})
@@ -558,18 +557,23 @@ for i in range(20):
     plt.subplot(20, Npics, Npics*i + 1)
     plt.imshow(teX[i].reshape(v_shape), vmin=0, vmax=1)
     plt.title("Test input")
+    plt.axis('off')
     plt.subplot(20, Npics, Npics*i + 2)
     plt.imshow(vr[i][0:784].reshape(v_shape), vmin=0, vmax=1)
     plt.title("Reconstruction 1")
+    plt.axis('off')
     plt.subplot(20, Npics, Npics*i + 3)
     plt.imshow(vr2[i][0:784].reshape(v_shape), vmin=0, vmax=1)
     plt.title("Reconstruction 2")
+    plt.axis('off')
     plt.subplot(20, Npics, Npics*i + 4)
     plt.imshow(vr3[i][0:784].reshape(v_shape), vmin=0, vmax=1)
     plt.title("Reconstruction 3")
+    plt.axis('off')
     plt.subplot(20, Npics, Npics*i + 5)
     plt.imshow(h4s[i][0:Nh2].reshape(h2_shape), vmin=0, vmax=1, interpolation="nearest")
     plt.title("Top states 3")
+    plt.axis('off')
 plt.tight_layout()
 ```
 
@@ -699,7 +703,7 @@ $$
 (p_{\mathbf{\theta
 }}(\mathbf{x}^{(i)}\vert \mathbf{z}))\right]\approx
 \frac{1}{K}\sum _{k=1}^{K}\log \left(p_{\mathbf{\theta
-}}(\mathbf{x}^{(i)}\vert \mathbf{z}^{(i,k)})\right)\approx \sum
+}}(\mathbf{x}^{(i)}\vert \mathbf{z}^{(i,k)})\right)\approx -\sum
 _{j}{\frac{1}{2}\log (\sigma _{x_{j}}^{(i,k)2})+\frac{(x_{j}^{(i)}-\mu
 _{x_{j}}^{(i,k)})^{2}}{2\sigma _{x_{j}}^{(i,k)2}}}
 $$
@@ -772,7 +776,7 @@ Implementirajte VAE sa 20 skrivenih varijabli $$z$$. Ulazni podaci neka su MNIST
 
 Koristite slijedeći predložak:
 
-```
+```python
 import numpy as np
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
@@ -792,6 +796,28 @@ n_hidden_gener_2=200 # 2 sloj dekodera
 n_z=2 # broj skrivenih varijabli
 n_input=784 # MNIST data input (img shape: 28*28)
 
+def draw_reconstructions(ins, outs, states, shape_in, shape_state):
+    """Vizualizacija ulaza i pripadajućih rekonstrkcija i stanja skrivenog sloja
+    ins -- ualzni vektori
+    outs -- rekonstruirani vektori
+    states -- vektori stanja skrivenog sloja
+    shape_in -- dimezije ulaznih slika npr. (28,28)
+    shape_state -- dimezije za 2D prikaz stanja (npr. za 100 stanja (10,10)
+    """
+    plt.figure(figsize=(8, 12*4))
+    for i in range(20):
+
+        plt.subplot(20, 4, 4*i + 1)
+        plt.imshow(ins[i].reshape(shape_in), vmin=0, vmax=1, interpolation="nearest")
+        plt.title("Test input")
+        plt.subplot(20, 4, 4*i + 2)
+        plt.imshow(outs[i][0:784].reshape(shape_in), vmin=0, vmax=1, interpolation="nearest")
+        plt.title("Reconstruction")
+        plt.subplot(20, 4, 4*i + 3)
+        plt.imshow(states[i][0:(shape_state[0] * shape_state[1])].reshape(shape_state), interpolation="nearest")
+        plt.colorbar()
+        plt.title("States")
+    plt.tight_layout()
 
 def weight_variable(shape, name):
     """Kreiranje težina"""
@@ -915,7 +941,7 @@ train_writer.close()
 x_sample = mnist.test.next_batch(100)[0]
 x_reconstruct, z_out = sess.run([x_reconstr_mean_out, z], feed_dict={x: x_sample})
 
-draw_reconstructions(x_sample, x_reconstruct, z_out, (28, 28), (4,5), 20)
+draw_reconstructions(x_sample, x_reconstruct, z_out, (28, 28), (4,5))
 
 # Vizualizacija raspored testnih uzoraka u 2D prostoru skrivenih varijabli - 1. način
 x_sample, y_sample = mnist.test.next_batch(5000)
