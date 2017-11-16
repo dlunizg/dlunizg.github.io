@@ -56,12 +56,12 @@ That is, we have two filters of size \\(3 \times 3\\), and they are applied with
 Therefore, the output volume size has spatial size (5 - 3 + 2)/2 + 1 = 3.
 Moreover, notice that a padding of \\(P = 1\\) is applied to the input volume, making the outer border of the input volume zero.
 The visualization below iterates over the output activations (green), and shows that each element is computed by elementwise multiplying the highlighted input (blue) with the filter (red), summing it up, and then offsetting the result by the bias.
--->
 
 <div class="fig figcenter fighighlight">
   <iframe src="/assets/conv-demo/index.html" width="100%" height="700px;" style="border:none;"></iframe>
   <div class="figcaption"></div>
 </div>
+-->
 
 
 <a name='vjezba'></a>
@@ -83,16 +83,18 @@ Metoda  `backward_params` računa gradijent s obzirom na parametre sloja (\\( \f
 ### 1. zadatak
 Dovršite implementacije potpuno povezanog sloja, sloja nelinearnosti 
 te funkcije gubitka u razredima `FC`, `ReLU` i `SoftmaxCrossEntropyWithLogits`.
-Podsjetimo se, funkcija cilja unakrsne entropije računa udaljenost između
-točne distribucije i distribucije koju predviđa model i definirana je kao:
+Podsjetimo se, gubitak unakrsne entropije računa udaljenost između
+točne distribucije i distribucije koju predviđa model i definiran je kao:
 
 $$
-L = - \sum_{i=1}^{C} y_i log(s_j(\mathbf{x})) \\
+L = - \sum_{i=1}^{C} y_i log(s_i(\mathbf{x})) \\
 $$
 
 gdje je C broj razreda, \\( \mathbf{x} \\) ulazni primjer u vektorkom obliku,
 \\( \mathbf{y} \\) točna distribucija preko svih razreda za dani primjer (najčešće one-hot vektor), a \\( s_j(\mathbf{x}) \\)
-izlaz Softmax funkcije za razred \\(j\\).
+izlaz Softmax funkcije za razred \\(i\\).
+Radi jednostavosti prikazali smo funkciju gubitka za samo jedan primjer dok u praksi definiramo gubitak nad skupom primjera
+pa će ukupan gubitak biti suma gubitaka preko svih primjera.
 Da biste izveli unazadni prolazak kroz sloj potrebno je najprije izračunati
 gradijent ove funkcije s obzirom na ulaz \frac{∂L}{∂\mathbf{x}}.
 Postupak derivacije možemo pojednostavniti tako da uvrstimo definiciju Softmax funkcije:
