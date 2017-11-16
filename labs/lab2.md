@@ -45,6 +45,12 @@ Neurone u konvolucijskim slojevima mreže obično nazivamo i filtrima.
 Konvolucijske mreže koriste tri važne ideje: rijetku povezanost, dijeljenje parametara i
 ekvivarijantnost reprezentacije.
 
+<div class="fig figcenter fighighlight">
+  <img src="/assets/lab2/convnet1.png" width="100%">
+  <img src="/assets/lab2/convnet2.png" width="30%">
+  <div class="figcaption figcenter">Primjer konvolucijske mreže za klasifikaciju slika. Tipično se izmjenjuju konvolucijski slojevi
+  i slojevi sažimanja (izvlačenja). Na kraju se dolazi do vektora značajki koji se potpuno povezanim slojem preslikava u konačnu distribuciju preko razreda.</div>
+</div>
 
 <a name='vjezba'></a>
 
@@ -73,12 +79,12 @@ L = - \sum_{i=1}^{C} y_i log(s_i(\mathbf{x})) \\
 $$
 
 gdje je C broj razreda, \\( \mathbf{x} \\) ulazni primjer u vektorkom obliku,
-\\( \mathbf{y} \\) točna distribucija preko svih razreda za dani primjer (najčešće one-hot vektor), a \\( s_j(\mathbf{x}) \\)
+\\( \mathbf{y} \\) točna distribucija preko svih razreda za dani primjer (najčešće one-hot vektor), a \\( s_i(\mathbf{x}) \\)
 izlaz Softmax funkcije za razred \\(i\\).
 Radi jednostavosti prikazali smo funkciju gubitka za samo jedan primjer dok u praksi definiramo gubitak nad skupom primjera
-pa će ukupan gubitak biti suma gubitaka preko svih primjera.
+pa će ukupan gubitak obično biti jednak prosječnom gubitku preko svih primjera.
 Da biste izveli unazadni prolazak kroz sloj potrebno je najprije izračunati
-gradijent ove funkcije s obzirom na ulaz \frac{∂L}{∂\mathbf{x}}.
+gradijent ove funkcije s obzirom na ulaz \\( \frac{∂L}{∂\mathbf{x}} \\).
 Postupak derivacije možemo pojednostavniti tako da uvrstimo definiciju Softmax funkcije:
 
 $$
