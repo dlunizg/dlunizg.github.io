@@ -46,24 +46,6 @@ Konvolucijske mreže koriste tri važne ideje: rijetku povezanost, dijeljenje pa
 ekvivarijantnost reprezentacije.
 
 
-**Konvolucija - demonstracija**. Ispod se nalazi demonstracija konvolucijskog sloja.
-Plavo - ulazni tenzor, crveno - tensor filtara, zeleno - izlazni tenzor.
-Svi tensozi izrezani su po dubini radi lakše vizualizacije.
-Preuzeto s [CS231n](http://cs231n.github.io/convolutional-networks/).
-<!---
-The input volume is of size \\(W_1 = 5, H_1 = 5, D_1 = 3\\), and the CONV layer parameters are \\(K = 2, F = 3, S = 2, P = 1\\).
-That is, we have two filters of size \\(3 \times 3\\), and they are applied with a stride of 2.
-Therefore, the output volume size has spatial size (5 - 3 + 2)/2 + 1 = 3.
-Moreover, notice that a padding of \\(P = 1\\) is applied to the input volume, making the outer border of the input volume zero.
-The visualization below iterates over the output activations (green), and shows that each element is computed by elementwise multiplying the highlighted input (blue) with the filter (red), summing it up, and then offsetting the result by the bias.
-
-<div class="fig figcenter fighighlight">
-  <iframe src="/assets/conv-demo/index.html" width="100%" height="700px;" style="border:none;"></iframe>
-  <div class="figcaption"></div>
-</div>
--->
-
-
 <a name='vjezba'></a>
 
 ## Vježba
