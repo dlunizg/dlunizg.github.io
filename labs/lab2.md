@@ -103,8 +103,10 @@ L = log \left(\sum_{j=1}^{C} e^{x_j}\right) - \sum_{i=1}^{C} y_i x_i \\
 Sada možemo jednostavno izračunati derivaciju funkcije cilja s obzirom na ulazni skalar \\( x_k \\):
 
 $$
-\frac{∂L}{∂x_k} = \frac{∂L}{∂x_k} log \left(\sum_{j=1}^{C} e^{x_j}\right) - \frac{∂L}{∂x_k} \sum_{i=1}^{C} y_i x_i \\
-\frac{∂L}{∂x_k} log \left(\sum_{j=1}^{C} e^{x_j}\right) = \frac{1}{\sum_{j=1}^{C} e^{x_j}} \cdot e^{x_k} = s_k(\mathbf{x}) \\
+\frac{∂L}{∂x_k} = \frac{∂}{∂x_k} log \left(\sum_{j=1}^{C} e^{x_j}\right) - \frac{∂}{∂x_k} \sum_{i=1}^{C} y_i x_i \\
+\frac{∂}{∂x_k} log \left(\sum_{j=1}^{C} e^{x_j}\right)
+  = \frac{1}{\sum_{j=1}^{C} e^{x_j}} \cdot e^{x_k}
+  = s_k(\mathbf{x}) \\
 \frac{∂L}{∂x_k} = s_k(\mathbf{x}) - y_k \\
 $$
 
