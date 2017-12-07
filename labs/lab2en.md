@@ -1,10 +1,10 @@
 ---
-layout: page
+layout: page_en
 mathjax: true
 permalink: /lab2en/
 ---
 
-## Contentsx
+## Contents
 
 - [Introduction](#intro)
 - [Overview](#vjezba)
