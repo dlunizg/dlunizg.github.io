@@ -1,5 +1,4 @@
 ---
-title: x
 layout: page
 mathjax: true
 permalink: /lab2en/
