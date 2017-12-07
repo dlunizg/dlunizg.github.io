@@ -4,8 +4,6 @@ mathjax: true
 permalink: /lab2en/
 ---
 
-## Contents
-
 [Introduction](#intro)
 [Overview](#vjezba)
  - [Task 1: backprop through FC, ReLU and log softmax](#1zad)
