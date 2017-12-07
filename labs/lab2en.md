@@ -4,10 +4,10 @@ mathjax: true
 permalink: /lab2en/
 ---
 
-## Contents
+## Exercise 2: convolutional models 
 
 - [Introduction](#intro)
-- [Overview](#vjezba)
+- [Exercise overview](#vjezba)
 - [Task 1: backprop through FC, ReLU and log softmax](#1zad)
 - [Task 2: regularization](#2zad)
 - [Task 3: Tensorflow MNIST](#3zad)
@@ -16,8 +16,7 @@ permalink: /lab2en/
 
 
 <a name='intro'></a>
-
-## Exercise 2: convolutional models 
+## Introduction
 
 This exercise considers convolutional models.
 Such models are appropriate for structured
@@ -97,7 +96,7 @@ discourage overfitting and promote generalization.
 
 <a name='vjezba'></a>
 
-## Task descriptions
+## Exercise overview
 
 The required dependencies are:
 Tensorflow, NumPy, [Cython](http://cython.org),
