@@ -1,4 +1,5 @@
 ---
+title: x
 layout: page
 mathjax: true
 permalink: /lab2en/
@@ -6,14 +7,13 @@ permalink: /lab2en/
 
 ## Contentsx
 
-[Introduction](#intro)
-
-[Overview](#vjezba)
- - [Task 1: backprop through FC, ReLU and log softmax](#1zad)
- - [Task 2: regularization](#2zad)
- - [Task 3: Tensorflow MNIST](#3zad)
- - [Task 4: Tensorflow CIFAR-10](#4zad)
-[Bonus tasks](#add)
+- [Introduction](#intro)
+- [Overview](#vjezba)
+- [Task 1: backprop through FC, ReLU and log softmax](#1zad)
+- [Task 2: regularization](#2zad)
+- [Task 3: Tensorflow MNIST](#3zad)
+- [Task 4: Tensorflow CIFAR-10](#4zad)
+- [Bonus tasks](#add)
 
 
 <a name='intro'></a>
