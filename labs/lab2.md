@@ -79,7 +79,9 @@ $$
 L = - \sum_{i=1}^{C} y_i log(s_i(\mathbf{x})) \\
 $$
 
-gdje je C broj razreda, \\( \mathbf{x} \\) ulazni primjer u vektorkom obliku,
+gdje je C broj razreda,
+\\( \mathbf{x} \\) ulaz funkcije softmaks
+kojeg možemo zvati klasifikacijska mjera ili logit,
 \\( \mathbf{y} \\) točna distribucija preko svih razreda za dani primjer (najčešće one-hot vektor), a \\( s_i(\mathbf{x}) \\)
 izlaz Softmax funkcije za razred \\(i\\).
 Radi jednostavosti prikazali smo funkciju gubitka za samo jedan primjer dok u praksi definiramo gubitak nad skupom primjera
@@ -110,8 +112,9 @@ $$
 \frac{∂L}{∂x_k} = s_k(\mathbf{x}) - y_k \\
 $$
 
-Konačno, gradijent s obzirom na sve ulazne podatke dobijemo tako da izračunamo razliku između vektora distribucije iz modela i
-točne distribucije:
+Konačno, gradijent s obzirom na sve ulaze sloja
+dobivamo tako da izračunamo razliku
+između vektora distribucije iz modela i točne distribucije:
 
 $$
 \frac{∂L}{∂\mathbf{x}} = s(\mathbf{x}) - \mathbf{y} \\
@@ -129,11 +132,14 @@ Preporuka je da na Linuxu koristite preglednik Geeqie.
 <a name='2zad'></a>
 
 ### 2. zadatak
-U ovom zadatku trebate dodati podršku za L2 regularizaciju parametara.
-Dovršite implementaciju `L2Regularizer` sloja te naučite regularizirani model iz
+U ovom zadatku trebate dodati podršku za
+L2 regularizaciju parametara.
+Dovršite implementaciju sloja `L2Regularizer`
+te naučite regularizirani model iz
 prethodnog zadatka koji se nalazi u `train_l2reg.py`.
-Igrajte se s regularizacijskim parametrom tako da naučite
-tri različite mreže \\( \lambda = 1e^{-3}, \lambda=1e^{-2}, \lambda=1e^{-1} \\)
+Proučite efekte regularizacijskog hiper-parametra
+tako da naučite tri različite mreže s
+\\( \lambda = 1e^{-3}, \lambda=1e^{-2}, \lambda=1e^{-1} \\)
 te usporedite naučene filtre u prvom sloju i dobivenu točnost.
 
 <!---
