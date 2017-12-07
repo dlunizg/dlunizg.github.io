@@ -6,15 +6,16 @@ permalink: /lab2en/
 
 ## Contents
 
-[Task descriptions](#vjezba)
-  - [Task 1: backprop through FC, ReLU and log softmax](#1zad)
-  - [Task 2: regularization](#2zad)
-  - [Task 3: Tensorflow MNIST](#3zad)
-  - [Task 4: Tensorflow CIFAR-10](#4zad)
+[Introduction](#intro)
+[Overview](#vjezba)
+ - [Task 1: backprop through FC, ReLU and log softmax](#1zad)
+ - [Task 2: regularization](#2zad)
+ - [Task 3: Tensorflow MNIST](#3zad)
+ - [Task 4: Tensorflow CIFAR-10](#4zad)
 [Bonus tasks](#add)
 
 
-<a name='cnn'></a>
+<a name='intro'></a>
 
 ## Exercise 2: convolutional models 
 
