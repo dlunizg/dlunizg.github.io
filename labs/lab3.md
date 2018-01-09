@@ -428,7 +428,7 @@ Funkcija `step` kojoj kostur nije opisan sadržava logiku pokretanja jednog prol
 
 #### 2.2: Uzorkovanje podataka na temelju naučene mreže
 
-Kod treniranja mreže smo implicitno uzimali idući znak niza umjesto predikciju mreže kao ulaz u idućem vremenskom koraku te nije primjenjiv za vrijeme testiranja (kad nam nije dostupan točni idući element niza). Iz ovog razloga greška na skupu za treniranje je umjetno drastično manja od greške na skupu za testiranje (validaciju). 
+Kod treniranja mreže smo implicitno uzimali idući znak niza umjesto predikciju mreže kao ulaz u idućem vremenskom koraku. Ovaj pristup nije primjenjiv za vrijeme testiranja (kad nam nije dostupan točni idući element niza). Iz ovog razloga greška na skupu za treniranje je umjetno drastično manja od greške na skupu za testiranje (validaciju). 
 
 Unutar okvira laboratorijske vježbe nećemo ulaziti u dubinu uzorkovanja nizova, već ćemo obraditi najosnovniji pristup. Svakih `sample_every` minibatcheva pokrenuti ćemo metodu za uzorkovanje iz naše povratne neuronske mreže na idući način:
 
