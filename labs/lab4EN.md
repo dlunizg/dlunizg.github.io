@@ -4,7 +4,7 @@ mathjax: true
 permalink: /lab4en/
 ---
 - [Generative models](#gm)
-- [Restrictrd Boltzman Machine](#rbm)
+- [Restrictrd Boltzmann Machine](#rbm)
   - [Task 1](#1zad)
   - [Task 2](#2zad)
   - [Task 3](#3zad)
@@ -15,31 +15,31 @@ permalink: /lab4en/
 
 <a name='gm'></a>
 
-## 4. vježba: Generative Models (GM)
+## Lab assignment 4: Generative Models (GM)
 _v1.2-2018_
 
-In this exercise, you will get to know generative models. Their main difference with respect to discriminatory models is that they are designed to generate samples that are characteristic of the distribution of the samples used for training. In order for them to work properly, it is essential that they can learn the important characteristics of the samples from the training set. One possible representation of important characteristics is the distribution of input vectors, which a model could use to generate more probable samples (more frequent in the training set), and less samples that are less likely.
+In this exercise, you will get to know generative models. Their main difference with respect to discriminative models is that they are designed to generate samples that are characteristic of the distribution of the samples used for training. In order for them to work properly, it is essential that they can learn the important characteristics of the samples from the training set. One possible representation of important characteristics is the distribution of input vectors, which a model could use to generate more probable samples (more frequent in the training set), and fewer samples that are less likely.
 
 The distribution of samples from the training set can be described by the distribution of the probability of multiple variables
-$$p(\mathbf x)$$. The probability of the training samples $$\mathbf x^{(i)}$$ should be high while the likelihood of other samples should be lower. Discriminatory models, on the other hand, are focused on the aposteriory probability of the class $$ d $$.
+$$p(\mathbf x)$$. The probability of the training samples $$\mathbf x^{(i)}$$ should be high while the likelihood of other samples should be lower. Discriminative models, on the other hand, are focused on the posterior probability of the class $$ d $$.
 
 $$ 
 p(d\vert \mathbf{x})=\frac{p(d)p(\mathbf{x}\vert d)}{p(\mathbf{x})}
 $$
 
-The above expressino suggests that knowledge of $$ p(\mathbf x)$$ could be useful information for discriminatory models, though they generally don't use it directly. But one can expect that an accurate knowledge of $$ p(\mathbf x)$$ could help to better estimate $$ p(d \vert \mathbf{x}) $$. This idea is additionally supported by a reasonable assumption that both the input samples and the corresponding class $$ d $ (output) are the consequence of the same essential features. Input samples contain a substantial amount of essential information, but often also contain noise that makes it more difficult to model direct transformation to the output. The transformation of essential features to the output is presumably simpler than direct input to output transformation.
+The above expression suggests that knowledge of $$ p(\mathbf x)$$ could be useful information for discriminative models, though they generally don't use it directly. But one can expect that an accurate knowledge of $$ p(\mathbf x)$$ could help to better estimate $$ p(d \vert \mathbf{x}) $$. This idea is additionally supported by a reasonable assumption that both the input samples and the corresponding class $$ d $ (output) are the consequence of the same essential features. Input samples contain a substantial amount of essential information, but often also contain noise that makes it more difficult to model direct transformation to the output. The transformation of essential features to the output is presumably simpler than the direct input to output transformation.
 
 <div class="fig figcenter fighighlight">
   <img src="/assets/lab4/bitneZen.svg" width="70%">
 </div>
 
-These ideas point to the use of generative models for extraction of essential features. Their primary purpose - generating samples - is not that important any more. After the training, the layer containing the essential featues can be used as an input layer for an additional discriminatory model (eg. MLP). Such model would "more easily" produce desired output. The focus of this excersize is on training of generative models.
+These ideas point to the use of generative models for extraction of essential features. Their primary purpose - generating samples - is not that important anymore. After the training, the layer containing the essential features can be used as an input layer for an additional discriminative model (eg. MLP). Such model would "more easily" produce the desired output. The focus of this exercise is on the training of generative models.
 
 <a name='rbm'></a>
 
-### Restrictrd Boltzman Machine (RBM)
+### Restricted Boltzmann Machine (RBM)
 
-Boltzman Machine (BM) is a [stochastic](https://en.wikipedia.org/wiki/Stochastic_neural_network) [recursive](https://en.wikipedia.org/wiki/Recursive_neural_network) [generative](https://en.wikipedia.org/wiki/Generative_model) network traind to maximize $$p(\mathbf x^{(i)})$$, and based on the Boltrman distribution which assigns lover probability to states $$\mathbf x$$ with higher energy $$E(\mathbf x)$$ according to the following expression
+Boltzmann Machine (BM) is a [stochastic](https://en.wikipedia.org/wiki/Stochastic_neural_network) [recursive](https://en.wikipedia.org/wiki/Recursive_neural_network) [generative](https://en.wikipedia.org/wiki/Generative_model) network traind to maximize $$p(\mathbf x^{(i)})$$, and based on the Boltzmann distribution which assigns lover probability to states $$\mathbf x$$ with higher energy $$E(\mathbf x)$$ according to the following expression
 
 $$
 p(\mathbf{x})\propto
@@ -68,7 +68,7 @@ $$
 \sum_{\mathbf{x}}p(\mathbf{x};\mathbf{W},\mathbf{b})=1
 $$
 
-According to the selected energy function and Boltzman's distribution, the probability of a node's state being 1 is equal to
+According to the selected energy function and Boltzmann's distribution, the probability of a node's state being 1 is equal to
 
 $$
 p(x_{j}=1)=\frac{1}{1+e^{-\sum
@@ -76,19 +76,19 @@ _{i=1}^{N}w_{\mathit{ji}}x_{i}-b_{j}}}=\sigma \left(\sum
 _{i=1}^{N}w_{\mathit{ji}}x_{i}+b_{j}\right)
 $$
 
-In order for the BM energy function to describe higher-order correlations, or more complex interconnections of individual elements of the data vector, we introduce the hidden variables $$h$$. Real data is then called the visible layer and is denoted by $$\mathbf in$$, while the hidden variables make the hidden layer $$\mathbf h$$.
+In order for the BM energy function to describe higher-order correlations or more complex interconnections of individual elements of the data vector, we introduce the hidden variables $$h$$. Real data is then called the visible layer and is denoted by $$\mathbf in$$, while the hidden variables make the hidden layer $$\mathbf h$$.
 
 $$
 \mathbf{x}=(\mathbf v,\mathbf h)
 $$
 
-With RBMs, no interconnections are allowed within the same layer. This restriction (hence the name Restricted Boltzman Machine) allows for simple updating of the network states. Although its purpose is well known, the hidden layer $$\mathbf h$$ and its distribution $$ p(\mathbf h)$$ are not predetermined.
+With RBMs, no interconnections are allowed within the same layer. This restriction (hence the name Restricted Boltzmann Machine) allows for simple updating of the network states. Although its purpose is well known, the hidden layer $$\mathbf h$$ and its distribution $$ p(\mathbf h)$$ are not predetermined.
 
 <div class="fig figcenter fighighlight">
   <img src="/assets/lab4/rbm.svg" width="20%">
 </div>
 
-The energy ofthe network then becomes
+The energy of the network then becomes
 
 $$
 E(\mathbf{v},\mathbf{h})=-\mathbf{v^{T}Wh}-\mathbf{b^{T}h}-\mathbf{a^{T}v}
@@ -157,9 +157,9 @@ _{\mathbf{v,h}}v_{j}p(\mathbf{v,h};\mathbf{W},\mathbf{a},\mathbf{b})\right]=N\le
 v_{j}\rangle -\langle v_{j}\rangle
 _{P(\mathbf{v},\mathbf{h};\mathbf{W},\mathbf{a},\mathbf{b})}\right]$$
 
-The final expressions of of all three equations contain two components in which $$ \langle \rangle $$ brackets denote averaged values ​​for $$N$$ input samples (usually the mini batch size).
+The final expressions of all three equations contain two components in which $$ \langle \rangle $$ brackets denote averaged values ​​for $$N$$ input samples (usually the mini batch size).
 The first part of the final expressions refers to the states of the network when the input samples are fixed in the visible layer. To determine the corresponding states of the hidden layer $$\mathbf{h}$$, it is sufficient to determine each state $$h_j$$ according to the expression for $$p(h_j = 1)$$.
-The seond part refers to the state of the network without a fixed visible layer, so these states can be interpreted as something that the network imagines, based on the current configuration of the parameters ($$\mathbf W$$, $$\mathbf a $$ and $$\mathbf b$$). To get to these states we need to iteratively alternate recalculating new layer states ([Gibss sampling] (https://en.wikipedia.org/wiki/Gibbs_sampling)) according to the expressions for $$p(h_j = 1)$$ and $$p(v_i = 1)$$. Due to the absence of interconnections within the layers, all hidden elements are sampled at once, and then all the elements of the visible layer. Theoretically, the number of iterations should be very large to get what the network "really thinks" i.e. to get to the stationary distribution. The obtained state is then independat of the initail state. The practical solution to this problem is the Contrastive Divergenvce (CD) algorithm where it is sufficient to do only $$k$$ iterations (where $$k$$ is a small number, often only 1), and for the initial states of the visible layer we take the input samples. Although this is a deviation from the theory, in practice it has proven to function well. The visualization of the CD-1 algorithm is given in the figure.
+The second part refers to the state of the network without a fixed visible layer, so these states can be interpreted as something that the network imagines, based on the current configuration of the parameters ($$\mathbf W$$, $$\mathbf a $$ and $$\mathbf b$$). To get to these states we need to iteratively alternate recalculating new layer states ([Gibss sampling] (https://en.wikipedia.org/wiki/Gibbs_sampling)) according to the expressions for $$p(h_j = 1)$$ and $$p(v_i = 1)$$. Due to the absence of interconnections within the layers, all hidden elements are sampled at once, and then all the elements of the visible layer. Theoretically, the number of iterations should be very large to get what the network "really thinks" i.e. to get to the stationary distribution. The obtained state is then independent of the initial state. The practical solution to this problem is the Contrastive Divergence (CD) algorithm where it is sufficient to do only $$k$$ iterations (where $$k$$ is a small number, often only 1), and for the initial states of the visible layer, we take the input samples. Although this is a deviation from the theory, in practice it has proven to function well. The visualization of the CD-1 algorithm is given in the figure.
 
 <div class="fig figcenter fighighlight">
   <img src="/assets/lab4/CDen.svg" width="50%">
@@ -174,16 +174,16 @@ $$\Delta b_{j}=\eta \left[\langle h_{j}\rangle ^{0}-\langle h_{j}\rangle
 $$\Delta a_{i}=\eta \left[\langle v_{i}\rangle ^{0}-\langle v_{i}\rangle
 ^{1}\right]$$
 
-The learning factor $$\eta$$ is usually set to a value less than 1. The first part in the expression for $$\Delta w_{\maths{ij}}$$ is often referred to as the positive phase, and a second part, as a negative phase.
+The learning factor $$\eta$$ is usually set to a value less than 1. The first part of the expression for $$\Delta w_{\maths{ij}}$$ is often referred to as the positive phase, and a second part, as a negative phase.
 
-The MNIST data base will be used in the tasks. Although pixels in MNIST images can obtain real values from the range [0, 1], each pixel can be viewed as the probability of the stochastic binary variable $$p(v_i = 1)$$.
+The MNIST database will be used in the tasks. Although pixels in MNIST images can obtain real values from the range [0, 1], each pixel can be viewed as the probability of the stochastic binary variable $$p(v_i = 1)$$.
 Input variables can then be treated as stochastic binary variables with [Bernoulli distribution] (https://en.wikipedia.org/wiki/Bernoulli_distribution), with given probability $$p(v_i=1)$$.
 
 <a name='1zad'></a>
 
 ### Task 1
 
-Implement the RBM that uses CD-1 for training. For input data use MNIST numbers. The visible layer must then have 784 elements, and the hidden layer should have 100 elements. Since the values of the input samples (image) are real numbers in the range [0 1], they can be used as $$p(v_i = 1)$$, so for the initial values of the visible layer, sampling should be performed. Set the mini batch size to 100 samples, and number of epochs to 100.
+Implement the RBM that uses CD-1 for training. For input data use MNIST numbers. The visible layer must then have 784 elements, and the hidden layer should have 100 elements. Since the values of the input samples (image) are real numbers in the range [0 1], they can be used as $$p(v_i = 1)$$, so for the initial values of the visible layer, sampling should be performed. Set the mini batch size to 100 samples, and the number of epochs to 100.
 
 
 **Subtasks:**
@@ -475,7 +475,7 @@ draw_generated(r_input, hout1, out_1_prob, v_shape, h1_shape, 50)
 
 ### Task 2
 
-Deep beleif Network (DBN) is a deep network that is obtained by stacking multiple RBMs one to another, each of which is trained greedily with inputs from the hidden ("outgoing") layer of the previous RBM (except the first RBM being trained directly with input samples). In theory, such DBN should increase $$ p(\mathbf v)$$ which is our initial goal. The use of DBN, ie reconstruction of the input sample, is carried out according to the scheme below. In the upward pass, hidden layers are determined from the visible layer until the highest RBM is reached, then the CD algorithm is executed, then in the downward direction, the lower hidden layers are determined until the visible layer. The weights between the individual layers are the same in the upward and in the downward pass. Implement a three-layer DBN that consists of two greedy RBMs. The first RBM should be as in 1st task, and the second RBM should have a hidden layer of 100 elements.
+Deep Belief Network (DBN) is a deep network that is obtained by stacking multiple RBMs one to another, each of which is trained greedily with inputs from the hidden ("outgoing") layer of the previous RBM (except the first RBM being trained directly with input samples). In theory, such DBN should increase $$ p(\mathbf v)$$ which is our initial goal. The use of DBN, ie reconstruction of the input sample, is carried out according to the scheme below. In the upward pass, hidden layers are determined from the visible layer until the highest RBM is reached, then the CD algorithm is executed, then in the downward direction, the lower hidden layers are determined until the visible layer. The weights between the individual layers are the same in the upward and in the downward pass. Implement a three-layer DBN that consists of two greedy RBMs. The first RBM should be as in 1st task, and the second RBM should have a hidden layer of 100 elements.
 
 **Subtasks:**
 1. Visualize the weights of $$\mathbf W_1$$ and $$\mathbf W_2$$ obtained by training.
@@ -572,9 +572,9 @@ draw_reconstructions(teX, vr2, h2downs, v_shape, h2_shape, 200)
 #...
 ```
 
-In order to further improve the generative properties of the DBN, the generative fine-tuning of the network parameters can be implemented. In the 2nd task, during reconstruction, the same weights and biases were used in the downward and upward steps. With fine-tuning, parameters that connect all layers except the two topmost, are split into two sets. The weight matrix between the lower layers is split into: $$\mathbf R_n$$ for the upward pass and $$\mathbf W'_n$$ for the downward pas. Initially, both matrices are equal to the original matrix $$\mathbf W_n$$. The new states of an upper hidden layer $$\mathbf s^{(n)}$$ are determined using $$\mathbf R$$ from the lower states $$\mathbf s^{(n-1)}$$ by sampling ($$sample \left(\sigma \left(\mathbf R_n \mathbf s^{(n-1)} + \mathbf b^{up}_n\right)\right) \to \mathbf s^{(n)}$$). In the downward pass (sleep phase) the "reconstruction" of the lower states $$\mathbf s^{(n-1)} $$ from $$\mathbf s^{(n)}$$ and the matrix $$\mathbf W'$$ ($$sample \left( \sigma \left(\mathbf W'_n \mathbf s^{(n)} + \mathbf b^{down}_{n-1} \right) \right) \to \mathbf s^{(n-1)}$$). The top two layers are classic RBM and share the same weight matrix for both directions, and the modification of these weights is carried out in the same way as in the 1st task.
+In order to further improve the generative properties of the DBN, the generative fine-tuning of the network parameters can be implemented. In the 2nd task, during reconstruction, the same weights and biases were used in the downward and upward steps. With fine-tuning, parameters that connect all layers except the two topmost, are split into two sets. The weight matrix between the lower layers is split into: $$\mathbf R_n$$ for the upward pass and $$\mathbf W'_n$$ for the downward pass. Initially, both matrices are equal to the original matrix $$\mathbf W_n$$. The new states of an upper hidden layer $$\mathbf s^{(n)}$$ are determined using $$\mathbf R$$ from the lower states $$\mathbf s^{(n-1)}$$ by sampling ($$sample \left(\sigma \left(\mathbf R_n \mathbf s^{(n-1)} + \mathbf b^{up}_n\right)\right) \to \mathbf s^{(n)}$$). In the downward pass (sleep phase) the "reconstruction" of the lower states $$\mathbf s^{(n-1)} $$ from $$\mathbf s^{(n)}$$ and the matrix $$\mathbf W'$$ ($$sample \left( \sigma \left(\mathbf W'_n \mathbf s^{(n)} + \mathbf b^{down}_{n-1} \right) \right) \to \mathbf s^{(n-1)}$$). The top two layers are classic RBM and share the same weight matrix for both directions, and the modification of these weights is carried out in the same way as in the 1st task.
 
-Weight training between the lower layers is different. Matrices $$\mathbf W'_n$$ are modified when new states are determined using the matrix $$\mathbf R_n$$ in the upward pass. In the downward pass matrix $$\mathbf R_n$$ is modified. The bias vectors of the individual layers $$\mathbf b_n$$ are also split to version for the upward pass $$\mathbf b_n^{up}$$ and for the downward pass $$\mathbf b_n^{down}$$. Initial biases are the same as the original ones $$\mathbf b$$.
+Weight training between the lower layers is different. Matrices $$\mathbf W'_n$$ are modified when new states are determined using the matrix $$\mathbf R_n$$ in the upward pass. In the downward pass, the matrix $$\mathbf R_n$$ is modified. The bias vectors of the individual layers $$\mathbf b_n$$ are also split to the version for the upward pass $$\mathbf b_n^{up}$$ and for the downward pass $$\mathbf b_n^{down}$$. Initial biases are the same as the original ones $$\mathbf b$$.
 
 To modify matrix $$\mathbf W'_n$$ in the upward pass ($$sample \left(\sigma \left(\mathbf R_n \mathbf s^{(n-1)} + \mathbf b^{up}_n\right)\right) \to \mathbf s^{(n)}$$) a downward sampling is performed $$sample \left( \sigma \left(\mathbf W'_n \mathbf s^{(n)} + \mathbf b^{down}_{n-1} \right) \right) \to \mathbf s^{(n-1)novo}$$. Weights are modified in the following way
 $$\Delta w'_{\mathit{ij}}=\eta
@@ -592,7 +592,7 @@ $$\Delta b_{\mathit{i}}^{\mathit{up}}=\eta
 
 This procedure is performed for each training sample and is referred to as the up-down algorithm (sometimes wake-sleep algorithm).
 
-HINT: pseudocode for training a four layer DBN is available in the appendix of this [article](https://www.cs.toronto.edu/~hinton/absps/fastnc.pdf)
+HINT: pseudocode for training a four-layer DBN is available in the appendix of this [article](https://www.cs.toronto.edu/~hinton/absps/fastnc.pdf)
 
 
 
@@ -600,7 +600,7 @@ HINT: pseudocode for training a four layer DBN is available in the appendix of t
 
 ### Task 3
 
-Implement the generative fine tuning procedure for DBN from the 2nd task. Use the CD-2 to train the topmost RBM.
+Implement the generative fine-tuning procedure for DBN from the 2nd task. Use the CD-2 to train the topmost RBM.
 
 Implementirajte postupak generativnog fine-tuninga na DBN iz 2. zadatka. Za treniranje gronjeg RBM-a koristite CD-2.
 
@@ -640,7 +640,7 @@ with g3.as_default():
     
     
     # top RBM Gibs passes
-    h2_up_prob = 
+    h2_up_prob = edid
     h2_up = 
     h2_down = h2_up
     for step in range(gibbs_sampling_steps):
@@ -739,8 +739,7 @@ plt.tight_layout()
 
 ### Variational Autoencoder (VAE)
 
-Autoencoder is a feed-forward network that uses backpropagation for training and can have a deep structure. Autoencoders are gnereative networks with a characteristic two-layer structure. The first part is called the encoder and maps (encodes) the input layer to the hidden layer. The second part is the decoder and transforms the hidden layer to the output layer. The primary goal of such a network is to achieve the similarity of inputs and outputs for each training sample, maximizing some similarity metrics. The primary goal is simple, which makes autoencoders' training unsupervised. The goal can be easily reached by direct copying the input to the output, but this is not in line with the hidden goal. The hidden goal, which is actually the most important, is to learn the essential features of the training samples. To achieve this, and avoid direct copying, various regularization techniques are used. Alteratively, another success rate can be used, such as maximizing probabilities. In any case, the variables of the hidden layer $$\mathbf z$ are responsible for extracting essential features from the input samples.
-ačajki ulaznih uzoraka.
+Autoencoder is a feed-forward network that uses backpropagation for training and can have a deep structure. Autoencoders are generative networks with a characteristic two-layer structure. The first part is called the encoder and maps (encodes) the input layer to the hidden layer. The second part is the decoder and transforms the hidden layer to the output layer. The primary goal of such a network is to achieve the similarity of inputs and outputs for each training sample, maximizing some similarity metrics. The primary goal is simple, which makes autoencoders' training unsupervised. The goal can be easily reached by direct copying the input to the output, but this is not in line with the hidden goal. The hidden goal, which is actually the most important, is to learn the essential features of the training samples. To achieve this, and avoid direct copying, various regularization techniques are used. Alternatively, another success rate can be used, such as maximizing probabilities. In any case, the variables of the hidden layer $$\mathbf z$ are responsible for extracting essential features from the input samples.
 
 [Variational Autoencoders (VAE)](http://arxiv.org/abs/1312.6114) are autoencoders that maximize the probability of $$p(\mathbf x)$$ of all training samples $$\mathbf x^{(i)}$$. VAE does not use additional regularization techniques, but some of them can be included in VAE (eg a combination of VAE and denoising autoencoder gives better results). Important features in the hidden layer $$\mathbf z$$ then have the role in modeling $$p(\mathbf x)$$.
 
@@ -750,8 +749,8 @@ p(\mathbf{x}\vert \mathbf{z};\theta
 )p(\mathbf{z})\mathbf{\mathit{dz}}
 $$
 
-The probabilities on the right side of the equation are as unknown as is $$p(\mathbf x)$$, but we will approximate them with Gaussian distributions. $$\Theta$$ are model parameters and we determine them through the training process. An additional aim is to minimize the amount of sampling operations, which are usually necessary when estimating unknown distributions.
-In this case, it is best to maximize the logprobability.
+The probabilities on the right side of the equation are as unknown as is $$p(\mathbf x)$$, but we will approximate them with Gaussian distributions. $$\Theta$$ are model parameters and we determine them through the training process. An additional aim is to minimize the number of sampling operations, which are usually necessary when estimating unknown distributions.
+In this case, it is best to maximize the log probability.
 
 $$
 \log _{\mathbf{\theta }}p(\mathbf{x}^{(1)},\ldots
@@ -765,7 +764,7 @@ $$
 p(z)=N(0,1)
 $$
 
-By doing this, we seemingly limit the hidden lyer in representing the important features.
+By doing this, we seemingly limit the hidden layer in representing the important features.
 
 <div class="fig figcenter fighighlight">
   <img src="/assets/lab4/VAE1.svg" width="50%">
@@ -778,7 +777,7 @@ $$
 p_{\mathbf{\theta }}(x\vert z)=N(\mu _{x}(z),\sigma _{x}(z))
 $$
 
-Parameters $$\Theta$$ include the weights and biases of all neurons of the hidden (internal) layers of the decoder and are determined trough the training. The complexity of $$p(\mathbf x \vert \mathbf z)$$ depends on the number of hidden layers and the number of neurons in them. The dotted lines on the diagram indicate sampling operations. For the sake of visibility, only single variable z is shown in the diagram, instead of the vector of the hidden variables $$\mathbf z$$.
+Parameters $$\Theta$$ include the weights and biases of all neurons of the hidden (internal) layers of the decoder and are determined through the training. The complexity of $$p(\mathbf x \vert \mathbf z)$$ depends on the number of hidden layers and the number of neurons in them. The dotted lines on the diagram indicate sampling operations. For the sake of visibility, only single variable z is shown in the diagram, instead of the vector of the hidden variables $$\mathbf z$$.
 
 <div class="fig figcenter fighighlight">
   <img src="/assets/lab4/VAE_dec.svg" width="50%">
@@ -786,7 +785,6 @@ Parameters $$\Theta$$ include the weights and biases of all neurons of the hidde
 </div>
 
 Now we should determine $$p(\mathbf z \vert \mathbf x)$$, such that the above assumptions work well. Since we do not have a way to determine the appropriate $$p(\mathbf z \vert \mathbf x) $$, we will approximate it with the normal distribution $$q(\mathbf z \vert \mathbf x)$$, but we will carefully determine the parameters of this substitute distribution.
-re te zamjenske distribucije.
 
 $$
 q_{\mathbf{\phi
@@ -799,7 +797,7 @@ $$
   <div class="figcaption figcenter">Encoder part</div>
 </div>
 
-Similar to the decoder, the parameters $$\Phi$$ include the weights and the biases of the encoder layers and they are determined by the training process. Complexity of $$q(\mathbf z \vert \mathbf x) $$ depends on the number of hidden layers and the number of neurons in them.
+Similar to the decoder, the parameters $$\Phi$$ include the weights and the biases of the encoder layers and they are determined by the training process. The complexity of $$q(\mathbf z \vert \mathbf x) $$ depends on the number of hidden layers and the number of neurons in them.
 
 The model is now complete, we only need a goal function that we can optimize by selecting the parameters $$\Theta$$ and $$\Phi$$ correctly.
 
@@ -816,7 +814,7 @@ $$
 _{\mathbf{\theta }}p(\mathbf{x}^{(i)})
 $$
 
-With the appropriate transformation of $$\log(p(\mathbf x))$$, which is an element of the abve sum, we get
+With the appropriate transformation of $$\log(p(\mathbf x))$$, which is an element of the above sum, we get
 
 $$
 \text{}\log (p(\mathbf x))=D_{\mathit{KL}}\left(q( \mathbf z\vert \mathbf x)\parallel
@@ -824,7 +822,7 @@ p(\mathbf z\vert \mathbf x)\right)-D_{\mathit{KL}}\left(q(\mathbf z\vert \mathbf
 (p(\mathbf x\vert \mathbf z))\right)
 $$
 
-$$D_{\mathit{KL}}$$ is [Kullback–Leibler divergence](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) and represents the measure of the similarity of the two distributions. As we substitute $$p(\mathbf z \vert \mathbf x)$$ with $$q(\mathbf z \vert \mathbf x)$$, it is logical to try to make these two distributions as similar as possible. The KL divergence would then achieve tha maximum, but as $$p(\mathbf z \vert \mathbf x)$$ is unknown, we maximize the remaining two parts. These two components together make the lower variational bound $$L$$ of $$log(p(\mathbf x))$$ and by maximizing the lower bound we increase the overall probability of the input sample $$\mathbf x$$.
+$$D_{\mathit{KL}}$$ is [Kullback–Leibler divergence](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) and represents the measure of the similarity of the two distributions. As we substitute $$p(\mathbf z \vert \mathbf x)$$ with $$q(\mathbf z \vert \mathbf x)$$, it is logical to try to make these two distributions as similar as possible. The KL divergence would then achieve the maximum, but as $$p(\mathbf z \vert \mathbf x)$$ is unknown, we maximize the remaining two parts. These two components together make the lower variational bound $$L$$ of $$log(p(\mathbf x))$$ and by maximizing the lower bound we increase the overall probability of the input sample $$\mathbf x$$.
 
 $$
 L(\mathbf{\theta ,\phi
@@ -868,8 +866,8 @@ _{j}{\frac{1}{2}\log (\sigma _{x_{j}}^{(i,k)2})+\frac{(x_{j}^{(i)}-\mu
 _{x_{j}}^{(i,k)})^{2}}{2\sigma _{x_{j}}^{(i,k)2}}}
 $$
 
-Usually $$K$$ is set to 1 to reduce the amount of sampling, provided that the size of the minibatch is at least 100.
-The final expressions for the two components now give us the ultimate goal function for one input pattern. The average value for all input samples $$\mathbf x ^ {(i)}$$ is optimized! It is still necessary to slightly modify the structure of the network to allow backproapagation into the encoder layers. It is necessary to transform the stochastic neuronss $$\mathbf z$$ into deterministic neurons with the stochastic attachment (the noise generator ε with the normal distribution $$N(0,1)$$).
+Usually, $$K$$ is set to 1 to reduce the amount of sampling, provided that the size of the minibatch is at least 100.
+The final expressions for the two components now give us the ultimate goal function for one input pattern. The average value for all input samples $$\mathbf x ^ {(i)}$$ is optimized! It is still necessary to slightly modify the structure of the network to allow backpropagation into the encoder layers. It is necessary to transform the stochastic neurons $$\mathbf z$$ into deterministic neurons with the stochastic attachment (the noise generator ε with the normal distribution $$N(0,1)$$).
 
 <div class="fig figcenter fighighlight">
   <img src="/assets/lab4/VAE_enc_dec2.svg" width="100%">
@@ -890,15 +888,15 @@ The final VAE training algorithm is now:
 6. &nbsp; &nbsp; Calculate new values for $$\Theta$$ and $$\Phi $$ according to the gradient
 7. While $$\Theta$$ and $$\Phi$$ are not converging
 
-So, by this procedure, we maximize the lower bound of the logprobability of the input samples. This gives us the confidence that the logprobability itself will grow, but there is no guarantee. Theoretically, it may happen that the lower bound is growing, and the probability itself is lowering, but in practice it is most often not the case. The possible explanation for this effect lies in the fact that with a sufficiently complex encoder, $$q(\mathbf z \vert \mathbf x)$$ becomes complex and allows to approximate the distribution of $$p(\mathbf z \vert \mathbf x)$$, which maximizes the first (neglected) member of expression for $$log(p(\mathbf x))$$.
+So, by this procedure, we maximize the lower bound of the log probability of the input samples. This gives us the confidence that the log probability itself will grow, but there is no guarantee. Theoretically, it may happen that the lower bound is growing, and the probability itself is lowering, but in practice, it is most often not the case. The possible explanation for this effect lies in the fact that with a sufficiently complex encoder, $$q(\mathbf z \vert \mathbf x)$$ becomes complex and allows to approximate the distribution of $$p(\mathbf z \vert \mathbf x)$$, which maximizes the first (neglected) member of expression for $$log(p(\mathbf x))$$.
 
-Generating new samples is performed only in the decoder part with the random initialization of the hidden layer $$\mathbf z$$ accordin to it's distribution
+Generating new samples is performed only in the decoder part with the random initialization of the hidden layer $$\mathbf z$$ according to its distribution
 $$
 p(z)=N(0,1)
 $$
-or some speciffic vector $$\mathbf z$$.
+or some specific vector $$\mathbf z$$.
 
-In this task also, the MNIST database is used, whose images are treated as a series of imaginary binary pixels $$x_i$$ with Bernoulli's distribution and probability set by the value of input image pixels $$p(x_i = 1) = x_i^{in}$$ . Then it is more appropriate for the decoder to implement Bernoulli's distribution instead of Gaussian. The output of the decoder can then represent the probability of $$p(x_i = 1)$$, which is also the expected value of output $$x_i$$. The probability itself can be defined as
+In this task also, the MNIST database is used, whose images are treated as a series of imaginary binary pixels $$x_i$$ with Bernoulli's distribution and probability set by the value of input image pixels $$p(x_i = 1) = x_i^{in}$$. Then it is more appropriate for the decoder to implement Bernoulli's distribution instead of Gaussian. The output of the decoder can then represent the probability of $$p(x_i = 1)$$, which is also the expected value of output $$x_i$$. The probability itself can be defined as
 
 $$
 p(x_{i}^{\mathit{out}}=1)=\sigma \left(\sum
@@ -932,7 +930,7 @@ $$H$$ is cross-entropy. Fortunately, Tensorflow offers a built-in function for $
 
 ### Task 4
 
-Implement VAE with 20 hidden variables $$z$$. Input data are MNIST numbers. The encoder and decoder have two hidden layers, each with 200 neurons with "softplus" activation functions.
+Implement VAE with 20 hidden variables $$z$$. Input data are MNIST numbers. The encoder and decoder have two hidden layers, each with 200 neurons with "soft plus" activation functions.
 
 **Subtasks:**
 
@@ -1223,7 +1221,7 @@ weights_d1 = test.eval(session=sess)
 boxplot_vis(3, weights_d1.T, 'Weights to decoder', 'Z elemets')
 
 
-# Visualization of muted hidden layer elements - 1nd variant
+# Visualization of muted hidden layer elements - 1st variant
 
 from mpl_toolkits.mplot3d import Axes3D
 
