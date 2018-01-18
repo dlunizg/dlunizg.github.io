@@ -330,7 +330,7 @@ with g1.as_default():
     dw1 = (w1_positive_grad - w1_negative_grad) / tf.to_float(tf.shape(X1)[0])
 
     update_w1 = tf.assign_add(w1, alpha * dw1)
-    update_vb1 = tf.assign_add(vb1, alpha * tf.reduce_mean(X1 - v1_prob, 0))
+    update_vb1 = tf.assign_add(vb1, alpha * tf.reduce_mean(X1 - v1, 0))
     update_hb1 = tf.assign_add(hb1, alpha * tf.reduce_mean(h0 - h1, 0)) 
 
     out1 = (update_w1, update_vb1, update_hb1)
