@@ -3,7 +3,6 @@ layout: page
 mathjax: true
 permalink: /lab4/
 ---
-
 - [Generativni modeli](#gm)
 - [Ograničeni Boltzmanov stroj](#rbm)
   - [1. zadatak](#1zad)
@@ -17,29 +16,30 @@ permalink: /lab4/
 <a name='gm'></a>
 
 ## 4. vježba: Generativni modeli (GM)
+_v1.2-2018_
 
 U ovoj vježbi pozabavit ćete se s generativnim modelima. Njihova glavna razlika u odnosu na diskriminativne modele je u tome što su predviđeni za generiranje uzoraka karakterističnih za distribuciju uzoraka korištenih pri treniranju. Da bi to mogli raditi na odgovarajući način, nužno je da mogu naučiti bitne karakteristike uzoraka iz skupa za treniranje. Jedna moguća reprezentacija tih bitnih karakteristika je distribucija ulaznih vektora, a model bi uz pomoć takve informacije mogao generirati više uzoraka koji su vjerojatniji (više zastupljeni u skupu za treniranje), a manje uzoraka koji su manje vjerojatni.
 
 Distribucija uzoraka iz skupa za treniranje može se opisati distribucijom vjerojatnosti više varijabli
-$$p(\mathbf x)$$. Vjerojatnost uzoraka za treniranje $$\mathbf x^{(i)}$$ trebala bi biti visoka dok bi vjerojatnost ostalih uzoraka trebala biti niža. Nasuprot tome, diskriminativni modeli fokusiraju se na vjerojatnost pojedine klase $$d$$ s obzirom na ulazni vektor
+$$p(\mathbf x)$$. Vjerojatnost uzoraka za treniranje $$\mathbf x^{(i)}$$ trebala bi biti visoka dok bi vjerojatnost ostalih uzoraka trebala biti niža. Nasuprot tome, diskriminativni modeli se, na više ili manje izravne načine, fokusiraju na aposteriornu vjerojatnost razreda $$d$$
 
 $$ 
 p(d\vert \mathbf{x})=\frac{p(d)p(\mathbf{x}\vert d)}{p(\mathbf{x})}
 $$
 
-Gornji izraz sugerira da je $$p(\mathbf x)$$ korisna informacija i za diskriminativne modele, iako je oni u pravilu ne koriste direktno. Logična je pretpostavka da bi preciznije poznavanje $$p(\mathbf x)$$ moglo pomoći u boljoj procjeni $$p(d \vert \mathbf{x})$$. Tu ideju dodatno podupire i razumna pretpostavka, da su i ulazni uzorci i odgovarajuća klasa $$d$$ (izlaz), posljedica istih bitnih značajki. Ulazni uzorci sadrže u sebi znatnu količinu bitnih informacija, ali često sadrže i šum koji dodatno otežava modeliranje direktne veze sa izlazom. Model veze izlaza i bitnih značajki, očekivano je jednostavniji nego direktna veza ulaza i izlaza.
+Gornji izraz sugerira da bi poznavanje $$p(\mathbf x)$$ mogla biti korisna informacija i za diskriminativne modele, iako je oni u pravilu ne koriste direktno. Ipak, logična je pretpostavka da bi preciznije poznavanje $$p(\mathbf x)$$ moglo pomoći u boljoj procjeni $$p(d \vert \mathbf{x})$$. Tu ideju dodatno podupire i razumna pretpostavka, da su i ulazni uzorci i odgovarajući razred $$d$$ (izlaz), posljedica istih bitnih značajki. Ulazni uzorci sadrže u sebi znatnu količinu bitnih informacija, ali često sadrže i šum koji dodatno otežava modeliranje direktne veze sa izlazom. Model veze izlaza i bitnih značajki, očekivano je jednostavniji nego direktna veza ulaza i izlaza.
 
 <div class="fig figcenter fighighlight">
-  <img src="/assets/lab4/bitneZ.svg" width="50%">
+  <img src="/assets/lab4/bitneZ.svg" width="70%">
 </div>
 
-Ovakva razmišljanja upućuju na upotrebu generativnih modela za ekstrakciju bitnih značajki. Njihova primarna namjena - generiranje uzoraka - tada je u drugom planu. Nkon treniranja, na njih se može nadograditi dodatni diskriminativni model (npr. MLP) koji na temelju bitnih značajki "lako" određuje željeni izlaz. Ova vježba fokusira se na treniranje generativnih modela.
+Ovakva razmišljanja upućuju na upotrebu generativnih modela za ekstrakciju bitnih značajki. Njihova primarna namjena - generiranje uzoraka - tada je u drugom planu. Nakon treniranja, na njih se može nadograditi dodatni diskriminativni model (npr. MLP) koji na temelju bitnih značajki "lako" određuje željeni izlaz. Ova vježba fokusira se na treniranje generativnih modela.
 
 <a name='rbm'></a>
 
 ### Ograničeni Boltzmanov stroj (RBM)
 
-Boltzmanov stroj (BM) je stohastička rekurzivna generativna mreža koja treniranjem nastoji maksimizirati $$p(\mathbf x^{(i)})$$, a temelji se na Boltrmanovoj distribuciji prema kojoj je vjerojatnost stanja $$\mathbf x$$ to manja, što je veća njegova energija $$E(\mathbf x)$$ prema slijedećem izrazu
+Boltzmanov stroj (BM) je [stohastička](https://en.wikipedia.org/wiki/Stochastic_neural_network) [rekurzivna](https://en.wikipedia.org/wiki/Recursive_neural_network) [generativna](https://en.wikipedia.org/wiki/Generative_model) mreža koja treniranjem nastoji maksimizirati $$p(\mathbf x^{(i)})$$, a temelji se na Boltrmanovoj distribuciji prema kojoj je vjerojatnost stanja $$\mathbf x$$ to manja, što je veća njegova energija $$E(\mathbf x)$$ prema slijedećem izrazu
 
 $$
 p(\mathbf{x})\propto
@@ -76,7 +76,7 @@ _{i=1}^{N}w_{\mathit{ji}}x_{i}-b_{j}}}=\sigma \left(\sum
 _{i=1}^{N}w_{\mathit{ji}}x_{i}+b_{j}\right)
 $$
 
-BM ima dodatne skrivene varijable $$h$$ kako bi se istom energetskom funkcijom mogle opisati korelacije višeg reda, odnosno kompleksnije međusobne veze pojedinih elemenata vektora podataka. Stvarne podatke nazivamo vidljivim slojem i označavamo s $$\mathbf v$$, dok skrivene varijable čine skriveni sloj $$\mathbf h$$.
+Kako bismo energetskom funkcijom BM-a mogli opisati korelacije višeg reda, odnosno kompleksnije međusobne veze pojedinih elemenata vektora podataka, uvodimo tzv. skrivene varijable $$h$$. Stvarne podatke nazivamo vidljivim slojem i označavamo s $$\mathbf v$$, dok skrivene varijable čine skriveni sloj $$\mathbf h$$.
 
 $$
 \mathbf{x}=(\mathbf v,\mathbf h)
@@ -103,14 +103,15 @@ _{j=1}^{N}w_{\mathit{ji}}h_{j}+a_{i}\right)$$ za vidljivi sloj
 $$p(h_{j}=1)=\sigma \left(\sum
 _{i=1}^{N}w_{\mathit{ji}}v_{i}+b_{j}\right)$$ za skriveni sloj
 
-Uzorkovanje vrijednosti pojedine varijable provodi se prema gornje dvije jednadžbe i generatora slučajnih brojeva.
+Uzorkovanje vrijednosti pojedine varijable provodi se prema gornje dvije jednadžbe i pomoću generatora slučajnih brojeva.
 
 ```python
 def sample_prob(probs):
     """Uzorkovanje vektora x prema vektoru vjerojatnosti p(x=1) = probs"""
-    return tf.nn.relu(
-        tf.sign(probs - tf.random_uniform(tf.shape(probs))))
+    return tf.to_float(tf.random_uniform(tf.shape(probs)) <= probs)
 ```
+
+**Učenje RBM-a**
 
 Prisjetimo se da želimo maksimizirati vjerojatnost svih uzoraka za učenje (stvaranih podatka) koji su u RBM-u predstavljeni vidljivim slojem. Stoga maksimiziramo umnožak svih $$p(\mathbf{v}^{(j)})$$ gdje je 
 
@@ -154,9 +155,9 @@ _{\mathbf{v,h}}v_{j}p(\mathbf{v,h};\mathbf{W},\mathbf{a},\mathbf{b})\right]=N\le
 v_{j}\rangle -\langle v_{j}\rangle
 _{P(\mathbf{v},\mathbf{h};\mathbf{W},\mathbf{a},\mathbf{b})}\right]$$
 
-Konačni izrazi sve tri jednadžbe sadrže po dvije komponenete u kojima $$\langle \rangle$$ zagrade označavaju usredjenje vrijednosti za $$N$$ ulaznih uzoraka (obično je to veličina mini grupe). 
+Konačni izrazi sve tri jednadžbe sadrže po dvije komponenete u kojima $$\langle \rangle$$ zagrade označavaju usrednjene vrijednosti za $$N$$ ulaznih uzoraka (obično je to veličina mini grupe). 
 Prvi pribrojnici u konačnim izrazima odnose se na stanja mreže kada su ulazni uzorci fiksirani u vidljivom sloju. Za određivanje odgovarajućih stanja skrivenog sloja $$\mathbf{h}$$ dovoljno je svaki element $$h_j$$ odrediti prema izrazu za $$p(h_j = 1)$$.
-Drugi pribrojnici odnose se na stanja mreže bez fiksnog vidljivog sloja pa se ta stanja mogu interpretirati kao nešto što mreža zamišlja na temelju trenutne konfiguracije paramatara ($$\mathbf W$$, $$\mathbf a$$ i $$\mathbf b$$). Da bi došli do tih stanja trebamo iterativno naizmjence računati nova stanja slojeva ([Gibssovo uzorkovanje](https://en.wikipedia.org/wiki/Gibbs_sampling)) prema izrazima za $$p(h_j = 1)$$ i $$p(v_i = 1)$$. Zbog izostanka međusobnih veza elemenata istog sloja, u jednoj iteracije se prvo paralelno uzorkouju svi skriveni elementi, a nakon toga svi elementi vidljivog sloja. Teoretski, broj iteracija treba biti velik kao bi dobili ono što mreža "stvarno" misli, odnosno kako bi došli do stacionarne distribucije. Tada je svejedno koje početno stanje vidljivog sloja uzmemo. Praktično rješenje ovog problema je Contrastive Divergenvce (CD) algoritam gdje je dovoljno napraviti svega k iteracija (gdje je k mali broj, često i samo 1), a za početna stanja vidljivog sloja uzimamo ulazne uzorke. Iako je ovo odmak od teorije, u praksi se pokazalo da dobro funkcionira. Vizualizacija CD-1 algoritma dana je na slici.
+Drugi pribrojnici odnose se na stanja mreže bez fiksnog vidljivog sloja pa se ta stanja mogu interpretirati kao nešto što mreža zamišlja na temelju trenutne konfiguracije parametara ($$\mathbf W$$, $$\mathbf a$$ i $$\mathbf b$$). Da bi došli do tih stanja trebamo iterativno naizmjence računati nova stanja slojeva ([Gibssovo uzorkovanje](https://en.wikipedia.org/wiki/Gibbs_sampling)) prema izrazima za $$p(h_j = 1)$$ i $$p(v_i = 1)$$. Zbog izostanka međusobnih veza elemenata istog sloja, u jednoj iteraciji se prvo paralelno uzorkuju svi skriveni elementi, a nakon toga svi elementi vidljivog sloja. Teoretski, broj iteracija treba biti velik kao bi dobili ono što mreža "stvarno" misli, odnosno kako bi došli do stacionarne distribucije. Tada je svejedno koje početno stanje vidljivog sloja uzmemo. Praktično rješenje ovog problema je Contrastive Divergenvce (CD) algoritam gdje je dovoljno napraviti svega $$k$$ iteracija (gdje je $$k$$ mali broj, često i samo 1), a za početna stanja vidljivog sloja uzimamo ulazne uzorke. Iako je ovo odmak od teorije, u praksi se pokazalo da dobro funkcionira. Vizualizacija CD-1 algoritma dana je na slici.
 
 <div class="fig figcenter fighighlight">
   <img src="/assets/lab4/CD.svg" width="50%">
@@ -180,26 +181,32 @@ Ulazne varijable tada možemo tretirati kao stohastičke binarne varjable s [Ber
 
 ### 1. zadatak
 
-Implementirajte RBM koji koristi CD-1 za učenje. Ulazni podaci neka su MNIST brojevi. Vidljivi sloj tada mora imati 784 elementa, a u skriveni sloj neka ima 100 elemenata. Vizualizirajte težine $$\mathbf W$$ ostvarene treniranjem te pokušajte interpretirati ostvarene težine pojedinih skrivenih neurona. Prikažite i rezultate rekonstrukcije prvih 20 testnih uzoraka MNIST baze. Kao rezultat rekonstukcije koji ćete prikazati, koristite $$p(v_{i}=1)=\sigma \left(\sum_{j=1}^{N}w_{\mathit{ji}}h_{j}+a_{i}\right)$$, umjesto binarnih vrijednosti dobivenih uzorkovanjem. Pokušajte interpretirati ostvarene težine pojedinih skrivenih neurona. Kako su vrijednosti ulaznih uzoraka (slika) realne u rasponu [0 1], oni mogu poslužiti kao $$p(v_i = 1)$$ pa za inicijalne vrijednosti vidljivog sloja trebate provesti uzorkovanje. Koristitie mini grupe veličine 100 uzoraka, a treniranje neka ima 100 epoha.
+Implementirajte RBM koji koristi CD-1 za učenje. Ulazni podaci neka su MNIST brojevi. Vidljivi sloj tada mora imati 784 elementa, a skriveni sloj neka ima 100 elemenata. Kako su vrijednosti ulaznih uzoraka (slika) realne u rasponu [0 1], oni mogu poslužiti kao $$p(v_i = 1)$$ pa za inicijalne vrijednosti vidljivog sloja trebate provesti uzorkovanje. Koristitie mini grupe veličine 100 uzoraka, a treniranje neka ima 100 epoha.
 
-Podzadaci: 
+**Podzadaci:**
 
-- Preskočiti inicijalno uzorkovanje/binarizaciju na temelju ulaznih uzoraka, već ulazne uzorke (realne u rasponu [0 1]) koristiti kao ualzne vektore $$\mathbf v$$ 
-- Povećajte broj Gibsovih uzorkovanja k u CD-k
-- Provedite eksperimente za manji i veći broj skrivenih neurona. Što opažate kod težina i rekonstrukcija?
-- Koji su efekti variranja koeficijenta učenja?
+1. Vizualizirajte težine $$\mathbf W$$ ostvarene treniranjem te pokušajte interpretirati ostvarene težine pojedinih skrivenih neurona.
+2. Vizualizirajte rezultate rekonstrukcije prvih 20 testnih uzoraka MNIST baze. Kao rezultat rekonstukcije koji ćete prikazati, koristite $$p(v_{i}=1)=\sigma \left(\sum_{j=1}^{N}w_{\mathit{ji}}h_{j}+a_{i}\right)$$, umjesto binarnih vrijednosti dobivenih uzorkovanjem.
+3. Ispitajte učestalost uključenosti elemenata skrivenog sloja te vizualizirajte naučene težine $$\mathbf W$$ soritrane prema učestalosti
+4. Preskočite inicijalno uzorkovanje/binarizaciju na temelju ulaznih uzoraka, već ulazne uzorke (realne u rasponu [0 1]) koristiti kao ualzne vektore $$\mathbf v$$. Koliko se tako dobijeni RBM razlikuje od prethodnog?
+5. Povećajte broj Gibsovih uzorkovanja k u CD-k. Koje su razlike?
+6. Provedite eksperimente za manji i veći broj skrivenih neurona. Što opažate kod težina i rekonstrukcija?
+7. Ispitajte efekt variranja koeficijenta učenja.
+8. Slučajno inicijalizirjte skriveni sloj, provedite nekoliko Gibbsovih uzorkovanje te vizualizirajte generirane uzorke vidljivog sloja
 
-Koristite slijedeći predložak s pomoćnom datotekom [utils.py](/assets/lab4/utils.py):
+Koristite slijedeći predložak s pomoćnom datotekom [utils.py](/assets/lab4/utils.py). 
+
+**NAPOMENA**: Osim nadopunjavanja koda koji nedostaje, predložak se treba prilagođavati prema potrebi, a može i prema vlastitim preferencijama. Stoga **budite oprezni s tvrdnjama da neki dio koda ne radi!**
 
 ```python
 import tensorflow as tf
 import numpy as np
 from tensorflow.examples.tutorials.mnist import input_data
-from PIL import Image
 from utils import tile_raster_images
 import math
 import matplotlib.pyplot as plt
-
+%matplotlib inline
+plt.rcParams['image.cmap'] = 'jet'
 
 mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
 trX, trY, teX, teY = mnist.train.images, mnist.train.labels, mnist.test.images,\
@@ -215,57 +222,87 @@ def bias(shape):
 
 def sample_prob(probs):
     """Uzorkovanje vektora x prema vektoru vjerojatnosti p(x=1) = probs"""
-    return tf.nn.relu(
-        tf.sign(probs - tf.random_uniform(tf.shape(probs))))
+    return tf.to_float(tf.random_uniform(tf.shape(probs)) <= probs)
 
-
-def draw_weights(W, shape, N, interpolation="bilinear"):
+def draw_weights(W, shape, N, stat_shape, interpolation="bilinear"):
     """Vizualizacija težina
-    
     W -- vektori težina
     shape -- tuple dimenzije za 2D prikaz težina - obično dimenzije ulazne slike, npr. (28,28)
     N -- broj vektora težina
+    shape_state -- dimezije za 2D prikaz stanja (npr. za 100 stanja (10,10)
     """
-    image = Image.fromarray( tile_raster_images(
+    image = (tile_raster_images(
         X=W.T,
         img_shape=shape,
-        tile_shape=(int(math.ceil(N/20)), 20),
+        tile_shape=(int(math.ceil(N/stat_shape[0])), stat_shape[0]),
         tile_spacing=(1, 1)))
     plt.figure(figsize=(10, 14))
     plt.imshow(image, interpolation=interpolation)
+    plt.axis('off')
     
-def draw_reconstructions(ins, outs, states, shape_in, shape_state):
-    """Vizualizacija ulaza i pripadajućih rekonstrkcija i stanja skrivenog sloja
+def draw_reconstructions(ins, outs, states, shape_in, shape_state, N):
+    """Vizualizacija ulaza i pripadajućih rekonstrukcija i stanja skrivenog sloja
     ins -- ualzni vektori
     outs -- rekonstruirani vektori
     states -- vektori stanja skrivenog sloja
     shape_in -- dimezije ulaznih slika npr. (28,28)
     shape_state -- dimezije za 2D prikaz stanja (npr. za 100 stanja (10,10)
+    N -- broj uzoraka
     """
-    plt.figure(figsize=(8, 12*4))
-    for i in range(20):
-
-        plt.subplot(20, 4, 4*i + 1)
+    plt.figure(figsize=(8, int(2 * N)))
+    for i in range(N):
+        plt.subplot(N, 4, 4*i + 1)
         plt.imshow(ins[i].reshape(shape_in), vmin=0, vmax=1, interpolation="nearest")
         plt.title("Test input")
-        plt.subplot(20, 4, 4*i + 2)
+        plt.axis('off')
+        plt.subplot(N, 4, 4*i + 2)
         plt.imshow(outs[i][0:784].reshape(shape_in), vmin=0, vmax=1, interpolation="nearest")
         plt.title("Reconstruction")
-        plt.subplot(20, 4, 4*i + 3)
-        plt.imshow(states[i][0:(shape_state[0] * shape_state[1])].reshape(shape_state), vmin=0, vmax=1, interpolation="nearest")
+        plt.axis('off')
+        plt.subplot(N, 4, 4*i + 3)
+        plt.imshow(states[i].reshape(shape_state), vmin=0, vmax=1, interpolation="nearest")
         plt.title("States")
+        plt.axis('off')
     plt.tight_layout()
 
-Nv = 784
-v_shape = (28,28)
-Nh = 100
+def draw_generated(stin, stout, gen, shape_gen, shape_state, N):
+    """Vizualizacija zadanih skrivenih stanja, konačnih skrivenih stanja i pripadajućih rekonstrukcija
+    stin -- početni skriveni sloj 
+    stout -- rekonstruirani vektori
+    gen -- vektori stanja skrivenog sloja
+    shape_gen -- dimezije ulaznih slika npr. (28,28)
+    shape_state -- dimezije za 2D prikaz stanja (npr. za 100 stanja (10,10)
+    N -- broj uzoraka
+    """
+    plt.figure(figsize=(8, int(2 * N)))
+    for i in range(N):
+
+        plt.subplot(N, 4, 4*i + 1)
+        plt.imshow(stin[i].reshape(shape_state), vmin=0, vmax=1, interpolation="nearest")
+        plt.title("set state")
+        plt.axis('off')
+        plt.subplot(N, 4, 4*i + 2)
+        plt.imshow(stout[i][0:784].reshape(shape_state), vmin=0, vmax=1, interpolation="nearest")
+        plt.title("final state")
+        plt.axis('off')
+        plt.subplot(N, 4, 4*i + 3)
+        plt.imshow(gen[i].reshape(shape_gen), vmin=0, vmax=1, interpolation="nearest")
+        plt.title("generated visible")
+        plt.axis('off')
+    plt.tight_layout()
+    
+Nh = 100 # Broj elemenata prvog skrivenog sloja
 h1_shape = (10,10)
+Nv = 784 # Broj elemenata vidljivog sloja
+v_shape = (28,28)
+Nu = 5000 # Broj uzoraka za vizualizaciju rekonstrukcije
 
 gibbs_sampling_steps = 1
-alpha = 0.1 # koeficijent učenja 
+alpha = 0.1
 
 g1 = tf.Graph()
 with g1.as_default():
+        
     X1 = tf.placeholder("float", [None, 784])
     w1 = weights([Nv, Nh])
     vb1 = bias([Nv])
@@ -276,70 +313,172 @@ with g1.as_default():
     h1 = h0
 
     for step in range(gibbs_sampling_steps):
-        v1_prob =
-        v1 =
-        h1_prob =
-        h1 =
+        v1_prob = 
+        v1 = 
+        h1_prob = 
+        h1 = 
+        
     
-    # pozitivna faza
     w1_positive_grad = 
-    
-    # negativna faza
     w1_negative_grad = 
 
     dw1 = (w1_positive_grad - w1_negative_grad) / tf.to_float(tf.shape(X1)[0])
 
-    # operacije za osvježavanje parametara mreže - one pokreću učenje RBM-a
     update_w1 = tf.assign_add(w1, alpha * dw1)
-    update_vb1 = tf.assign_add(vb1, alpha * tf.reduce_mean(X1 - v1_prob, 0))
+    update_vb1 = tf.assign_add(vb1, alpha * tf.reduce_mean(X1 - v1, 0))
     update_hb1 = tf.assign_add(hb1, alpha * tf.reduce_mean(h0 - h1, 0)) 
 
     out1 = (update_w1, update_vb1, update_hb1)
     
-    # rekonstrukcija ualznog vektora - koristimo vjerojatnost p(v=1)
     v1_prob = 
+    v1 = 
     
     err1 = X1 - v1_prob
     err_sum1 = tf.reduce_mean(err1 * err1)
     
-    initialize1 = tf.initialize_all_variables()
+    initialize1 = tf.global_variables_initializer()
 
 batch_size = 100
 epochs = 100
 n_samples = mnist.train.num_examples
-
 total_batch = int(n_samples / batch_size) * epochs
 
-with tf.Session(graph=g1) as sess:
-    sess.run(initialize1)
-    for i in range(total_batch):
-        batch, label = mnist.train.next_batch(batch_size)
-        err, _ = sess.run([err_sum1, out1], feed_dict={X1: batch})
+sess1 = tf.Session(graph=g1)
+sess1.run(initialize1)
+
+for i in range(total_batch):
+    batch, label = mnist.train.next_batch(batch_size)
+    err, _ = sess1.run([err_sum1, out1], feed_dict={X1: batch})
         
-        if i%(int(total_batch/10)) == 0:
-            print "Batch count: ", i, "  Avg. reconstruction error: ", err
-    
-    w1s = w1.eval()
-    vb1s = vb1.eval()
-    hb1s = hb1.eval()
-    vr, h1_probs, h1s = sess.run([v1_prob, h1_prob, h1], feed_dict={X1: teX[0:2,:]})
+    if i%(int(total_batch/10)) == 0:
+        print(i, err)
+
+w1s = w1.eval(session=sess1)
+vb1s = vb1.eval(session=sess1)
+hb1s = hb1.eval(session=sess1)
+vr, h1s = sess1.run([v1_prob, h1], feed_dict={X1: teX[0:Nu,:]})
 
 # vizualizacija težina
-draw_weights(w1s, v_shape, Nh) 
+draw_weights(w1s, v_shape, Nh, h1_shape)
 
 # vizualizacija rekonstrukcije i stanja
-draw_reconstructions(teX, vr, h1s, v_shape, h1_shape)
+draw_reconstructions(teX, vr, h1s, v_shape, h1_shape, 200)
+
+# vizualizacija jedne rekonstrukcije s postepenim dodavanjem doprinosa aktivnih skrivenih elemenata
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+def draw_rec(inp, title, size, Nrows, in_a_row, j):
+    """ Iscrtavanje jedne iteracije u kreiranju vidljivog sloja
+    inp - vidljivi sloj
+    title - naslov sličice
+    size - 2D dimenzije vidljiovg sloja
+    Nrows - maks. broj redaka sličica
+    in-a-row . broj sličica u jednom redu
+    j - pozicija sličice u gridu
+    """
+    plt.subplot(Nrows, in_a_row, j)
+    plt.imshow(inp.reshape(size), vmin=0, vmax=1, interpolation="nearest")
+    plt.title(title)
+    plt.axis('off')
+    
+    
+def reconstruct(ind, states, orig, weights, biases):
+    """ Slijedno iscrtavanje rekonstrukcije vidljivog sloja
+    ind - indeks znamenke u orig (matrici sa znamenkama kao recima)
+    states - vektori stanja ulaznih vektora
+    orig - originalnalni ulazni vektori
+    weights - matrica težina
+    biases - vektori pomaka vidljivog sloja
+    """
+    j = 1
+    in_a_row = 6
+    Nimg = states.shape[1] + 3
+    Nrows = int(np.ceil(float(Nimg+2)/in_a_row))
+    
+    plt.figure(figsize=(12, 2*Nrows))
+       
+    draw_rec(states[ind], 'states', h1_shape, Nrows, in_a_row, j)
+    j += 1
+    draw_rec(orig[ind], 'input', v_shape, Nrows, in_a_row, j)
+    
+    reconstr = biases.copy()
+    j += 1
+    draw_rec(sigmoid(reconstr), 'biases', v_shape, Nrows, in_a_row, j)
+    
+    for i in range(Nh):
+        if states[ind,i] > 0:
+            j += 1
+            reconstr = reconstr + weights[:,i]
+            titl = '+= s' + str(i+1)
+            draw_rec(sigmoid(reconstr), titl, v_shape, Nrows, in_a_row, j)
+    plt.tight_layout()
+    
+reconstruct(0, h1s, teX, w1s, vb1s) # prvi argument je indeks znamenke u matrici znamenki
+
+# Vjerojatnost da je skriveno stanje uključeno kroz Nu ulaznih uzoraka
+plt.figure()
+tmp = (h1s.sum(0)/h1s.shape[0]).reshape(h1_shape)
+plt.imshow(tmp, vmin=0, vmax=1, interpolation="nearest")
+plt.axis('off')
+plt.colorbar()
+plt.title('vjerojatnosti (ucestalosti) aktivacije pojedinih neurona skrivenog sloja')
+
+# Vizualizacija težina sortitranih prema učestalosti
+tmp_ind = (-tmp).argsort(None)
+draw_weights(w1s[:, tmp_ind], v_shape, Nh, h1_shape)
+plt.title('Sortirane matrice tezina - od najucestalijih do najmanje koristenih')
+
+# Generiranje uzoraka iz slučajnih vektora
+r_input = np.random.rand(100, Nh)
+r_input[r_input > 0.9] = 1 # postotak aktivnih - slobodno varirajte
+r_input[r_input < 1] = 0
+r_input = r_input * 20 # pojačanje za slučaj ako je mali postotak aktivnih
+
+s = 10
+i = 0
+r_input[i,:] = 0
+r_input[i,i]= s
+i += 1
+r_input[i,:] = 0
+r_input[i,i]= s
+i += 1
+r_input[i,:] = 0
+r_input[i,i]= s
+i += 1
+r_input[i,:] = 0
+r_input[i,i]= s
+i += 1
+r_input[i,:] = 0
+r_input[i,i]= s
+i += 1
+r_input[i,:] = 0
+r_input[i,i]= s
+i += 1
+r_input[i,:] = 0
+r_input[i,i]= s
+
+out_1 = sess1.run((v1), feed_dict={h0: r_input})
+
+# Emulacija dodatnih Gibbsovih uzorkovanja pomoću feed_dict
+for i in range(1000):
+    out_1_prob, out_1, hout1 = sess1.run((v1_prob, v1, h1), feed_dict={X1: out_1})
+
+draw_generated(r_input, hout1, out_1_prob, v_shape, h1_shape, 50)
 ```
 
 <a name='2zad'></a>
 
 ### 2. zadatak
 
-Deep beleif Network (DBN) je duboka mreža koja se dobije slaganjem više RBM-ova jednog na drugi, pri čemu se svaki slijedeć RBM pohlepno trenira pomoću skrivenog ("izlaznog") sloja prethodnog RBM-a (osim prvog RBM-a koji se trenira direktno s ulaznim uzorcima). Teoretski tako izgrađen DBN trebao bi povećati $$p(\mathbf v)$$ što nam je i cilj. Korištenje DBN, odnosno rekonstrukcija ulaznog uzorka provodi se prema donjoj shemi. U prolazu prema gore određuju se skriveni slojevi iz vidljivog sloja dok se ne dođe do najgornjeg RBM-a, zatim se na njemu provede CD-k algoritam, nakon čega se, u prolasku prema dolje, određuju niži skriveni slojevi dok se ne dođe do rekonstruiranog vidljivog sloja. Težine između pojedinih slojeva su iste u prolazu gore kao i u prolazu prema dolje. Implementirajte troslojni DBN koji se sastoji od dva pohlepno pretrenirana RBM-a. Prvi RBM neka je isit kao i u 1. zadatku, a drugi RBM neka ima skriveni sloj od 100 elemenata.  Vizualizirajte težine $$\mathbf W_1$$ i $$\mathbf W_2$$ ostvarene treniranjem te rezultate rekonstrukcije prvih 20 testnih uzoraka MNIST baze. Komentirajte rezultate.
+Deep beleif Network (DBN) je duboka mreža koja se dobije slaganjem više RBM-ova jednog na drugi, pri čemu se svaki slijedeć RBM pohlepno trenira pomoću skrivenog ("izlaznog") sloja prethodnog RBM-a (osim prvog RBM-a koji se trenira direktno s ulaznim uzorcima). Teoretski, tako izgrađen DBN trebao bi povećati $$p(\mathbf v)$$ što nam je i cilj. Korištenje DBN, odnosno rekonstrukcija ulaznog uzorka provodi se prema donjoj shemi. U prolazu prema gore određuju se skriveni slojevi iz vidljivog sloja dok se ne dođe do najgornjeg RBM-a, zatim se na njemu provede CD-k algoritam, nakon čega se, u prolasku prema dolje, određuju niži skriveni slojevi dok se ne dođe do rekonstruiranog vidljivog sloja. Težine između pojedinih slojeva su iste u prolazu gore kao i u prolazu prema dolje. Implementirajte troslojni DBN koji se sastoji od dva pohlepno pretrenirana RBM-a. Prvi RBM neka je isit kao i u 1. zadatku, a drugi RBM neka ima skriveni sloj od 100 elemenata.
 
-Podzadaci:
+**Podzadaci:**
 
-- Postavite broj skrivenih varijabli gornjeg RBM-a jednak broju elemenata vidljivog sloja donjeg RBM-a, a inicijalne težine $$\mathbf W_2$$ postavite na $$\mathbf W_1^T$$. Koji su efekti promjene? Vizualizirajte uzorke krovnog skrivenog sloja kao matrice 28x28.
+1. Vizualizirajte težine $$\mathbf W_1$$ i $$\mathbf W_2$$ ostvarene treniranjem.
+2. Vizualizirajte rezultate rekonstrukcije prvih 20 testnih uzoraka MNIST baze. 
+3. Postavite broj skrivenih varijabli gornjeg RBM-a jednak broju elemenata vidljivog sloja donjeg RBM-a, a inicijalne težine $$\mathbf W_2$$ postavite na $$\mathbf W_1^T$$. Koji su efekti promjene? Vizualizirajte uzorke krovnog skrivenog sloja kao matrice 28x28.
+4. Slučajno inicijalizirjte krovni skriveni sloj, provedite nekoliko Gibbsovih uzorkovanje te vizualizirajte generirane uzorke vidljivog sloja - usporedite s prethodnim zadatkom.
 
 <div class="fig figcenter fighighlight">
   <img src="/assets/lab4/DBN1.svg" width="100%">
@@ -348,56 +487,55 @@ Podzadaci:
 Koristite slijedeći predložak uz prtedložak 1. zadatka:
 
 ```python
-Nh2 = 100
-h2_shape = (10,10) 
+Nh2 = Nh # Broj elemenata drugog skrivenog sloja
+h2_shape = h1_shape 
 
 gibbs_sampling_steps = 2
 alpha = 0.1
 
 g2 = tf.Graph()
 with g2.as_default():
+    
     X2 = tf.placeholder("float", [None, Nv])
     w1a = tf.Variable(w1s)
     vb1a = tf.Variable(vb1s)
     hb1a = tf.Variable(hb1s)
     w2 = weights([Nh, Nh2])
-    vb2 = bias([Nh])
     hb2 = bias([Nh2])
     
-    # vidljivi sloj drugog RBM-a
-    v2_prob  =
-    v2 =
-    # skriveni sloj drugog RBM-a
-    h2_prob =
-    h2 =
-    h3 = h2
+    h1up_prob  = 
+    h1up = 
+    h2up_prob = 
+    h2up = 
+    h2down = h2up
     
     for step in range(gibbs_sampling_steps):
-        v3_prob =
-        v3 =
-        h3_prob =
-        h3 =
+        h1down_prob = 
+        h1down = 
+        h2down_prob = 
+        h2down = 
     
-    w2_positive_grad =
-    w2_negative_grad =
+    w2_positive_grad = 
+    w2_negative_grad = 
 
-    dw2 = (w2_positive_grad - w2_negative_grad) / tf.to_float(tf.shape(v2)[0])
+    dw2 = (w2_positive_grad - w2_negative_grad) / tf.to_float(tf.shape(h1up)[0])
 
     update_w2 = tf.assign_add(w2, alpha * dw2)
-    update_vb2 = tf.assign_add(vb2, alpha * tf.reduce_mean(v2 - v3, 0))
-    update_hb2 = tf.assign_add(hb2, alpha * tf.reduce_mean(h2 - h3, 0))
+    update_hb1a = tf.assign_add(hb1a, alpha * tf.reduce_mean(h1up - h1down, 0))
+    update_hb2 = tf.assign_add(hb2, alpha * tf.reduce_mean(h2up - h2down, 0))
 
-    out2 = (update_w2, update_vb2, update_hb2)
+    out2 = (update_w2, update_hb1a, update_hb2)
 
     # rekonsturkcija ulaza na temelju krovnog skrivenog stanja h3
     # ...
     # ...
-    v4_prob =
+    v_out_prob = 
+    v_out = 
     
-    err2 = X2 - v5_prob
+    err2 = X2 - v_out_prob
     err_sum2 = tf.reduce_mean(err2 * err2)
     
-    initialize2 = tf.initialize_all_variables()
+    initialize2 = tf.global_variables_initializer()
 
 batch_size = 100
 epochs = 100
@@ -405,37 +543,45 @@ n_samples = mnist.train.num_examples
 
 total_batch = int(n_samples / batch_size) * epochs
 
-with tf.Session(graph=g2) as sess:
-    sess.run(initialize2)
-
-    for i in range(total_batch):
-        # iteracije treniranja 
-        #...
-        #...
+sess2 = tf.Session(graph=g2)
+sess2.run(initialize2)
+for i in range(total_batch):
+    # iteracije treniranja 
+    #...
+    #...
+    if i%(int(total_batch/10)) == 0:
+        print(i, err)
         
-        if i%(int(total_batch/10)) == 0:
-            print "Batch count: ", i, "  Avg. reconstruction error: ", err
-            
-    w2s, vb2s, hb2s = sess.run([w2, vb2, hb2], feed_dict={X2: batch})
-    vr2, h3_probs, h3s = sess.run([v5_prob, h3_prob, h3], feed_dict={X2: teX[0:50,:]})
+    w2s, hb1as, hb2s = sess2.run([w2, hb1a, hb2], feed_dict={X2: batch})
+    vr2, h2downs = sess2.run([v_out_prob, h2down], feed_dict={X2: teX[0:Nu,:]})
 
 # vizualizacija težina
-draw_weights(w2s, h1_shape, Nh2, interpolation="nearest")
+draw_weights(w2s, h1_shape, Nh2, h2_shape, interpolation="nearest")
 
 # vizualizacija rekonstrukcije i stanja
-draw_reconstructions(teX, vr2, h3s, v_shape, h2_shape)
+draw_reconstructions(teX, vr2, h2downs, v_shape, h2_shape, 200)
+
+# Generiranje uzoraka iz slučajnih vektora krovnog skrivenog sloja
+#...
+#...
+# Emulacija dodatnih Gibbsovih uzorkovanja pomoću feed_dict
+#...
+#...
 ```
 
-Kako bi se dodatno poboljšala generativna svojstva DBN-a, može se provesti generativni fine-tuning parametara mreže. U 2. zadatku, prilikom rekonstruiranja korištene su iste težine i pomaci u prolascima prema dolje i prema gore. Kod fine-tuninga, parametri koji vežu sve slojeve osim dva najgornja, razdvajaju se u dva skupa. Matrice težina između nižih slojeva dijele se na: $$\mathbf W'_n$$ za prolaz prema gore i $$\mathbf R_n$$ za prolaz prema dolje. Inicijalno su obje matrice jednake originalnoj matrici $$\mathbf W_n$$. Kod prolaza prema gore (faza budnosti - wake phase) određuju se nova stanja viših skrivenih slojeva $$\mathbf s^{(n)}$$ iz nižih stanja $$\mathbf s^{(n-1)}$$ pomoću matrica $$\mathbf W'$$ postupkom uzorkovanja ($$sample \left(\sigma \left(\mathbf W'_n \mathbf s^{(n-1)} + \mathbf b_n\right)\right) \to \mathbf s^{(n)}$$) . Pri prolasku prema dolje (faza spavanja - sleep phase) određuju se "rekonstrukcije" nižih stanja $$\mathbf s^{(n-1)}$$ iz $$\mathbf s^{(n)}$$ i matrica $$\mathbf R$$ ($$sample \left( \sigma \left(\mathbf R_n \mathbf s^{(n)} + \mathbf b_{n-1} \right) \right) \to \mathbf s^{(n-1)}$$). Najgornja dva sloja su klasični RBM i dijele istu matricu težina za prolaske u oba smjera, a modificiranje tih težina provodi se na isti način kao u 1.zadatku.
-Treniranje težina između nižih slojeva je drugačije. Matrice $$\mathbf R_n$$ se korigiraju kada se određuju nova stanja pomoću matrica $$\mathbf W'_n$$ u prolasku prema gore. U prolasku prema dolje korigiraju se matrice $$\mathbf W'_n$$. Vektori pomaka pojedinih slojeva $$\mathbf b_n$$ se isto dijele na varijante za prolaz prema gore $$\mathbf b_n^{up}$$ i za ptrolaz prem dolje $$\mathbf b_n^{down}$$. Inicijalni pomaci jednaki su originalnim pomacima $$\mathbf b$$.
-Za korekciju matrica $$\mathbf R_n$$ prilikom prolaska prema gore ($$sample \left(\sigma \left(\mathbf W'_n \mathbf s^{(n-1)} + \mathbf b_n\right)\right) \to \mathbf s^{(n)}$$) provodi se i $$sample \left( \sigma \left(\mathbf R_n \mathbf s^{(n)} + \mathbf b_{n-1} \right) \right) \to \mathbf s^{(n-1)novo}$$. Korekcija elemenata radi se na slijedeći način
-$$\Delta r_{\mathit{ij}}=\eta
+Kako bi se dodatno poboljšala generativna svojstva DBN-a, može se provesti generativni fine-tuning parametara mreže. U 2. zadatku, prilikom rekonstruiranja korištene su iste težine i pomaci u prolascima prema dolje i prema gore. Kod fine-tuninga, parametri koji vežu sve slojeve osim dva najgornja, razdvajaju se u dva skupa. Matrice težina između nižih slojeva dijele se na: $$\mathbf R_n$$ za prolaz prema gore i $$\mathbf W'_n$$ za prolaz prema dolje. Inicijalno su obje matrice jednake originalnoj matrici $$\mathbf W_n$$. Kod prolaza prema gore (faza budnosti - wake phase) određuju se nova stanja viših skrivenih slojeva $$\mathbf s^{(n)}$$ iz nižih stanja $$\mathbf s^{(n-1)}$$ pomoću matrica $$\mathbf R$$ postupkom uzorkovanja ($$sample \left(\sigma \left(\mathbf R_n \mathbf s^{(n-1)} + \mathbf b^{up}_n\right)\right) \to \mathbf s^{(n)}$$) . Pri prolasku prema dolje (faza spavanja - sleep phase) određuju se "rekonstrukcije" nižih stanja $$\mathbf s^{(n-1)}$$ iz $$\mathbf s^{(n)}$$ i matrica $$\mathbf W'$$ ($$sample \left( \sigma \left(\mathbf W'_n \mathbf s^{(n)} + \mathbf b^{down}_{n-1} \right) \right) \to \mathbf s^{(n-1)}$$). Najgornja dva sloja su klasični RBM i dijele istu matricu težina za prolaske u oba smjera, a modificiranje tih težina provodi se na isti način kao u 1.zadatku.
+
+Treniranje težina između nižih slojeva je drugačije. Matrice $$\mathbf W'_n$$ se korigiraju kada se određuju nova stanja pomoću matrica $$\mathbf R_n$$ u prolasku prema gore. U prolasku prema dolje korigiraju se matrice $$\mathbf R_n$$. Vektori pomaka pojedinih slojeva $$\mathbf b_n$$ se isto dijele na varijante za prolaz prema gore $$\mathbf b_n^{up}$$ i za ptrolaz prem dolje $$\mathbf b_n^{down}$$. Inicijalni pomaci jednaki su originalnim pomacima $$\mathbf b$$.
+
+Za korekciju matrica $$\mathbf W'_n$$ prilikom prolaska prema gore ($$sample \left(\sigma \left(\mathbf R_n \mathbf s^{(n-1)} + \mathbf b^{up}_n\right)\right) \to \mathbf s^{(n)}$$) provodi se i $$sample \left( \sigma \left(\mathbf W'_n \mathbf s^{(n)} + \mathbf b^{down}_{n-1} \right) \right) \to \mathbf s^{(n-1)novo}$$. Korekcija elemenata radi se na slijedeći način
+$$\Delta w'_{\mathit{ij}}=\eta
 s_{j}^{(n)}(s_{i}^{(n-1)}-s_{i}^{(n-1)\mathit{novo}})$$
 Korekcija pomaka za prolaz prema dolje provodi se na slijedeći način
 $$\Delta b_{\mathit{i}}^{\mathit{down}}=\eta
 (s_{i}^{(n-1)}-s_{i}^{(n-1)\mathit{novo}})$$
-Za korekciju matrica $$\mathbf W'_n$$ prilikom prolaska prema dolje ($$sample \left( \sigma \left(\mathbf R_n \mathbf s^{(n)} + \mathbf b_{n-1} \right) \right) \to \mathbf s^{(n-1)}$$) provodi se i $$sample \left(\sigma \left(\mathbf W'_n \mathbf s^{(n-1)} + \mathbf b_n\right)\right) \to \mathbf s^{(n)novo}$$. Korekcija elemenata radi se na slijedeći način
-$$\Delta w'_{\mathit{ij}}=\eta
+
+Za korekciju matrica $$\mathbf R_n$$ prilikom prolaska prema dolje ($$sample \left( \sigma \left(\mathbf W'_n \mathbf s^{(n)} + \mathbf b^{down}_{n-1} \right) \right) \to \mathbf s^{(n-1)}$$) provodi se i $$sample \left(\sigma \left(\mathbf R_n \mathbf s^{(n-1)} + \mathbf b^{up}_n\right)\right) \to \mathbf s^{(n)novo}$$. Korekcija elemenata radi se na slijedeći način
+$$\Delta r_{\mathit{ij}}=\eta
 s_{i}^{(n-1)}(s_{j}^{(n)}-s_{j}^{(n)\mathit{novo}})$$
 Korekcija pomaka za prolaz prema dolje provodi se na slijedeći način
 $$\Delta b_{\mathit{i}}^{\mathit{up}}=\eta
@@ -451,11 +597,13 @@ HINT: pseudokod za treniranje četveroslojnog DBN-a nalazi se u dodacima ovog [�
 
 ### 3. Zadatak
 
-Implementirajte postupak generativnog fine-tuninga na DBN iz 2. zadatka. Vizualizirajte konačne varijante matrica $$\mathbf W'$$ i $$\mathbf R$$ kao  i rezultate rekonstrukcije prvih 20 testnih uzoraka MNIST baze. ZA treniranje gronjeg RBM-a koristite CD-2.
+Implementirajte postupak generativnog fine-tuninga na DBN iz 2. zadatka. Za treniranje gornjeg RBM-a koristite CD-2.
 
-Podzadaci:
+**Podzadaci:**
 
-- Provedite generiranje uzoraka tako da slučajno inicijalizirate krovni skriveni sloj, na njemu provedete CD-4 i rekonstruirajte izlazni sloj. Vizualizirajte rezultate.
+1. Vizualizirajte konačne varijante matrica $$\mathbf W'$$ i $$\mathbf R$$.
+2. Vizualizirajte rezultate rekonstrukcije prvih 20 testnih uzoraka MNIST baze.
+3. Slučajno inicijalizirjte krovnni skriveni sloj, provedite nekoliko Gibbsovih uzorkovanje te vizualizirajte generirane uzorke vidljivog sloja - usporedite s prethodnim zadacima
 
 <div class="fig figcenter fighighlight">
   <img src="/assets/lab4/DBN2.svg" width="40%">
@@ -468,13 +616,14 @@ Koristite slijedeći predložak, kao i predloške 1. i 2. zadatka.
 beta = 0.01
 
 g3 = tf.Graph()
-with g3.as_default():   
+with g3.as_default():
+
     X3 = tf.placeholder("float", [None, Nv])
-    w1_up = tf.Variable(w1s)
+    r1_up = tf.Variable(w1s)
     w1_down = tf.Variable(tf.transpose(w1s))
     w2a = tf.Variable(w2s)
     hb1_up = tf.Variable(hb1s)
-    hb1_down = tf.Variable(vb2s)
+    hb1_down = tf.Variable(hb1as)
     vb1_down = tf.Variable(vb1s)
     hb2a = tf.Variable(hb2s)
     
@@ -482,18 +631,18 @@ with g3.as_default():
     h1_up_prob = 
     h1_up = # s^{(n)} u pripremi
     v1_up_down_prob = 
-    v1_up_down = # s^{(n-1)\mathit{novo}} u pripremi
+    v1_up_down = # s^{(n-1)\mathit{novo}} u tekstu pripreme
     
     
     # top RBM Gibs passes
     h2_up_prob = 
     h2_up = 
-    h4 = h2_up
+    h2_down = h2_up
     for step in range(gibbs_sampling_steps):
         h1_down_prob = 
         h1_down = 
-        h4_prob = 
-        h4 = 
+        h2_down_prob = 
+        h2_down = 
        
     # sleep pass
     v1_down_prob = 
@@ -512,18 +661,18 @@ with g3.as_default():
     dw3 = 
     update_w2 = tf.assign_add(w2a, beta * dw3)
     update_hb1_down = tf.assign_add(hb1_down, beta * tf.reduce_mean(h1_up - h1_down, 0))
-    update_hb2 = tf.assign_add(hb2a, beta * tf.reduce_mean(h2_up - h4, 0))
+    update_hb2 = tf.assign_add(hb2a, beta * tf.reduce_mean(h2_up - h2_down, 0))
     
     # recognition weights update during sleep pass
-    update_w1_up = tf.assign_add(w1_up, beta * tf.matmul(tf.transpose(v1_down_prob), h1_down - h1_down_up) / tf.to_float(tf.shape(X3)[0]))
-    update_hb1_up = tf.assign_add(hb1_up, beta * tf.reduce_mean(h1_down - h1_down_up, 0))###########^ #####
+    update_r1_up = tf.assign_add(r1_up, beta * tf.matmul(tf.transpose(v1_down_prob), h1_down - h1_down_up) / tf.to_float(tf.shape(X3)[0]))
+    update_hb1_up = tf.assign_add(hb1_up, beta * tf.reduce_mean(h1_down - h1_down_up, 0))
     
-    out3 = (update_w1_down, update_vb1_down, update_w2, update_hb1_down, update_hb2, update_w1_up, update_hb1_up)
+    out3 = (update_w1_down, update_vb1_down, update_w2, update_hb1_down, update_hb2, update_r1_up, update_hb1_up)
     
     err3 = X3 - v1_down_prob
     err_sum3 = tf.reduce_mean(err3 * err3)
     
-    initialize3 = tf.initialize_all_variables()
+    initialize3 = tf.global_variables_initializer()
 
 batch_size = 100
 epochs = 100
@@ -531,23 +680,24 @@ n_samples = mnist.train.num_examples
 
 total_batch = int(n_samples / batch_size) * epochs
 
-with tf.Session(graph=g3) as sess:
-    sess.run(initialize3)
-    for i in range(total_batch):
-        #
-        err, _ = sess.run([err_sum3, out3], feed_dict={X3: batch})
+sess3 = tf.Session(graph=g3)
+sess3.run(initialize3)
+for i in range(total_batch):
+    #...
+    err, _ = sess3.run([err_sum3, out3], feed_dict={X3: batch})
         
-        if i%(int(total_batch/10)) == 0:
-            print "Batch count: ", i, "  Avg. reconstruction error: ", err
+    if i%(int(total_batch/10)) == 0:
+        print(i, err)
     
-    w2ss, w1_ups, w1_downs, hb2ss, hb1_ups, hb1_downs, vb1_downs = sess.run(
-        [w2a, w1_up, w1_down, hb2a, hb1_up, hb1_down, vb1_down], feed_dict={X3: batch})
-    vr3, h4s, h4_probs = sess.run([v1_down_prob, h4, h4_prob], feed_dict={X3: teX[0:20,:]})
+    w2ss, r1_ups, w1_downs, hb2ss, hb1_ups, hb1_downs, vb1_downs = sess3.run(
+        [w2a, r1_up, w1_down, hb2a, hb1_up, hb1_down, vb1_down], feed_dict={X3: batch})
+    vr3, h2_downs, h2_down_probs = sess3.run([v1_down_prob, h2_down, h2_down_prob], feed_dict={X3: teX[0:Nu,:]})
+
 
 # vizualizacija težina
-draw_weights(w1_ups, v_shape, Nh)
-draw_weights(w1_downs.T, v_shape, Nh)
-draw_weights(w2ss, h1_shape, Nh2, interpolation="nearest")
+draw_weights(r1_ups, v_shape, Nh, h1_shape)
+draw_weights(w1_downs.T, v_shape, Nh, h1_shape)
+draw_weights(w2ss, h1_shape, Nh2, h2_shape, interpolation="nearest")
 
 # vizualizacija rekonstrukcije i stanja
 Npics = 5
@@ -557,24 +707,26 @@ for i in range(20):
     plt.subplot(20, Npics, Npics*i + 1)
     plt.imshow(teX[i].reshape(v_shape), vmin=0, vmax=1)
     plt.title("Test input")
-    plt.axis('off')
     plt.subplot(20, Npics, Npics*i + 2)
     plt.imshow(vr[i][0:784].reshape(v_shape), vmin=0, vmax=1)
     plt.title("Reconstruction 1")
-    plt.axis('off')
     plt.subplot(20, Npics, Npics*i + 3)
     plt.imshow(vr2[i][0:784].reshape(v_shape), vmin=0, vmax=1)
     plt.title("Reconstruction 2")
-    plt.axis('off')
     plt.subplot(20, Npics, Npics*i + 4)
     plt.imshow(vr3[i][0:784].reshape(v_shape), vmin=0, vmax=1)
     plt.title("Reconstruction 3")
-    plt.axis('off')
     plt.subplot(20, Npics, Npics*i + 5)
-    plt.imshow(h4s[i][0:Nh2].reshape(h2_shape), vmin=0, vmax=1, interpolation="nearest")
+    plt.imshow(h2_downs[i][0:Nh2].reshape(h2_shape), vmin=0, vmax=1, interpolation="nearest")
     plt.title("Top states 3")
-    plt.axis('off')
 plt.tight_layout()
+
+# Generiranje uzoraka iz slučajnih vektora krovnog skrivenog sloja
+#...
+#...
+# Emulacija dodatnih Gibbsovih uzorkovanja pomoću feed_dict
+#...
+#...
 ```
 
 
@@ -709,7 +861,7 @@ _{x_{j}}^{(i,k)})^{2}}{2\sigma _{x_{j}}^{(i,k)2}}}
 $$
 
 Obično se $$K$$ postavlja na 1 kako bi se smanjila količina uzorkovanja, uz uvjet da je veličina minibatcha  barem 100.
-Konačni izrazi za dvije komponente sada nam daju konačnu funkciju cilja za jedan ulazni uzorak. Optimizira se prosječna vrijednost za sve uzorke $$\mathbf x^{(i)}$$! Prethodno je potrebno još malo modificirati strukturu mreže kako bi omogućili backproapagation i u enkoderski sloj. Nužno je stohastičke neurone $$\mathbf z$$ pretvoriti u determinističke neurone s stohastičkim dodatkom (generatorom šuma $$\epsilon$$ po normalnoj razdiobi $$N(0,1)$$).
+Konačni izrazi za dvije komponente sada nam daju konačnu funkciju cilja za jedan ulazni uzorak. Optimizira se prosječna vrijednost za sve uzorke $$\mathbf x^{(i)}$$! Prethodno je potrebno još malo modificirati strukturu mreže kako bi omogućili backproapagation i u enkoderski sloj. Nužno je stohastičke neurone $$\mathbf z$$ pretvoriti u determinističke neurone s stohastičkim dodatkom (generatorom šuma ε po normalnoj razdiobi $$N(0,1)$$).
 
 <div class="fig figcenter fighighlight">
   <img src="/assets/lab4/VAE_enc_dec2.svg" width="100%">
@@ -724,7 +876,7 @@ Primijetite da konačna struktura mreže uključuje stohastičko uzorkovanje, no
 Konačni algoritam treniranja VAE sada je:
 1. Inicijaliziraj parametre $$\Theta$$ i $$\Phi$$
 2. Ponavljaj
-3. &nbsp;&nbsp; Odaberi slučajni minibarch $$\mathbf X^M$$
+3. &nbsp;&nbsp; Odaberi slučajni minibatch $$\mathbf X^M$$
 4. &nbsp;&nbsp;  Uzorkuj ε
 5. &nbsp;&nbsp;  Odredi gradijent od $$L$$ s obzirom na $$\Theta$$ i $$\Phi$$
 6. &nbsp;&nbsp;  Izračunaj nove vrijednosti za $$\Theta$$ i $$\Phi$$ prema gradijentu
@@ -772,7 +924,14 @@ $$H$$ je unakrsna entropija. Srećom, Tensorflow nudi gotovu funkciju za $$H(\ma
 
 ### 4. Zadatak
 
-Implementirajte VAE sa 20 skrivenih varijabli $$z$$. Ulazni podaci neka su MNIST brojevi. Enkoder i dekoder neka imaju po dva skrivena sloja, svaki sa 200 neurona sa "softplus" aktivacijskim funkcijama. Vizualizirajte rezultate rekonstrukcije za prvih 20 testnih uzoraka MNIST baze. Ponovite postupak treniranja sa samo 2 skrivene varijable $$z$$. Vizualizirajte rezultate rekonstrukcije za prvih 20 testnih uzoraka MNIST baze, ali i raspored testnih uzoraka u 2D prostoru skrivenih varijabli.
+Implementirajte VAE sa 20 skrivenih varijabli $$z$$. Ulazni podaci neka su MNIST brojevi. Enkoder i dekoder neka imaju po dva skrivena sloja, svaki sa 200 neurona sa "softplus" aktivacijskim funkcijama. 
+
+**Podzadaci:**
+
+ 1. Vizualizirajte rezultate rekonstrukcije za prvih 20 testnih uzoraka MNIST baze. 
+ 2. Vizualizirajte distribucije srednjih vrijednosti i standardnih devijacija skrivenih varijabli $$z$$ za primjereni broj ulaznih uzoraka
+ 3. Ponovite treniranje iz prethodna 2 podzadatka za samo 2 elementa u skrivenenom sloju $$\mathbf z$$. 
+ 4. Vizualizirajte raspored testnih uzoraka u 2D prostoru skrivenih varijabli.
 
 Koristite slijedeći predložak:
 
@@ -781,13 +940,15 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
 import os
+import matplotlib.pyplot as plt
+%matplotlib inline
+plt.rcParams['image.cmap'] = 'jet'
 
-mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
+mnist = input_data.read_data_sets('../MNIST_data/', one_hot=True)
 n_samples = mnist.train.num_examples
 
 learning_rate = 0.001
 batch_size = 100
-
 
 n_hidden_recog_1=200 # 1 sloj enkodera
 n_hidden_recog_2=200 # 2 sloj enkodera
@@ -795,6 +956,33 @@ n_hidden_gener_1=200 # 1 sloj dekodera
 n_hidden_gener_2=200 # 2 sloj dekodera
 n_z=2 # broj skrivenih varijabli
 n_input=784 # MNIST data input (img shape: 28*28)
+in_shape = (28,28)
+
+def get_canvas(Z, ind, nx, ny, in_shape, batch_size, sess):
+    """Crtanje rekonstrukcija na odgovarajućim pozicijama u 2D prostoru skrivenih varijabli
+    Z -- skriveni vektori raspoređeni u gridu oko ishodišta
+    ind -- indeksi za rezanje Z-a na batch_size blokove za slanje u graf -zbog problema sa random generatorom
+    nx -- raspon grida po x osi - skrivena varijabla z0
+    ny -- raspon grida po y osi - skrivena varijabla z1
+    in_shape -- dimenzije jedne rekonstrukcije i.e. ulazne sličice
+    batch_size -- veličina minibatcha na koji je graf naviknut
+    sess -- session grafa mreže
+    """
+    # get reconstructions for visualiations
+    X = np.empty((0,in_shape[0]*in_shape[1])) # empty array for concatenation 
+    # split hidden vectors into minibatches of batch_size due to TF random generator limitation
+    for batch in np.array_split(Z,ind):
+        # fill up last batch to full batch_size if neccessary
+        # this addition will not be visualized, but is here to avoid TF error
+        if batch.shape[0] < batch_size:
+            batch = np.concatenate((batch, np.zeros((batch_size-batch.shape[0], batch.shape[1]))), 0)
+        # get batch_size reconstructions and add them to array of previous reconstructions
+        X = np.vstack((X, sess.run(x_reconstr_mean_out, feed_dict={z: batch})))
+    # make canvas with reconstruction tiles arranged by the hidden state coordinates of each reconstruction
+    # this is achieved for all reconstructions by clever use of reshape, swapaxes and axis inversion
+    return (X[0:nx*ny,:].reshape((nx*ny,in_shape[0],in_shape[1])).swapaxes(0,1)
+            .reshape((in_shape[0],ny,nx*in_shape[1])).swapaxes(0,1)[::-1,:,:]
+            .reshape((ny*in_shape[0],nx*in_shape[1])))
 
 def draw_reconstructions(ins, outs, states, shape_in, shape_state):
     """Vizualizacija ulaza i pripadajućih rekonstrkcija i stanja skrivenog sloja
@@ -814,11 +1002,32 @@ def draw_reconstructions(ins, outs, states, shape_in, shape_state):
         plt.imshow(outs[i][0:784].reshape(shape_in), vmin=0, vmax=1, interpolation="nearest")
         plt.title("Reconstruction")
         plt.subplot(20, 4, 4*i + 3)
-        plt.imshow(states[i][0:(shape_state[0] * shape_state[1])].reshape(shape_state), interpolation="nearest")
+        plt.imshow(states[i][0:(shape_state[0] * shape_state[1])].reshape(shape_state),
+                   vmin=-4, vmax=4, interpolation="nearest")
         plt.colorbar()
         plt.title("States")
     plt.tight_layout()
+    
+def plot_latent(inmat, labels):
+    """Crtanje pozicija uzoraka u 2D latentnom prostoru
+    inmat -- matrica latentnih stanja
+    labels -- labela klas
+    """
+    plt.figure(figsize=(8, 6)) 
+    plt.axis([-4, 4, -4, 4])
+    plt.gca().set_autoscale_on(False)
 
+    plt.scatter(inmat[:, 0], inmat[:, 1], c=np.argmax(labels, 1))
+    plt.colorbar()
+    plt.xlabel('z0')
+    plt.ylabel('z1')
+
+def save_latent_plot(name):
+    """Spremanje trenutnog figure-a
+    name -- ime datoteke
+    """
+    plt.savefig(name)
+    
 def weight_variable(shape, name):
     """Kreiranje težina"""
     # http://andyljones.tumblr.com/post/110998971763/an-explanation-of-xavier-initialization
@@ -832,44 +1041,41 @@ def bias_variable(shape):
 
 def variable_summaries(var, name):
     """Prikupljanje podataka za Tensorboard"""
-    with tf.name_scope('summaries'):
+    with tf.name_scope(name):
         mean = tf.reduce_mean(var)
-        tf.scalar_summary('mean/' + name, mean)
-        with tf.name_scope('stddev'):
-            stddev = tf.sqrt(tf.reduce_mean(tf.square(var - mean)))
-        tf.scalar_summary('stddev/' + name, stddev)
-        tf.scalar_summary('max/' + name, tf.reduce_max(var))
-        tf.scalar_summary('min/' + name, tf.reduce_min(var))
-        tf.histogram_summary(name, var)
+        tf.summary.scalar('mean', mean)
+        stddev = tf.sqrt(tf.reduce_mean(tf.square(var - mean)))
+        tf.summary.scalar('stddev', stddev)
+        tf.summary.scalar('max', tf.reduce_max(var))
+        tf.summary.scalar('min', tf.reduce_min(var))
+        tf.summary.histogram(name, var)
 
 def vae_layer(input_tensor, input_dim, output_dim, layer_name, act=tf.nn.softplus):
     """Kreiranje jednog skrivenog sloja"""
     # Adding a name scope ensures logical grouping of the layers in the graph.
     with tf.name_scope(layer_name):
         # This Variable will hold the state of the weights for the layer
-        with tf.name_scope('weights'):
-            weights = weight_variable([input_dim, output_dim], layer_name + '/weights')
-            variable_summaries(weights, layer_name + '/weights')
-        with tf.name_scope('biases'):
-            biases = bias_variable([output_dim])
-            variable_summaries(biases, layer_name + '/biases')
-        with tf.name_scope('Wx_plus_b'):
-            preactivate = tf.matmul(input_tensor, weights) + biases
-            tf.histogram_summary(layer_name + '/pre_activations', preactivate)
+        weights = weight_variable([input_dim, output_dim], layer_name + '/weights')
+        variable_summaries(weights,'weights')
+        tf.summary.tensor_summary('weightsT', weights)
+        biases = bias_variable([output_dim])
+        variable_summaries(biases, 'biases')
+        preactivate = tf.matmul(input_tensor, weights) + biases
+        tf.summary.histogram('pre_activations', preactivate)
         activations = act(preactivate, name='activation')
-        tf.histogram_summary(layer_name + '/activations', activations)
+        tf.summary.histogram('activations', activations)
     return activations
 
 tf.reset_default_graph() 
-
-sess = tf.InteractiveSession()        
+    
+sess = tf.InteractiveSession()
         
 # definicije ulaznog tenzora
 x = 
 
-# TODO definirajte enkoiderski dio
+# definirajte enkoiderski dio
 layer_e1 = vae_layer(x, n_input, n_hidden_recog_1, 'layer_e1') 
-layer_e2 = vae_layer(layer_e1, n_hidden_recog_1, n_hidden_recog_2, 'layer_e2')
+layer_e2 = 
 
 with tf.name_scope('z'):
 # definirajte skrivene varijable i pripadajući generator šuma
@@ -877,12 +1083,12 @@ with tf.name_scope('z'):
     z_log_sigma_sq = 
     eps = tf.random_normal((batch_size, n_z), 0, 1, dtype=tf.float32)
                          
-    z = 
-    tf.histogram_summary('z/activations', z)
+    z = tf.add(z_mean, tf.multiply(tf.sqrt(tf.exp(z_log_sigma_sq)), eps))
+    tf.summary.histogram('activations', z)
 
 # definirajte dekoderski dio
 layer_d1 = vae_layer(z, n_z, n_hidden_gener_1, 'layer_d1') 
-layer_d2 = vae_layer(layer_d1, n_hidden_gener_1, n_hidden_gener_2, 'layer_d2')
+layer_d2 = 
             
 # definirajte srednju vrijednost rekonstrukcije
 x_reconstr_mean = 
@@ -890,40 +1096,44 @@ x_reconstr_mean =
 x_reconstr_mean_out = tf.nn.sigmoid(x_reconstr_mean)
 
 # definirajte dvije komponente funkcije cijene
-with tf.name_scope('costs'):                         
-    # komponenta funkcije cijene - unakrsna entropija
+with tf.name_scope('cost'):
     cost1 = 
-    # komponenta funkcije cijene - KL divergencija
-    cost2 =
-    #tf.scalar_summary('cost2', cost2)
-    cost = tf.reduce_mean(cost1 + cost2)   # average over batch
-    tf.scalar_summary('cost', cost)
+    tf.summary.histogram('cross_entropy', cost1)
+    cost2 = 
+    tf.summary.histogram('D_KL', cost2)
+    cost = tf.reduce_mean(tf.reduce_sum(cost1,1) + tf.reduce_sum(cost2,1))   # average over batch
+    tf.summary.histogram('cost', cost)
                          
 # ADAM optimizer
 with tf.name_scope('train'):
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
-                         
-# Prikupljanje podataka za Tensorboard
-merged = tf.merge_all_summaries()                        
-train_writer = tf.train.SummaryWriter('train', sess.graph)
 
-init = tf.initialize_all_variables()                         
-sess.run(init)
+# Prikupljanje podataka za Tensorboard
+merged = tf.summary.merge_all()
+
+init = tf.global_variables_initializer()
 
 saver = tf.train.Saver()
 
-n_epochs = 10
+n_epochs = 100
+train_writer = tf.summary.FileWriter('train', sess.graph)
 
+sess.run(init)
+
+total_batch = int(n_samples / batch_size)
+step = 0
 for epoch in range(n_epochs):
     avg_cost = 0.
-    total_batch = int(n_samples / batch_size)
-    
+        
     for i in range(total_batch):
         batch_xs, _ = mnist.train.next_batch(batch_size)
+        # Fit training using batch data
         opt, cos = sess.run((optimizer, cost), feed_dict={x: batch_xs})
+        # Compute average loss
         avg_cost += cos / n_samples * batch_size
         
-    if epoch % 10 == 9:
+    # Display logs per epoch step
+    if epoch%(int(n_epochs/10)) == 0:
         print("Epoch:", '%04d' % (epoch+1),
               "cost=", "{:.9f}".format(avg_cost)) 
         run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
@@ -941,32 +1151,102 @@ train_writer.close()
 x_sample = mnist.test.next_batch(100)[0]
 x_reconstruct, z_out = sess.run([x_reconstr_mean_out, z], feed_dict={x: x_sample})
 
-draw_reconstructions(x_sample, x_reconstruct, z_out, (28, 28), (4,5))
+draw_reconstructions(x_sample, x_reconstruct, z_out, (28, 28), (4,5)) # prilagodite dimenzije prema potrebi
 
 # Vizualizacija raspored testnih uzoraka u 2D prostoru skrivenih varijabli - 1. način
 x_sample, y_sample = mnist.test.next_batch(5000)
-z_mu = sess.run(z_mean, feed_dict={x: x_sample})
-plt.figure(figsize=(8, 6)) 
-plt.scatter(z_mu[:, 0], z_mu[:, 1], c=np.argmax(y_sample, 1))
-plt.colorbar()
+z_mu, z_sigma = sess.run((z_mean, z_log_sigma_sq), feed_dict={x: x_sample})
+    
+plot_latent(z_mu, y_sample)
+#save_latent_plot('trt.png')
 
 # Vizualizacija raspored testnih uzoraka u 2D prostoru skrivenih varijabli - 2. način
 
-nx = ny = 20
+nx = ny = 21
 x_values = np.linspace(-3, 3, nx)
 y_values = np.linspace(-3, 3, ny)
 
 canvas = np.empty((28*ny, 28*nx))
-for i, yi in enumerate(x_values):
-    for j, xi in enumerate(y_values):
-        z_mu = np.array([[xi, yi]])
-        x_mean = sess.run(x_reconstr_mean_out, feed_dict={z: np.repeat(z_mu,100,0)})
-        canvas[(nx-i-1)*28:(nx-i)*28, j*28:(j+1)*28] = x_mean[0].reshape(28, 28)
 
-plt.figure(figsize=(8, 10))        
+# Trikovito popunjavanje rezultata za grid zbog fiksirane veličine z batcha u grafu
+# Valjda će se to riješiti u nekoj budućoj verziji TF
 Xi, Yi = np.meshgrid(x_values, y_values)
+Z = np.column_stack((Xi.flatten(), Yi.flatten()))
+X = np.empty((0,28*28))
+ind = list(range(batch_size, nx*ny, batch_size))
+for i in np.array_split(Z,ind):
+    if i.shape[0] < batch_size:
+        i = np.concatenate((i, np.zeros((batch_size-i.shape[0], i.shape[1]))), 0)
+    X = np.vstack((X, sess.run(x_reconstr_mean_out, feed_dict={z: i})))
+    
+for i, yi in enumerate(y_values):
+    for j, xi in enumerate(x_values):
+        canvas[(nx-i-1)*28:(nx-i)*28, j*28:(j+1)*28] = X[i*nx+j].reshape(28, 28)
+
+plt.figure(figsize=(8, 10))
 plt.imshow(canvas, origin="upper")
+plt.xticks( np.linspace(14,588-14,11), np.round(np.linspace(-3,3,11), 2) )
+plt.yticks( np.linspace(14,588-14,11), np.round(np.linspace(3,-3,11), 2) )
+plt.xlabel('z0')
+plt.ylabel('z1')
 plt.tight_layout()
+
+# Vizualizacija ugašenih elemenata skrivenog sloja - 1. način
+
+# Pomoćna funkcija za crtanje boxplot grafova
+def boxplot_vis(pos, input_data, label_x, label_y):
+    ax = fig.add_subplot(130+pos)
+    plt.boxplot(input_data, 0, '', 0, 0.75)
+    ax.set_xlabel(label_x)
+    ax.set_ylabel(label_y)
+    return ax
+   
+fig = plt.figure(figsize=(15,4))
+
+# Vizualizacija statistike za z_mean
+boxplot_vis(1,z_mu, 'Z mean values', 'Z elemets')
+
+# Vizualizacija statistike za z_sigma
+ax = boxplot_vis(2, np.square(np.exp(z_sigma)), 'Z sigma values', 'Z elemets')
+ax.set_xlim([-0.05,1.1])
+
+# Vizualizacija statistike za težine ulaza u dekoder
+test = tf.get_default_graph().get_tensor_by_name("layer_d1/weights:0")
+weights_d1 = test.eval(session=sess)
+boxplot_vis(3, weights_d1.T, 'Weights to decoder', 'Z elemets')
+
+
+# Vizualizacija ugašenih elemenata skrivenog sloja - 2. način
+
+from mpl_toolkits.mplot3d import Axes3D
+
+# Funkcija za crtanje 3D bar grafa
+def bargraph_vis(pos, input_data, dims, color, labels):
+    ax = fig.add_subplot(120+pos, projection='3d')
+    xpos, ypos = np.meshgrid(range(dims[0]), range(dims[1]))
+    xpos = xpos.flatten('F')
+    ypos = ypos.flatten('F')
+    zpos = np.zeros_like(xpos)
+    
+    dx = np.ones_like(zpos) 
+    dy = np.ones_like(zpos) * 0.5
+    dz = input_data.flatten()
+    
+    ax.bar3d(xpos, ypos, zpos, dx, dy, dz, color=color)
+    ax.view_init(elev=30., azim=5)
+    ax.set_xlabel(labels[0])
+    ax.set_ylabel(labels[1])
+    ax.set_zlabel(labels[2])
+                             
+fig = plt.figure(figsize=(15,7))
+
+# 3D bar graf za z_mean
+labels = ('Samples', 'Hidden elements', 'Z mean')
+bargraph_vis(1, z_mu, [200, z_mu.shape[1]], 'g', labels)
+
+# 3D bar graf za težine iz z_mena u dekoder
+labels = ('Decoder elements', 'Hidden elements Z', 'Weights')
+bargraph_vis(2, weights_d1.T, weights_d1.T.shape, 'y', labels)
 
 
 ```
