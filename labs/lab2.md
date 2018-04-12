@@ -164,21 +164,26 @@ konvolucijskih i potpuno povezanih slojeva.
 U Tensorflowu definirajte i naučite model koji je ekvivalentan regulariziranom modelu iz 2. zadatka.
 Korisite identičnu arhitekturu i parametre učenja da biste reproducirali rezultate.
 Tijekom učenja vizualizirajte filtre u prvom sloju kao u prethodnoj vježbi.
-Kako biste u graf dodali operaciju konvolucije koristite `tf.nn.conv2d` ili `tf.contrib.layers.convolution2d`.
+Kako biste u graf dodali operaciju konvolucije
+koristite `tf.nn.conv2d` ili `tf.layers.conv2d`.
 Prije toga proučite službenu dokumentaciju vezanu za [konvoluciju](https://www.tensorflow.org/versions/master/api_docs/python/nn.html#convolution).
 
 <!---
 Dodajte u model normalizaciju podataka po slojevima nakon svakog konvolucijskog sloja ([Batch
 normalization](https://arxiv.org/abs/1502.03167)). To najlakše možete
-napraviti tako da konvoluciji zadate `tf.contrib.layers.batch_norm`
+napraviti tako da konvoluciji zadate
+`tf.contrib.layers.batch_norm`
 kao parametar normalizacije kako je prikazano ispod:
 -->
 
-Primjer korištenja konvolucije iz `tf.contrib` paketa nalazi se ispod.
-Ako želite koristiti `tf.nn.conv2d` onda će vam od pomoći biti službeni [tutorial](https://www.tensorflow.org/versions/master/tutorials/mnist/pros/index.html#build-a-multilayer-convolutional-network).
+U nastavku teksta navodimo primjer korištenja
+konvolucije iz paketa `tf.layers`.
+Ako želite koristiti `tf.nn.conv2d` onda će vam
+od pomoći biti službeni
+[tutorial](https://www.tensorflow.org/tutorials/deep_cnn).
 
 ```python
-import tensorflow.contrib.layers as layers
+import tensorflow.layers as layers
 
 def build_model(inputs, labels, num_classes):
   weight_decay = ...
@@ -292,12 +297,17 @@ Na kraju funkcije možete izračunati ostale pokazatelje te ih isprintati.
   <div class="figcaption figcenter">Primjer kako bi trebao izgledati dobar graf tijekom učenja.</div>
 </div>
 
-Vizualizirajte slučajno inicijalizirane i naučene filtre u prvom sloju.
+Vizualizirajte slučajno inicijalizirane
+i naučene filtre u prvom sloju.
 Da biste dohvatili varijablu u kojoj se
-nalaze težine prvog konvolucijskog sloja možete pozvati metodu
-`tf.contrib.framework.get_variables` kojoj kao argument predate *scope* pod kojim se
-varijabla nalazi u vašem modelu. Ispod je primjer kako to može izgledati gdje će
-*scope* u vašem slučaju ovisiti o tome kako ste ga nazvali tijekom definiranja grafa.
+nalaze težine prvog konvolucijskog sloja
+možete pozvati metodu
+`tf.contrib.framework.get_variables`
+kojoj kao argument predate *scope* pod kojim se
+varijabla nalazi u vašem modelu.
+U nastavku je primjer kako to može izgledati, gdje će
+*scope* u vašem slučaju ovisiti o tome
+kako ste ga nazvali tijekom definiranja grafa.
 
 ```python
 sess = tf.Session()
