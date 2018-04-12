@@ -165,7 +165,7 @@ U Tensorflowu definirajte i naučite model koji je ekvivalentan regulariziranom 
 Korisite identičnu arhitekturu i parametre učenja da biste reproducirali rezultate.
 Tijekom učenja vizualizirajte filtre u prvom sloju kao u prethodnoj vježbi.
 Kako biste u graf dodali operaciju konvolucije
-koristite `tf.nn.conv2d` ili `tf.layers.conv2d`.
+koristite `tf.nn.conv2d` ili `tf.contrib.layers.convolution2d`.
 Prije toga proučite službenu dokumentaciju vezanu za [konvoluciju](https://www.tensorflow.org/versions/master/api_docs/python/nn.html#convolution).
 
 <!---
@@ -177,13 +177,13 @@ kao parametar normalizacije kako je prikazano ispod:
 -->
 
 U nastavku teksta navodimo primjer korištenja
-konvolucije iz paketa `tf.layers`.
+konvolucije iz paketa `tf.contrib.layers`.
 Ako želite koristiti `tf.nn.conv2d` onda će vam
 od pomoći biti službeni
 [tutorial](https://www.tensorflow.org/tutorials/deep_cnn).
 
 ```python
-import tensorflow.layers as layers
+import tensorflow.contrib.layers as layers
 
 def build_model(inputs, labels, num_classes):
   weight_decay = ...
