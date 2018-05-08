@@ -4,7 +4,6 @@ mathjax: true
 permalink: /lab3en/
 ---
 
-
 ## Exercise 3: Sequence modelling with recurrent neural networks
 
 In the third lab assignment our topics are recurrent neural networks and character-level language modellng.
