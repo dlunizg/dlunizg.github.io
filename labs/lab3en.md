@@ -1,7 +1,7 @@
 ---
 layout: page
 mathjax: true
-permalink: /lab3/
+permalink: /lab3en/
 ---
 
 
