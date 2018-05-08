@@ -11,7 +11,7 @@ U trećoj laboratorijskoj vježbi bavimo se povratnim neuronskim mrežama i prob
 
 Kao što su konvolucijske neuronske mreže arhitektura specijalizirana za obrađivanje slika kroz iterativno povećavajuće lokalne filtre, povratne neuronske mreže su arhitektura specijalizirana za obrađivanje nizova podataka u smjeru jedne dimenzije (simuliranje protoka vremena). Intuitivan i motivirajuć primjer ovoga je tekst, u kojemu možemo zamisliti trenutni smisao rečenice kao funkciju svih dosadašnjih riječi, te za slučaj jezika europskog podrijetla - možemo pretpostaviti da se trenutni smisao mijenja od početka rečenice prema kraju, u smjeru s lijeva na desno. 
 
-Glavna prednost povratnih neuronskih mreža ne nalazi se u obrađivanju postojećih nizova, već u generiranju novih slijedova na temelju naučene reprezentacije u skrivenom sloju ili na temelju naučenih parametara mreže. Slijedovi generirani (i obrađivani) pomoću povratnih neuronskih mreža mogu imati varijabilnu duljinu, za razliku od generiraja slika pomoću konvolucijskih mreža, u kojima dimenzije izlaza (generirane slike) moraju biti unaprijed poznate. U zadnje vrijeme adaptacije konvolucijskih slojeva i mreža za projekciju podataka varijabilne duljine u reprezentaciju skrivenog sloja uzimaju maha te konkuriraju povratnim modelima, no generiranje je još u domeni povratnih mreža.
+Glavna prednost povratnih neuronskih mreža ne nalazi se u obrađivanju postojećih nizova, već u generiranju novih slijedova na temelju naučene reprezentacije u skrivenom sloju ili na temelju naučenih parametara mreže. Slijedovi generirani (i obrađivani) pomoću povratnih neuronskih mreža mogu imati varijabilnu duljinu, za razliku od generiranja slika pomoću konvolucijskih mreža, u kojima dimenzije izlaza (generirane slike) moraju biti unaprijed poznate. U zadnje vrijeme adaptacije konvolucijskih slojeva i mreža za projekciju podataka varijabilne duljine u reprezentaciju skrivenog sloja uzimaju maha te konkuriraju povratnim modelima, no generiranje je još u domeni povratnih mreža.
 
 Statističko modeliranje jezika je problem aproksimacije vjerojatnosne distribucije preko niza riječi. Za zadani niz riječi \\(\mathbf{w}\\) *"The quick brown fox jumped"* duljine \\(n = 5\\), jezični model pridodaje vjerojatnost \\(P(\mathbf{w}) = P(w_1,...,w_n)\\) tom nizu riječi, koju interpretiramo kao vjerojatnost da se taj niz pojavi u stvarnom jeziku.
 
@@ -456,6 +456,4 @@ def sample(seed, n_sample):
 
 ### Zadatak 3: višeslojna povratna neuronska mreža u tensorflowu
 
-U duhu blagdana, kod riješenog 3. zadatka će biti dostupan uskoro za eksperimentiranje, te se zadatak neće bodovati!
-
-
+TODO
