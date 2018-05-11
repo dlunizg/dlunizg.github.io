@@ -35,13 +35,13 @@
      inkscape:window-height="777"
      id="namedview314"
      showgrid="false"
-     inkscape:zoom="1.2322041"
-     inkscape:cx="295.86765"
-     inkscape:cy="114.57418"
+     inkscape:zoom="1.7425997"
+     inkscape:cx="374.88066"
+     inkscape:cy="123.32653"
      inkscape:window-x="67"
      inkscape:window-y="34"
      inkscape:window-maximized="0"
-     inkscape:current-layer="id1" /><defs
+     inkscape:current-layer="id17" /><defs
      class="ClipPathGroup"
      id="defs4"><clipPath
        id="presentation_clip_path"
@@ -541,30 +541,28 @@
                      style="fill:#000000;stroke:none"
                      id="tspan299">x</tspan></tspan></tspan></text>
 </g></g><g
-           id="g301"
-           class="com.sun.star.drawing.TextShape"><g
-             id="id17"><rect
-               style="fill:none;stroke:none"
-               id="rect304"
-               height="963"
-               width="3557"
-               y="6261"
-               x="13954"
-               class="BoundingBox" /><text
-               id="text306"
-               class="TextShape"><tspan
-                 style="font-weight:400;font-size:635px;font-family:'Liberation Sans', sans-serif"
-                 id="tspan308"
-                 font-weight="400"
-                 font-size="635px"
-                 class="TextParagraph"><tspan
-                   id="tspan310"
-                   y="6962"
-                   x="14204"
-                   class="TextPosition"><tspan
-                     style="fill:#000000;stroke:none"
-                     id="tspan312">T ili F</tspan></tspan></tspan></text>
-</g></g><text
+           id="id17"><rect
+             class="BoundingBox"
+             x="13954"
+             y="6261"
+             width="3557"
+             height="963"
+             id="rect304"
+             style="fill:none;stroke:none" /><text
+             class="TextShape"
+             id="text306"><tspan
+               class="TextParagraph"
+               font-size="635px"
+               font-weight="400"
+               id="tspan308"
+               style="font-weight:400;font-size:635px;font-family:'Liberation Sans', sans-serif"><tspan
+                 class="TextPosition"
+                 x="14204"
+                 y="6962"
+                 id="tspan310"><tspan
+                   id="tspan312"
+                   style="fill:#000000;stroke:none">T or F</tspan></tspan></tspan></text>
+</g><text
            xml:space="preserve"
            style="font-style:normal;font-weight:normal;font-size:1128.88891602px;line-height:125%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
            x="5830.9702"
@@ -598,5 +596,5 @@
    style="font-style:italic;font-size:599.722229px"
    id="tspan4379-0">f</tspan><tspan
    style="font-size:352.77786255px;baseline-shift:sub"
-   id="tspan4377-1">2</tspan></tspan></text>
+   id="tspan4377-1" /></tspan></text>
 </g></g></g></svg>
