@@ -10,6 +10,8 @@ permalink: /lab4/
   - [3. zadatak](#3zad)
 - [Varijacijski autoenkider](#vae)
   - [4. zadatak](#4zad)
+- [Generative adversarial networks](#gan)
+  - [5. zadatak](#5zad)
 
 
 
@@ -39,7 +41,7 @@ Ovakva razmišljanja upućuju na upotrebu generativnih modela za ekstrakciju bit
 
 ### Ograničeni Boltzmanov stroj (RBM)
 
-Boltzmanov stroj (BM) je [stohastička](https://en.wikipedia.org/wiki/Stochastic_neural_network) [rekurzivna](https://en.wikipedia.org/wiki/Recursive_neural_network) [generativna](https://en.wikipedia.org/wiki/Generative_model) mreža koja treniranjem nastoji maksimizirati $$p(\mathbf x^{(i)})$$, a temelji se na Boltrmanovoj distribuciji prema kojoj je vjerojatnost stanja $$\mathbf x$$ to manja, što je veća njegova energija $$E(\mathbf x)$$ prema slijedećem izrazu
+Boltzmanov stroj (BM) je [stohastička](https://en.wikipedia.org/wiki/Stochastic_neural_network) [rekurzivna](https://en.wikipedia.org/wiki/Recursive_neural_network) [generativna](https://en.wikipedia.org/wiki/Generative_model) mreža koja treniranjem nastoji maksimizirati $$p(\mathbf x^{(i)})$$, a temelji se na Boltrmanovoj distribuciji prema kojoj je vjerojatnost stanja $$\mathbf x$$ to manja, što je veća njegova energija $$E(\mathbf x)$$ prema sljedećem izrazu
 
 $$
 p(\mathbf{x})\propto
@@ -163,14 +165,14 @@ Drugi pribrojnici odnose se na stanja mreže bez fiksnog vidljivog sloja pa se t
   <img src="/assets/lab4/CD.svg" width="50%">
 </div>
 
-Korekcija težina i pomaka za ulazni uzorak vi, tada se može realizirati na slijedeći način:
+Korekcija težina i pomaka za ulazni uzorak vi, tada se može realizirati na sljedeći način:
 
-$$\Delta w_{\mathit{ij}}= \left[\langle v_{i}h_{j}\rangle ^{0}-\langle
-v_{i}h_{j}\rangle ^{1}\right]$$
+$$\Delta w_{\mathit{ij}}= \eta \left[\langle v_{i}h_{j}\rangle ^{0}-\langle
+v_{i}h_{j}\rangle ^{1}\right]$$, 
 $$\Delta b_{j}=\eta \left[\langle h_{j}\rangle ^{0}-\langle h_{j}\rangle
-^{1}\right]$$
+^{1}\right]$$, 
 $$\Delta a_{i}=\eta \left[\langle v_{i}\rangle ^{0}-\langle v_{i}\rangle
-^{1}\right]$$
+^{1}\right]$$, 
 
 Faktor učenja $$\eta$$ obično se postavlja na vrijednost manju od 1. Prvi pribrojnik u izrazu za $$\Delta w_{\mathit{ij}}$$ često se naziva pozitivna faza, a drugi pribrojnik, negativna faza.
 
@@ -190,13 +192,13 @@ Implementirajte RBM koji koristi CD-1 za učenje. Ulazni podaci neka su MNIST br
 3. Ispitajte učestalost uključenosti elemenata skrivenog sloja te vizualizirajte naučene težine $$\mathbf W$$ soritrane prema učestalosti
 4. Preskočite inicijalno uzorkovanje/binarizaciju na temelju ulaznih uzoraka, već ulazne uzorke (realne u rasponu [0 1]) koristiti kao ualzne vektore $$\mathbf v$$. Koliko se tako dobijeni RBM razlikuje od prethodnog?
 5. Povećajte broj Gibsovih uzorkovanja k u CD-k. Koje su razlike?
-6. Provedite eksperimente za manji i veći broj skrivenih neurona. Što opažate kod težina i rekonstrukcija?
-7. Ispitajte efekt variranja koeficijenta učenja.
-8. Slučajno inicijalizirjte skriveni sloj, provedite nekoliko Gibbsovih uzorkovanje te vizualizirajte generirane uzorke vidljivog sloja
+6. Ispitajte efekt variranja koeficijenta učenja.
+7. Slučajno inicijalizirjte skriveni sloj, provedite nekoliko Gibbsovih uzorkovanje te vizualizirajte generirane uzorke vidljivog sloja
+8. Provedite prethodne eksperimente za manji i veći broj skrivenih neurona. Što opažate kod težina i rekonstrukcija?
 
-Koristite slijedeći predložak s pomoćnom datotekom [utils.py](/assets/lab4/utils.py). 
+Koristite sljedeći predložak s pomoćnom datotekom [utils.py](/assets/lab4/utils.py). 
 
-**NAPOMENA**: Osim nadopunjavanja koda koji nedostaje, predložak se treba prilagođavati prema potrebi, a može i prema vlastitim preferencijama. Stoga **budite oprezni s tvrdnjama da neki dio koda ne radi!**
+**NAPOMENA**: Osim nadopunjavanja koda koji nedostaje, predložak se treba prilagođavati prema potrebi, a može i prema vlastitim preferencijama. Stoga **budite oprezni s tvrdnjama da vam neki dio koda ne radi!**
 
 ```python
 import tensorflow as tf
@@ -471,20 +473,22 @@ draw_generated(r_input, hout1, out_1_prob, v_shape, h1_shape, 50)
 
 ### 2. zadatak
 
-Deep beleif Network (DBN) je duboka mreža koja se dobije slaganjem više RBM-ova jednog na drugi, pri čemu se svaki slijedeć RBM pohlepno trenira pomoću skrivenog ("izlaznog") sloja prethodnog RBM-a (osim prvog RBM-a koji se trenira direktno s ulaznim uzorcima). Teoretski, tako izgrađen DBN trebao bi povećati $$p(\mathbf v)$$ što nam je i cilj. Korištenje DBN, odnosno rekonstrukcija ulaznog uzorka provodi se prema donjoj shemi. U prolazu prema gore određuju se skriveni slojevi iz vidljivog sloja dok se ne dođe do najgornjeg RBM-a, zatim se na njemu provede CD-k algoritam, nakon čega se, u prolasku prema dolje, određuju niži skriveni slojevi dok se ne dođe do rekonstruiranog vidljivog sloja. Težine između pojedinih slojeva su iste u prolazu gore kao i u prolazu prema dolje. Implementirajte troslojni DBN koji se sastoji od dva pohlepno pretrenirana RBM-a. Prvi RBM neka je isit kao i u 1. zadatku, a drugi RBM neka ima skriveni sloj od 100 elemenata.
+Deep beleif Network (DBN) je duboka mreža koja se dobije slaganjem više RBM-ova jednog na drugi, pri čemu se svaki sljedeći RBM pohlepno trenira pomoću skrivenog ("izlaznog") sloja prethodnog RBM-a (osim prvog RBM-a koji se trenira direktno s ulaznim uzorcima). Teoretski, tako izgrađen DBN trebao bi povećati $$p(\mathbf v)$$ što nam je i cilj. Korištenje DBN, odnosno rekonstrukcija ulaznog uzorka provodi se prema donjoj shemi. U prolazu prema gore određuju se skriveni slojevi iz vidljivog sloja dok se ne dođe do najgornjeg RBM-a, zatim se na njemu provede CD-k algoritam, nakon čega se, u prolasku prema dolje, određuju niži skriveni slojevi dok se ne dođe do rekonstruiranog vidljivog sloja. Težine između pojedinih slojeva su iste u prolazu gore kao i u prolazu prema dolje. Implementirajte troslojni DBN koji se sastoji od dva pohlepno pretrenirana RBM-a. Prvi RBM neka je isit kao i u 1. zadatku, a drugi RBM neka ima skriveni sloj od 100 elemenata.
 
 **Podzadaci:**
 
 1. Vizualizirajte težine $$\mathbf W_1$$ i $$\mathbf W_2$$ ostvarene treniranjem.
 2. Vizualizirajte rezultate rekonstrukcije prvih 20 testnih uzoraka MNIST baze. 
-3. Postavite broj skrivenih varijabli gornjeg RBM-a jednak broju elemenata vidljivog sloja donjeg RBM-a, a inicijalne težine $$\mathbf W_2$$ postavite na $$\mathbf W_1^T$$. Koji su efekti promjene? Vizualizirajte uzorke krovnog skrivenog sloja kao matrice 28x28.
-4. Slučajno inicijalizirjte krovni skriveni sloj, provedite nekoliko Gibbsovih uzorkovanje te vizualizirajte generirane uzorke vidljivog sloja - usporedite s prethodnim zadatkom.
+3. Slučajno inicijalizirjte krovni skriveni sloj, provedite nekoliko Gibbsovih uzorkovanje te vizualizirajte generirane uzorke vidljivog sloja - usporedite s prethodnim zadatkom.
+4. Postavite broj skrivenih varijabli gornjeg RBM-a jednak broju elemenata vidljivog sloja donjeg RBM-a, a inicijalne težine $$\mathbf W_2$$ postavite na $$\mathbf W_1^T$$. Koji su efekti promjene? Vizualizirajte uzorke krovnog skrivenog sloja kao matrice 28x28.
 
 <div class="fig figcenter fighighlight">
   <img src="/assets/lab4/DBN1.svg" width="100%">
 </div>
 
-Koristite slijedeći predložak uz prtedložak 1. zadatka:
+Koristite sljedeći predložak uz prtedložak 1. zadatka:
+
+**NAPOMENA**: Osim nadopunjavanja koda koji nedostaje, predložak se treba prilagođavati prema potrebi, a može i prema vlastitim preferencijama. Stoga **budite oprezni s tvrdnjama da vam neki dio koda ne radi!**
 
 ```python
 Nh2 = Nh # Broj elemenata drugog skrivenog sloja
@@ -573,17 +577,17 @@ Kako bi se dodatno poboljšala generativna svojstva DBN-a, može se provesti gen
 
 Treniranje težina između nižih slojeva je drugačije. Matrice $$\mathbf W'_n$$ se korigiraju kada se određuju nova stanja pomoću matrica $$\mathbf R_n$$ u prolasku prema gore. U prolasku prema dolje korigiraju se matrice $$\mathbf R_n$$. Vektori pomaka pojedinih slojeva $$\mathbf b_n$$ se isto dijele na varijante za prolaz prema gore $$\mathbf b_n^{up}$$ i za ptrolaz prem dolje $$\mathbf b_n^{down}$$. Inicijalni pomaci jednaki su originalnim pomacima $$\mathbf b$$.
 
-Za korekciju matrica $$\mathbf W'_n$$ prilikom prolaska prema gore ($$sample \left(\sigma \left(\mathbf R_n \mathbf s^{(n-1)} + \mathbf b^{up}_n\right)\right) \to \mathbf s^{(n)}$$) provodi se i $$sample \left( \sigma \left(\mathbf W'_n \mathbf s^{(n)} + \mathbf b^{down}_{n-1} \right) \right) \to \mathbf s^{(n-1)novo}$$. Korekcija elemenata radi se na slijedeći način
+Za korekciju matrica $$\mathbf W'_n$$ prilikom prolaska prema gore ($$sample \left(\sigma \left(\mathbf R_n \mathbf s^{(n-1)} + \mathbf b^{up}_n\right)\right) \to \mathbf s^{(n)}$$) provodi se i $$sample \left( \sigma \left(\mathbf W'_n \mathbf s^{(n)} + \mathbf b^{down}_{n-1} \right) \right) \to \mathbf s^{(n-1)novo}$$. Korekcija elemenata radi se na sljedeći način
 $$\Delta w'_{\mathit{ij}}=\eta
 s_{j}^{(n)}(s_{i}^{(n-1)}-s_{i}^{(n-1)\mathit{novo}})$$
-Korekcija pomaka za prolaz prema dolje provodi se na slijedeći način
+Korekcija pomaka za prolaz prema dolje provodi se na sljedeći način
 $$\Delta b_{\mathit{i}}^{\mathit{down}}=\eta
 (s_{i}^{(n-1)}-s_{i}^{(n-1)\mathit{novo}})$$
 
-Za korekciju matrica $$\mathbf R_n$$ prilikom prolaska prema dolje ($$sample \left( \sigma \left(\mathbf W'_n \mathbf s^{(n)} + \mathbf b^{down}_{n-1} \right) \right) \to \mathbf s^{(n-1)}$$) provodi se i $$sample \left(\sigma \left(\mathbf R_n \mathbf s^{(n-1)} + \mathbf b^{up}_n\right)\right) \to \mathbf s^{(n)novo}$$. Korekcija elemenata radi se na slijedeći način
+Za korekciju matrica $$\mathbf R_n$$ prilikom prolaska prema dolje ($$sample \left( \sigma \left(\mathbf W'_n \mathbf s^{(n)} + \mathbf b^{down}_{n-1} \right) \right) \to \mathbf s^{(n-1)}$$) provodi se i $$sample \left(\sigma \left(\mathbf R_n \mathbf s^{(n-1)} + \mathbf b^{up}_n\right)\right) \to \mathbf s^{(n)novo}$$. Korekcija elemenata radi se na sljedeći način
 $$\Delta r_{\mathit{ij}}=\eta
 s_{i}^{(n-1)}(s_{j}^{(n)}-s_{j}^{(n)\mathit{novo}})$$
-Korekcija pomaka za prolaz prema dolje provodi se na slijedeći način
+Korekcija pomaka za prolaz prema dolje provodi se na sljedeći način
 $$\Delta b_{\mathit{i}}^{\mathit{up}}=\eta
 (s_{i}^{(n)}-s_{i}^{(n)\mathit{novo}})$$
 
@@ -609,7 +613,9 @@ Implementirajte postupak generativnog fine-tuninga na DBN iz 2. zadatka. Za tren
   <img src="/assets/lab4/DBN2.svg" width="40%">
 </div>
 
-Koristite slijedeći predložak, kao i predloške 1. i 2. zadatka.
+Koristite sljedeći predložak, kao i predloške 1. i 2. zadatka.
+
+**NAPOMENA**: Osim nadopunjavanja koda koji nedostaje, predložak se treba prilagođavati prema potrebi, a može i prema vlastitim preferencijama. Stoga **budite oprezni s tvrdnjama da vam neki dio koda ne radi!**
 
 ```python
 #
@@ -918,7 +924,7 @@ p(x_{j}^{\mathit{out}}=1)+(1-x_{j}^{\text{in}})\log
 _{j}H\left(p(x_{j}=1),p(x_{j}^{\mathit{out}}=1)\right)
 $$
 
-$$H$$ je unakrsna entropija. Srećom, Tensorflow nudi gotovu funkciju za $$H(\mathbf x,\sigma(\mathbf y))$$: `tf.nn.sigmoid_cross_entropy_with_logits(y,x)`. Obratite pažnju da prvi argument funkcije nije $$p(x_j = 1)$$!
+$$H$$ je unakrsna entropija. Srećom, Tensorflow nudi gotovu funkciju za $$H(\mathbf x,\sigma(\mathbf y))$$: [`tf.nn.sigmoid_cross_entropy_with_logits(y,x)`](https://www.tensorflow.org/api_docs/python/tf/nn/sigmoid_cross_entropy_with_logits). Obratite pažnju da prvi argument funkcije nije $$p(x_j = 1)$$!
 
 <a name='4zad'></a>
 
@@ -930,10 +936,12 @@ Implementirajte VAE sa 20 skrivenih varijabli $$z$$. Ulazni podaci neka su MNIST
 
  1. Vizualizirajte rezultate rekonstrukcije za prvih 20 testnih uzoraka MNIST baze. 
  2. Vizualizirajte distribucije srednjih vrijednosti i standardnih devijacija skrivenih varijabli $$z$$ za primjereni broj ulaznih uzoraka
- 3. Ponovite treniranje iz prethodna 2 podzadatka za samo 2 elementa u skrivenenom sloju $$\mathbf z$$. 
- 4. Vizualizirajte raspored testnih uzoraka u 2D prostoru skrivenih varijabli.
+ 3. Vizualizirajte raspored testnih uzoraka u 2D prostoru skrivenih varijabli.
+ 4. Ponovite eksperimente iz prethodnih podzadataka za samo 2 elementa u skrivenenom sloju $$\mathbf z$$. 
 
-Koristite slijedeći predložak:
+Koristite sljedeći predložak:
+
+**NAPOMENA**: Osim nadopunjavanja koda koji nedostaje, predložak se treba prilagođavati prema potrebi, a može i prema vlastitim preferencijama. Stoga **budite oprezni s tvrdnjama da vam neki dio koda ne radi!**
 
 ```python
 import numpy as np
@@ -1251,7 +1259,219 @@ bargraph_vis(2, weights_d1.T, weights_d1.T.shape, 'y', labels)
 
 ```
 
-### Bonus zadatak - Tensorboard
+#### Bonus zadatak - Tensorboard
 
 Predložak za 4. zadatak sadrži kod za prikupljanje podataka koji se mogu prikazati pomoću [Tensorboard](https://www.tensorflow.org/versions/r0.12/how_tos/summaries_and_tensorboard/index.html). Pokrenite Tensorboard i provjerite koje su informacije dostupne o treniranom VAE.
+
+<a name='gan'></a>
+
+### Generative asdversarial networks (GAN)
+
+Primarna namjena GAN-a je isto generiranje novih i uvjerljivih uzoraka, no princip rada je malo drugačiji od prethodna dva modela. GAN ne procjenjuje direktno parametre $$p(\mathbf x)$$ ili bilo koje druge distribucije, premda se njegovo treniranje može interpretirati kao estimacija $$p(\mathbf x)$$. Najvjerojatnije zahvaljujući tom drugačijem pristupu, GAN-ovi često generiraju vizualno najbolje uzorke u usporedbi sa VAE ili drugim generativnim mrežama.
+
+GAN se sastoji od dvije zasebne mreže 
+
+1. Generator (G) koji ima zadatak generirati uvjerljive uzorke
+2. Diskriminator (D) koji ima zadatak prepoznati radi li se o pravom uzorku (iz skupa za trniranje) ili lažnom uzorku koji je generirao G
+
+<div class="fig figcenter fighighlight">
+  <img src="/assets/lab4/GAN.svg" width="100%">
+</div>
+
+Te dvije mreže su protivnici (Adversaries), imaju dijametralno suprotstavljene ciljeve te se pokušavaju nadmudriti. To nadmetanje ih tjera da budu sve bolji u postizanju svog cilja i da se fokusiraju na sve bitne detalje ulaznih podataka. Očekivano, njihovo nadmetanje trebalo bi dovesti do toga da generator generira savršene uzorke koje diskriminator ne može razlikovati od uzoraka iz skupa za treniranje. Da bi generator postigao takav uspjeh nužno je da i diskriminator bude maksimalno dobar u svom zadatku.
+
+Generator na svojem izlazu generira uzorke za neki slučajni ulazni vektor koji prati neku distribuciju. Ta slučajnost na ulazu omogućuje generatoru da uvijek generira nove uzorke. Pri tome nema nekih posebnih ograničenja na arhitekturu generatora, no poželjno je da se može trenirati backpropagation algoritmom. 
+
+<div class="fig figcenter fighighlight">
+  <img src="/assets/lab4/G.svg" width="50%">
+</div>
+
+Diskriminator na svome izlazu treba estimirati pripadnost razredu stvarnih ili lažnih uzoraka za svaki ulazni vektor. Za razliku od generatora, ovdje je moguće koristiti učenje pod nadzorom jer se za svaki uzorak zna da li je došao iz skupa za treniranje ili od generatora. Radi jednostavnosti možemo izlaz diskriminatora ograničiti u rasponu $$[0,1]$$ i interpretirati kao vjerojatnost da je ulazni uzorak stvaran (iz skupa za treniranje).
+
+<div class="fig figcenter fighighlight">
+  <img src="/assets/lab4/D.svg" width="50%">
+</div>
+
+Gore opisani ciljevi diskriminatora i generatora mogu se formalno izraziti u sljedećoj funkciji cilja:
+
+$$\min_G \max_D V(D,G) = E_{ \mathbf x \sim p_{data}(\mathbf x) } [\log D( \mathbf x)] + E_{ \mathbf z  \sim p_{\mathbf z}(\mathbf z) } [\log(1 - D(G( \mathbf z)))]$$
+
+Prvi pribrojnik predstavlja očekivanje procjene log vjerojatnosti da su uzorci iz skupa za treniranje stvarni. Drugi pribrojnik predstavlja očekivanje procjene log vjerojatnosti da generirani uzorci nisu stvarni, tj. da su umjetni. Diskriminator ima za cilj maksimizirati oba pribrojnika, dok generator ima za cilj minimizirati drugi pribrojnik. Svaki pribrojnik funkcije cilja može se jednostavno procijeniti za jednu mini grupu te se može procijeniti gradijent s obzirom na prametre obiju mreža. 
+
+Treniranje dviju mreža (G i D) može se provesti istovremeno ili se u jednoj iteraciji prvo može trenirati jedna mreža a zatim druga. Dodatno, neki autori preporučuju da se u nekoliko uzastopnih iteracija trenira jedna mreža, a nakon toga druga mreža samo jednu iteraciju. Odgovarajuće funkcije cijana ze obje mreže možete implementirati maštovitom upotrebom funkcije [`tf.nn.sigmoid_cross_entropy_with_logits(y,x)`](https://www.tensorflow.org/api_docs/python/tf/nn/sigmoid_cross_entropy_with_logits).
+
+<div class="fig figcenter fighighlight">
+  <img src="/assets/lab4/GAN2.svg" width="100%">
+</div>
+
+Kako diskriminator treba primati ulazne uzorke iz dva različita izvora, u TensorFlow okruženju možemo ga implementirati kao dvije identične mreže od kojih svaka prima ulazne uzorke iz jednog izvora, s time da oba diskriminatora dijele, odnosno koriste iste težine. Treniranje svakog pojedinog diskriminatora onda uzrokuje modifikacije istog skupa težina. Dijeljenje parametara mreže, odnosno varijabli se u TensorFlow okruženju postiže pomoću opsega varijable [`tf.variable_scope`](https://www.tensorflow.org/api_docs/python/tf/variable_scope) i ključne riječi `reuse`.
+
+Kod generiranja slika uspješnim se pokazao Deep Convolutional GAN (DCGAN) koji u skrivenim slojevima obiju mreža koristi konvolucijske slojeve. Za razliku od klasičnih konvolucijskih mreža, ovdje se ne koriste pooling slojevi nego se uzorkovanje provodi pomoću konvolucijskih slojeva koji imaju posmak veći od 1. Autori mreže preporučuju korištenje Batch normalizacije u svim slojevima osim u izlaznom sloju generatora te ulaznom i izlaznom sloju diskriminatora. Korištenje Leaky ReLU aktivacijskih funkcija u svim slojevima osim u izlaznim je još jedna specifičnost DCGAN-a kao i eliminacija potpuno povezanih slojeva.
+
+<div class="fig figcenter fighighlight">
+  <img src="/assets/lab4/DCGAN.svg" width="100%">
+</div>
+
+<a name='5zad'></a>
+
+### 5. Zadatak
+
+Implementirajte DCGAN s generatorom (4 konvolucijska sloja) i diskriminatorom (3 konvolucijska sloja). U svim konvolucijama koristite veličinu jezgre [4,4], osim u izlaznom sloju diskriminatora, a broj kanala od ulaza prema izlazu neka bude G: 512 256, 128, 1 i D: 64, 128, 1. Ulaz u generator $$\mathbf z$$ neka ima 100 elemenata prema normalnoj distribuciji $$N(0,1)$$. Ulazni podaci neka su MNIST brojevi skalirani na veličinu 32x32 te treniranje provedite kroz barem 20 epoha. U jednoj iteraciji provedite jednu optimizaciju generatora i jednu optimizaciju diskriminatora s po jednom mini grupom. Koristite tanh aktivacijsku funkciju za izlaz generatora i sigmoid aktivaciju za izlaz diskriminator.
+
+**Podzadaci:**
+
+ 1. Vizualizirajte rezultate generiranja 100 novih uzoraka iz slučajnih vektora $$\mathbf z$$. Usporedite rezultate s uzorcima generiranim pomoću VAE.
+ 2. U jednoj iteraciji provedite nekoliko koraka treniranja generatora i samo jedan korak treniranja diskriminatora. Vizualizirajte generirane uzorke. Ponovite isti postupak samo zamijenite mjesta generatora i diskriminatora.
+ 3. Isključite batch normalizaciju u obje mreže. Komentirajte rezultate.
+ 4. Unutar jedne iteracije provedite treniranje diskriminatora sa dvaje minigrupe a generatora sa jednom minigrupom. Komentirajte retzultate.
+
+Koristite sljedeći predložak:
+
+**NAPOMENA**: Osim nadopunjavanja koda koji nedostaje, predložak se treba prilagođavati prema potrebi, a može i prema vlastitim preferencijama. Stoga **budite oprezni s tvrdnjama da vam neki dio koda ne radi!**
+
+```python
+import numpy as np
+import tensorflow as tf
+from tensorflow.examples.tutorials.mnist import input_data
+from utils import tile_raster_images
+import matplotlib.pyplot as plt
+import math
+
+%matplotlib inline
+plt.rcParams['image.cmap'] = 'jet'
+
+mnist = input_data.read_data_sets("MNIST_data/", one_hot=True, reshape=[])
+n_samples = mnist.train.num_examples
+
+# training parameters
+batch_size = 100
+lr = 0.0002
+n_epochs = 20
+
+def lrelu(x, th=0.2):
+    return tf.maximum(th * x, x)
+
+# D(x)
+def discriminator(x, isTrain=True, reuse=False):
+    with tf.variable_scope('discriminator', reuse=reuse):
+        # 1st hidden layer
+        conv = tf.layers.conv2d(x, 64, [4, 4], strides=(2, 2), padding='same')
+        lrelu_ = lrelu(conv, 0.2)
+        
+        # 2nd hidden layer
+        
+        
+        # output layer
+        
+        
+        return out, conv
+
+# G(z)
+def generator(z, isTrain=True):
+    with tf.variable_scope('generator'):
+        # 1st hidden layer
+        conv = tf.layers.conv2d_transpose(z, 512, [4, 4], strides=(1, 1), padding='valid')
+        lrelu_ = lrelu(tf.layers.batch_normalization(conv, training=isTrain))
+        
+        # 2nd hidden layer
+        
+        # 3rd hidden layer
+        
+        # output layer
+
+        
+        return out
+
+def show_generated(G, N, shape=(32,32), stat_shape=(10,10), interpolation="bilinear"):
+    """Visualization of generated samples
+     G - generated samples
+     N - number of samples
+     shape - dimensions of samples eg (32,32)
+     stat_shape - dimension for 2D sample display (eg for 100 samples (10,10)
+    """
+    
+    image = (tile_raster_images(
+        X=G,
+        img_shape=shape,
+        tile_shape=(int(math.ceil(N/stat_shape[0])), stat_shape[0]),
+        tile_spacing=(1, 1)))
+    plt.figure(figsize=(10, 14))
+    plt.imshow(image, interpolation=interpolation)
+    plt.axis('off')
+    plt.show()
+    
+
+def gen_z(N, batch_size):
+    z = np.random.normal(0, 1, (batch_size, 1, 1, N))
+    return z
+
+# input variables
+x = tf.placeholder(tf.float32, shape=(None, 32, 32, 1))
+z = tf.placeholder(tf.float32, shape=(None, 1, 1, 100))
+isTrain = tf.placeholder(dtype=tf.bool)
+    
+# generator
+G_z = generator(z, isTrain)
+    
+# discriminator
+# real
+D_real, D_real_logits = discriminator(x, isTrain)
+# fake
+...
+
+
+# labels for learning
+true_labels = tf.ones([batch_size, 1, 1, 1]
+true_labels = tf.zeros([batch_size, 1, 1, 1]
+# loss for each network                       
+D_loss_real =
+D_loss_fake =
+D_loss = D_loss_real + D_loss_fake
+G_loss = 
+
+# trainable variables for each network
+T_vars = tf.trainable_variables()
+D_vars = [var for var in T_vars if var.name.startswith('discriminator')]
+G_vars = [var for var in T_vars if var.name.startswith('generator')]
+
+# optimizer for each network
+with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):
+    D_optim = tf.train.AdamOptimizer(lr, beta1=0.3).minimize(D_loss, var_list=D_vars)
+    G_optim = tf.train.AdamOptimizer(lr, beta1=0.3).minimize(G_loss, var_list=G_vars)
+
+
+# open session and initialize all variables
+config = tf.ConfigProto()
+config.gpu_options.allow_growth=True
+sess = tf.InteractiveSession(config=config)
+tf.global_variables_initializer().run()
+
+# MNIST resize and normalization
+train_set = tf.image.resize_images(mnist.train.images, [32, 32]).eval()
+# input normalization
+...
+
+#fixed_z_ = np.random.uniform(-1, 1, (100, 1, 1, 100))
+fixed_z_ = gen_z(100, 100)
+total_batch = int(n_samples / batch_size)
+
+for epoch in range(n_epochs):
+    for iter in range(total_batch):
+        # update discriminator
+        x_ = train_set[iter*batch_size:(iter+1)*batch_size]
+        
+        # update discriminator
+        
+        z_ = gen_z(100, batch_size)
+        loss_d_, _ = sess.run([D_loss, D_optim], {x: x_, z: z_, isTrain: True})
+                
+
+        # update generator
+        ...
+            
+    print('[%d/%d] loss_d: %.3f, loss_g: %.3f' % ((epoch + 1), n_epochs, loss_d_, loss_g_))
+    
+    test_images = sess.run(G_z, {z: fixed_z_, isTrain: False})
+    show_generated(test_images, 100)
+```
 
