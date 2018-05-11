@@ -24,7 +24,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -48,10 +48,10 @@
      fit-margin-right="0.8"
      fit-margin-bottom="0.8"
      inkscape:zoom="1.2416667"
-     inkscape:cx="290.59955"
+     inkscape:cx="358.65324"
      inkscape:cy="243.26983"
-     inkscape:window-x="67"
-     inkscape:window-y="34"
+     inkscape:window-x="57"
+     inkscape:window-y="24"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg2" />
   <clipPath
@@ -461,7 +461,7 @@
      style="fill-rule:nonzero;stroke:#595959;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round"
      inkscape:connector-curvature="0"
      id="path167"
-     d="m 453.88043,146.498 -42.40533,-42.40535 -95.64191,0 0,111.6104 42.40533,42.40536 95.64191,0 z m 0,0 -95.64191,0 -42.40533,-42.40535 m 42.40533,42.40535 0,111.61041" />
+     d="m 462.73949,155.35706 -42.40533,-42.40535 -95.64191,0 0,111.6104 42.40533,42.40536 95.64191,0 z m 0,0 -95.64191,0 -42.40533,-42.40535 m 42.40533,42.40535 0,111.61041" />
   <path
      style="fill:#595959;fill-opacity:0.3137;fill-rule:nonzero"
      inkscape:connector-curvature="0"
