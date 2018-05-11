@@ -167,12 +167,12 @@ The second part refers to the state of the network without a fixed visible layer
 
 Modification of weights and displacements for the input sample can then be callcualted in the followong way:
 
-$$\Delta w_{\mathit{ij}}= \left[\langle v_{i}h_{j}\rangle ^{0}-\langle
-v_{i}h_{j}\rangle ^{1}\right]$$
+$$\Delta w_{\mathit{ij}}= \eta \left[\langle v_{i}h_{j}\rangle ^{0}-\langle
+v_{i}h_{j}\rangle ^{1}\right]$$, 
 $$\Delta b_{j}=\eta \left[\langle h_{j}\rangle ^{0}-\langle h_{j}\rangle
-^{1}\right]$$
+^{1}\right]$$, 
 $$\Delta a_{i}=\eta \left[\langle v_{i}\rangle ^{0}-\langle v_{i}\rangle
-^{1}\right]$$
+^{1}\right]$$, 
 
 The learning factor $$\eta$$ is usually set to a value less than 1. The first part of the expression for $$\Delta w_{\maths{ij}}$$ is often referred to as the positive phase, and a second part, as a negative phase.
 
@@ -192,16 +192,13 @@ Implement the RBM that uses CD-1 for training. For input data use MNIST numbers.
 3. Examine the activation frequency of hidden layer elements and visualize the learned weights of $$\mathbf W$$ sorted by the frequency
 4. Skip the initial sampling/binarization based on the real input data, and use the original input data (real numbers from the range [0 1]) as input layer $$\mathbf v$$. How different is such RBM from the previous one?
 5. Increase the number of Gibs sampling in CDs. What are the differences?
-6. Perform experiments for a smaller and larger number of hidden neurons. What do you observe about weights and reconstructions?
-7. Examine the effects of varying the learning constant.
-8. Randomly initialize the hidden layer, run a few Gibbs samplings, and visualize the generated visible layer
+6. Examine the effects of varying the learning constant.
+7. Randomly initialize the hidden layer, run a few Gibbs samplings, and visualize the generated visible layer
+8. Perform above experiments with a smaller and a larger number of hidden neurons. What do you observe about weights and reconstructions?
 
 Use the following template with the utility file [utils.py](/assets/lab4/utils.py).
 
-
-
-
-**REMARK**: In addition to filling out the missing code, the template should be tailored as needed, and can be customized freely. So please **be especially careful with the claims that some of the code is not working!**
+**REMARK**: In addition to filling out the missing code, the template should be tailored as needed, and can be customized freely. So please **be especially careful with the claims that some of the code is not working for you!**
 
 ```python
 import tensorflow as tf
@@ -480,14 +477,17 @@ Deep Belief Network (DBN) is a deep network that is obtained by stacking multipl
 **Subtasks:**
 1. Visualize the weights of $$\mathbf W_1$$ and $$\mathbf W_2$$ obtained by training.
 2. Visualize the results of the reconstruction of the first 20 MNIST samples.
-3. Set the number of hidden layer elements of the upper RBM to the number of lower RBM visible layer elements, and set the initial weights $$\mathbf W_2$$ to $$\mathbf W_1^T$$. What are the effects of change? Visualize elements of the topmost layer as 28x28 matrix.
-4. Randomly initialize the topmost hidden layer, run a few Gibbs samplings, and visualize generated visible layer patterns - compare with the previous task.
+3. Randomly initialize the topmost hidden layer, run a few Gibbs samplings, and visualize generated visible layer patterns - compare with the previous task.
+4. Set the number of hidden layer elements of the upper RBM to the number of lower RBM visible layer elements, and set the initial weights $$\mathbf W_2$$ to $$\mathbf W_1^T$$. What are the effects of change? Visualize elements of the topmost layer as 28x28 matrix.
 
 <div class="fig figcenter fighighlight">
   <img src="/assets/lab4/DBN1.svg" width="100%">
 </div>
 
 Use the following template together with the template from the 1st task:
+
+**REMARK**: In addition to filling out the missing code, the template should be tailored as needed, and can be customized freely. So please **be especially careful with the claims that some of the code is not working for you!**
+
 
 ```python
 Nh2 = Nh # The number of elements of the second hidden layer
@@ -615,6 +615,8 @@ Implementirajte postupak generativnog fine-tuninga na DBN iz 2. zadatka. Za tren
 </div>
 
 Use the following template, as well as templates from tasks 1 and 2.
+
+**REMARK**: In addition to filling out the missing code, the template should be tailored as needed, and can be customized freely. So please **be especially careful with the claims that some of the code is not working for you!**
 
 ```python
 #
@@ -936,10 +938,12 @@ Implement VAE with 20 hidden variables $$z$$. Input data are MNIST numbers. The 
 
  1. Visualize the reconstruction results for the first 20 MNIST samples.
  2. Visualize the distribution of mean values and standard deviations of the hidden variables $$z$$ for a sufficient number of input samples
- 3. Repeat the training from the previous 2 subtasks with only 2 elements in the hidden layer $$\mathbf z$$.
- 4. Visualize the layout of test samples in the 2D hidden variable space.
+ 3. Visualize the layout of test samples in the 2D hidden variable space.
+ 4. Repeat experiments from the previous subtasks with only 2 elements in the hidden layer $$\mathbf z$$.
 
 Use the following template:
+
+**REMARK**: In addition to filling out the missing code, the template should be tailored as needed, and can be customized freely. So please **be especially careful with the claims that some of the code is not working for you!**
 
 ```python
 import numpy as np
@@ -1256,7 +1260,217 @@ bargraph_vis(2, weights_d1.T, weights_d1.T.shape, 'y', labels)
 
 ```
 
-### Bonus task - Tensorboard
+#### Bonus task - Tensorboard
 
 The template for Task 4 contains the data collection code that can be displayed using [Tensorboard](https://www.tensorflow.org/get_started/summaries_and_tensorboard). Run Tensorboard and check what information is available on a trained VAE.
 
+<a name='gan'></a>
+
+### Generative asdversarial networks (GAN)
+
+GAN's primary purpose is to generate new and persuasive samples, but the working principle is slightly different from the previous two models. GAN does not directly evaluate the parameters of $$p(\mathbf x)$$ or any other distribution, although its training can be interpreted as an estimate of $$p(\mathbf x)$$. Most likely due to this different approach, GANs often generate visually the best samples compared to VAE or other generative networks.
+
+GAN consists of two separate networks:
+
+1. Generator (G) whose task is to generate convincing samples
+2. A discriminator (D) whose task is to identify whether a sample is a genuine (from a training set) or an artificial sample generated by G
+
+<div class="fig figcenter fighighlight">
+  <img src="/assets/lab4/GAN.svg" width="100%">
+</div>
+
+These two networks are adversaries as they have diametrically opposed goals and are trying to outsmart each other. This competition makes them better in achieving their own goal and puts their focus on all the essential details of input data. Eventually, their competing should result in the generator that generates perfect samples that the discriminator can't distinguish from the training samples. In order for the generator to achieve that, it is necessary for the discriminator to be very successful in its own task.
+
+Generator outputs samples for some random input vector at its input which obeys some preselected distribution. This randomness at the input allows the generator to always generate new, unseen samples. There are no special limitations on the architecture of the generator, but it is desirable to be trainable using the backpropagation algorithm.
+
+<div class="fig figcenter fighighlight">
+  <img src="/assets/lab4/G.svg" width="50%">
+</div>
+
+At its output, the discriminator should estimate the class of an input sample, genuine or artificial. Unlike a generator, it is possible to use supervised learning because the class of each sample is known. For simplicity, the output of the discriminator can be limited to $$ [0,1] $$ and interpret as a probability that the input sample is real (from the training set).
+
+<div class="fig figcenter fighighlight">
+  <img src="/assets/lab4/D.svg" width="50%">
+</div>
+
+The described discriminator and generator goals can be formally expressed in the following goal function:
+
+$$\min_G \max_D V(D,G) = E_{ \mathbf x \sim p_{data}(\mathbf x) } [\log D( \mathbf x)] + E_{ \mathbf z  \sim p_{\mathbf z}(\mathbf z) } [\log(1 - D(G( \mathbf z)))]$$
+
+The first addend represents the expectation of estimated log probability that the samples from the training set are genuine. The second addend represents the expectation of a log probability estimation that the generated samples are not real, ie. generated. The discriminator aims to maximize both addends, while the generator aims to minimize just the second addend. Each addend can be easily evaluated for a mini-batch and gradients can be estimated for parameters of both networks
+
+Training of both networks (G and D) can be carried out simultaneously or in one iteration one can first train one network and then the other. In addition, some authors recommend that one network is trained for several iterations and then the other network for just one iteration. Appropriate goal functions of both networks can be implemented with the imaginative use of the [`tf.nn.sigmoid_cross_entropy_with_logits (y, x)`](https://www.tensorflow.org/api_docs/python/tf/nn/sigmoid_cross_entropy_with_logits) function.
+
+<div class="fig figcenter fighighlight">
+  <img src="/assets/lab4/GAN2.svg" width="100%">
+</div>
+
+As a discriminator needs to receive input samples from two different sources, we can implement it in the TensorFlow environment as two identical networks each receiving input samples from one source, with both discriminators sharing or using the same weights. Training each individual discriminator then causes modifications of the same set of weights. Sharing network parameters or variables in the TensorFlow environment is achieved by using the variable scope [`tf.variable_scope`](https://www.tensorflow.org/api_docs/python/tf/variable_scope) and the `reuse` keyword.
+
+Deep Convolutional GAN ​​(DCGAN) provide very good results for image generation, and they use convolutional layers as hidden layers in both the generator and the discriminator. Unlike conventional convolutional networks, pooling layers are not used here, but subsampling is performed using convolution layers with stride greater than 1. The authors recommend using Batch normalization in all layers except in the output layer of the generator, and the input and output layers of the discriminator. The use of Leaky ReLU activation functions in all layers except in outputs is another specificity of DCGAN as well as the elimination of fully-connected layers.
+
+<div class="fig figcenter fighighlight">
+  <img src="/assets/lab4/DCGAN.svg" width="100%">
+</div>
+
+<a name='5zad'> </a>
+
+### Task 5
+
+Implement DCGAN with the generator (4 convolution layers) and a discriminator (3 convolution layers). Use kernel size [4,4] in all convolutions except for the output layer of the discriminator. The number of channels from the input to the output layers should be G: 512, 256, 128, 1 and D: 64, 128, Generator input $$\mathbf z$$ should have 100 elements obeying the normal distribution $$ N (0,1) $$. Use MNIST numbers scaled to size 32x32 as training set and train the network for at least 20 epochs. In each iteration, perform optimization of the generator and one optimization of the discriminator with one mini-batch each. Use a tanh activation function for the generator output and sigmoid activation for the discriminator output.
+
+**Subtasks:**
+
+ 1. Visualize the results of generating 100 new samples from random variables $$ \ mathbf z $$. Compare the results with samples generated by VAE.
+ 2. In one iteration, use two mini-batches to train the generator and only one mini-batch to train the discriminator. Visualize generated samples. Repeat the same procedure with two mini-batches for the discriminator and one for the generator. Comment on the results.
+ 3. Turn off batch normalization in both networks. Comment on the results.
+
+Use the following template:
+
+**REMARK**: In addition to filling out the missing code, the template should be tailored as needed, and can be customized freely. So please **be especially careful with the claims that some of the code is not working for you!**
+
+```python
+import numpy as np
+import tensorflow as tf
+from tensorflow.examples.tutorials.mnist import input_data
+from utils import tile_raster_images
+import matplotlib.pyplot as plt
+import math
+
+%matplotlib inline
+plt.rcParams['image.cmap'] = 'jet'
+
+mnist = input_data.read_data_sets("MNIST_data/", one_hot=True, reshape=[])
+n_samples = mnist.train.num_examples
+
+# training parameters
+batch_size = 100
+lr = 0.0002
+n_epochs = 20
+
+def lrelu(x, th=0.2):
+    return tf.maximum(th * x, x)
+
+# D(x)
+def discriminator(x, isTrain=True, reuse=False):
+    with tf.variable_scope('discriminator', reuse=reuse):
+        # 1st hidden layer
+        conv = tf.layers.conv2d(x, 64, [4, 4], strides=(2, 2), padding='same')
+        lrelu_ = lrelu(conv, 0.2)
+        
+        # 2nd hidden layer
+        
+        
+        # output layer
+        
+        
+        return out, conv
+
+# G(z)
+def generator(z, isTrain=True):
+    with tf.variable_scope('generator'):
+        # 1st hidden layer
+        conv = tf.layers.conv2d_transpose(z, 512, [4, 4], strides=(1, 1), padding='valid')
+        lrelu_ = lrelu(tf.layers.batch_normalization(conv, training=isTrain))
+        
+        # 2nd hidden layer
+        
+        # 3rd hidden layer
+        
+        # output layer
+
+        
+        return out
+
+def show_generated(G, N, shape=(32,32), stat_shape=(10,10), interpolation="bilinear"):
+    """Visualization of generated samples
+     G - generated samples
+     N - number of samples
+     shape - dimensions of samples eg (32,32)
+     stat_shape - dimension for 2D sample display (eg for 100 samples (10,10)
+    """
+    
+    image = (tile_raster_images(
+        X=G,
+        img_shape=shape,
+        tile_shape=(int(math.ceil(N/stat_shape[0])), stat_shape[0]),
+        tile_spacing=(1, 1)))
+    plt.figure(figsize=(10, 14))
+    plt.imshow(image, interpolation=interpolation)
+    plt.axis('off')
+    plt.show()
+    
+
+def gen_z(N, batch_size):
+    z = np.random.normal(0, 1, (batch_size, 1, 1, N))
+    return z
+
+# input variables
+x = tf.placeholder(tf.float32, shape=(None, 32, 32, 1))
+z = tf.placeholder(tf.float32, shape=(None, 1, 1, 100))
+isTrain = tf.placeholder(dtype=tf.bool)
+    
+# generator
+G_z = generator(z, isTrain)
+    
+# discriminator
+# real
+D_real, D_real_logits = discriminator(x, isTrain)
+# fake
+...
+
+
+# labels for learning
+true_labels = tf.ones([batch_size, 1, 1, 1]
+true_labels = tf.zeros([batch_size, 1, 1, 1]
+# loss for each network                       
+D_loss_real =
+D_loss_fake =
+D_loss = D_loss_real + D_loss_fake
+G_loss = 
+
+# trainable variables for each network
+T_vars = tf.trainable_variables()
+D_vars = [var for var in T_vars if var.name.startswith('discriminator')]
+G_vars = [var for var in T_vars if var.name.startswith('generator')]
+
+# optimizer for each network
+with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):
+    D_optim = tf.train.AdamOptimizer(lr, beta1=0.3).minimize(D_loss, var_list=D_vars)
+    G_optim = tf.train.AdamOptimizer(lr, beta1=0.3).minimize(G_loss, var_list=G_vars)
+
+
+# open session and initialize all variables
+config = tf.ConfigProto()
+config.gpu_options.allow_growth=True
+sess = tf.InteractiveSession(config=config)
+tf.global_variables_initializer().run()
+
+# MNIST resize and normalization
+train_set = tf.image.resize_images(mnist.train.images, [32, 32]).eval()
+# input normalization
+...
+
+#fixed_z_ = np.random.uniform(-1, 1, (100, 1, 1, 100))
+fixed_z_ = gen_z(100, 100)
+total_batch = int(n_samples / batch_size)
+
+for epoch in range(n_epochs):
+    for iter in range(total_batch):
+        # update discriminator
+        x_ = train_set[iter*batch_size:(iter+1)*batch_size]
+        
+        # update discriminator
+        
+        z_ = gen_z(100, batch_size)
+        loss_d_, _ = sess.run([D_loss, D_optim], {x: x_, z: z_, isTrain: True})
+                
+
+        # update generator
+        ...
+            
+    print('[%d/%d] loss_d: %.3f, loss_g: %.3f' % ((epoch + 1), n_epochs, loss_d_, loss_g_))
+    
+    test_images = sess.run(G_z, {z: fixed_z_, isTrain: False})
+    show_generated(test_images, 100)
+```

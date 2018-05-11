@@ -1316,14 +1316,13 @@ Kod generiranja slika uspješnim se pokazao Deep Convolutional GAN (DCGAN) koji 
 
 ### 5. Zadatak
 
-Implementirajte DCGAN s generatorom (4 konvolucijska sloja) i diskriminatorom (3 konvolucijska sloja). U svim konvolucijama koristite veličinu jezgre [4,4], osim u izlaznom sloju diskriminatora, a broj kanala od ulaza prema izlazu neka bude G: 512 256, 128, 1 i D: 64, 128, 1. Ulaz u generator $$\mathbf z$$ neka ima 100 elemenata prema normalnoj distribuciji $$N(0,1)$$. Ulazni podaci neka su MNIST brojevi skalirani na veličinu 32x32 te treniranje provedite kroz barem 20 epoha. U jednoj iteraciji provedite jednu optimizaciju generatora i jednu optimizaciju diskriminatora s po jednom mini grupom. Koristite tanh aktivacijsku funkciju za izlaz generatora i sigmoid aktivaciju za izlaz diskriminator.
+Implementirajte DCGAN s generatorom (4 konvolucijska sloja) i diskriminatorom (3 konvolucijska sloja). U svim konvolucijama koristite veličinu jezgre [4,4], osim u izlaznom sloju diskriminatora, a broj kanala od ulaza prema izlazu neka bude G: 512, 256, 128, 1 i D: 64, 128, 1. Ulaz u generator $$\mathbf z$$ neka ima 100 elemenata prema normalnoj distribuciji $$N(0,1)$$. Ulazni podaci neka su MNIST brojevi skalirani na veličinu 32x32 te treniranje provedite kroz barem 20 epoha. U jednoj iteraciji provedite jednu optimizaciju generatora i jednu optimizaciju diskriminatora s po jednom mini grupom. Koristite tanh aktivacijsku funkciju za izlaz generatora i sigmoid aktivaciju za izlaz diskriminator.
 
 **Podzadaci:**
 
  1. Vizualizirajte rezultate generiranja 100 novih uzoraka iz slučajnih vektora $$\mathbf z$$. Usporedite rezultate s uzorcima generiranim pomoću VAE.
- 2. U jednoj iteraciji provedite nekoliko koraka treniranja generatora i samo jedan korak treniranja diskriminatora. Vizualizirajte generirane uzorke. Ponovite isti postupak samo zamijenite mjesta generatora i diskriminatora.
+ 2. U jednoj iteraciji provedite treniranje diskriminatora sa dvaje minigrupe a generatora sa jednom minigrupom. Vizualizirajte generirane uzorke. Ponovite isti postupak samo zamijenite mjesta generatora i diskriminatora. Komentirajte retzultate.
  3. Isključite batch normalizaciju u obje mreže. Komentirajte rezultate.
- 4. Unutar jedne iteracije provedite treniranje diskriminatora sa dvaje minigrupe a generatora sa jednom minigrupom. Komentirajte retzultate.
 
 Koristite sljedeći predložak:
 
