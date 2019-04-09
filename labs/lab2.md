@@ -180,7 +180,7 @@ U nastavku teksta navodimo primjer korištenja
 konvolucije iz paketa `tf.contrib.layers`.
 Ako želite koristiti `tf.nn.conv2d` onda će vam
 od pomoći biti službeni
-[tutorial](https://www.tensorflow.org/tutorials/deep_cnn).
+[tutorial](https://www.tensorflow.org/tutorials/estimators/cnn).
 
 ```python
 import tensorflow.contrib.layers as layers
