@@ -69,7 +69,7 @@ Metoda  `backward_params` računa gradijent s obzirom na parametre sloja (\\( \f
 
 <a name='1zad'></a>
 
-### 1. zadatak
+### 1. zadatak (25%)
 Dovršite implementacije potpuno povezanog sloja, sloja nelinearnosti 
 te funkcije gubitka u razredima `FC`, `ReLU` i `SoftmaxCrossEntropyWithLogits`.
 Podsjetimo se, gubitak unakrsne entropije računa udaljenost između
@@ -122,16 +122,32 @@ $$
 
 Kako biste bili sigurni da ste ispravno napisali sve slojeva testirajte gradijente pozivom skripte `check_grads.py`.
 Zadovoljavajuća relativna greška bi trebala biti manja od \\(10^{-5}\\) ako vaši tenzori imaju dvostruku preciznost.
-Napokon, pokrenite učenje modela pozivom skripte `train.py`. Napomena: najprije postavite odgovarajuće puteve u varijable
-`DATA_DIR` i `SAVE_DIR` te prevedite Cython modul `im2col_cython.pyx` tako da izvršite `python3 setup_cython.py build_ext --inplace`.
+Proučite izvorni kod te skripte jer će vam slična skripta biti vrlo korisna za treću vježbu.
+Razmislite zašto duboke modele radije učimo analitičkima gradijentima nego numeričkim gradijentima.
 
+Sada postavite odgovarajuće puteve u varijable
+`DATA_DIR` i `SAVE_DIR` te prevedite Cython modul `im2col_cython.pyx` 
+tako da izvršite `python3 setup_cython.py build_ext --inplace`.
+Proučite izvorni kod funkcija `col2im_cython` i `im2col_cython`
+te istražite kao se te funkcije koriste.
+
+Proučite i skicirajte model zadan objektom `net` u skripti `train.py`.
+Odredite veličine tenzora te broj parametara u svakom sloju.
+Odredite veličinu receptivnog polja značajki iz posljednjeg (drugog) konvolucijskog sloja.
+Procijenite ukupnu količinu memorije za pohranjivanje aktivacija 
+koje su potrebne za provođenje backpropa
+ako učimo s mini-grupama od 50 slika.
+
+Napokon, pokrenite učenje modela pozivom skripte `train.py`. 
+Odredite vezu između početnog iznosa funkcije gubitka i broja razreda C.
 Tijekom učenja možete promatrati vizualizaciju filtara koji se spremaju u `SAVE_DIR` direktorij.
-Budući da svaka težina odgovara jednom pikselu slike u vašem pregledniku isključite automatsko glađenje slike da biste mogli bolje vidjeti.
+Budući da svaka težina odgovara jednom pikselu slike, 
+u vašem pregledniku isključite automatsko glađenje slike da biste mogli bolje vidjeti.
 Preporuka je da na Linuxu koristite preglednik Geeqie.
 
 <a name='2zad'></a>
 
-### 2. zadatak
+### 2. zadatak (25%)
 U ovom zadatku trebate dodati podršku za
 L2 regularizaciju parametara.
 Dovršite implementaciju sloja `L2Regularizer`
@@ -160,27 +176,13 @@ konvolucijskih i potpuno povezanih slojeva.
 
 <a name='3zad'></a>
 
-### 3. zadatak - usporedba s Tensorflowom
+### 3. zadatak - usporedba s Tensorflowom (25%)
+
 U Tensorflowu definirajte i naučite model koji je ekvivalentan regulariziranom modelu iz 2. zadatka.
-Korisite identičnu arhitekturu i parametre učenja da biste reproducirali rezultate.
-Tijekom učenja vizualizirajte filtre u prvom sloju kao u prethodnoj vježbi.
-Kako biste u graf dodali operaciju konvolucije
-koristite `tf.nn.conv2d` ili `tf.contrib.layers.convolution2d`.
-Prije toga proučite službenu dokumentaciju vezanu za [konvoluciju](https://www.tensorflow.org/versions/master/api_docs/python/nn.html#convolution).
-
-<!---
-Dodajte u model normalizaciju podataka po slojevima nakon svakog konvolucijskog sloja ([Batch
-normalization](https://arxiv.org/abs/1502.03167)). To najlakše možete
-napraviti tako da konvoluciji zadate
-`tf.contrib.layers.batch_norm`
-kao parametar normalizacije kako je prikazano ispod:
--->
-
+Koristite identičnu arhitekturu i parametre učenja da biste reproducirali rezultate.
+Konvoluciju zadajte operacijama `tf.nn.conv2d` ili `tf.contrib.layers.convolution2d`.
 U nastavku teksta navodimo primjer korištenja
 konvolucije iz paketa `tf.contrib.layers`.
-Ako želite koristiti `tf.nn.conv2d` onda će vam
-od pomoći biti službeni
-[tutorial](https://www.tensorflow.org/tutorials/estimators/cnn).
 
 ```python
 import tensorflow.contrib.layers as layers
@@ -214,10 +216,26 @@ def build_model(inputs, labels, num_classes):
   return logits, loss
 ```
 
+Ako želite koristiti `tf.nn.conv2d` onda će vam od pomoći biti službeni
+[tutorial](https://www.tensorflow.org/tutorials/estimators/cnn)
+i [dokumentacija](https://www.tensorflow.org/versions/master/api_docs/python/nn.html#convolution).
+
+Tijekom učenja vizualizirajte filtre u prvom sloju kao u prethodnoj vježbi.
+Nakon svake epohe učenja pohranite filtre i gubitak u datoteku (ili koristite Tensorboard).
+Na kraju učenja prikažite kretanje gubitka kroz epohe (matplotlib).
+
+<!---
+Dodajte u model normalizaciju podataka po slojevima nakon svakog konvolucijskog sloja ([Batch
+normalization](https://arxiv.org/abs/1502.03167)). To najlakše možete
+napraviti tako da konvoluciji zadate
+`tf.contrib.layers.batch_norm`
+kao parametar normalizacije kako je prikazano ispod:
+-->
+
+
 
 <a name='4zad'></a>
-
-### 4. zadatak - Klasifikacija na CIFAR-10 skupu
+### 4. zadatak - Klasifikacija na CIFAR-10 skupu (25%)
 [CIFAR-10](https://www.cs.toronto.edu/~kriz/cifar.html) dataset sastoji se od 50000 slika za učenje i validaciju te 10000 slika za
 testiranje dimenzija 32x32 podijeljenih u 10 razreda.
 Najprije skinite dataset pripremljen za Python [ovdje](https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz).
@@ -450,20 +468,25 @@ te proširivanje skupa za učenje raznim modificiranjem slika (*data jittering*)
 Bez ovih trikova je jako teško preći preko 90% ukupne točnosti.
 
 
-### Bonus zadatak - Multiclass hinge loss
+### Bonus zadatak - Multiclass hinge loss (max 20%)
 
-Pokušajte u zadnjem zadatku unakrsnu entropiju zamijeniti s multiclass hinge lossom te
-usporedite rezultate. Objašnjenje multiclass hinge lossa možete pronaći [ovdje](http://cs231n.github.io/linear-classify/#svm).
+Pokušajte u zadnjem zadatku unakrsnu entropiju zamijeniti 
+višerazrednim gubitkom zglobnice te usporedite rezultate. 
+Objašnjenje tog gubitka možete pronaći [ovdje](http://cs231n.github.io/linear-classify/#svm).
+Za sve bodove zadatak je potrebno ostvariti 
+primjenom osnovnih Tensorflowovih operacija nad tenzorima. 
 
-Proučite u Tensorflow dokumentaciji osnovne operacije nad tenzorima kako biste pronašli najlakši način
-da to ostvarite. Pomoć: jedna opcija kako to možete izvesti je da razdvojite logite
+Pomoć: jedna opcija kako to možete izvesti je da razdvojite logite
 (izlazi iz zadnjeg potpuno povezanog sloja) na matricu logita netočnih razreda i vektor
 logita na mjestima točnih razreda.
 To možete izvesti pomoću operacija `tf.dynamic_partition` i `tf.one_hot`.
-Zatim unutar `tf.maximum` računate razliku između matrice logita na netočnim
-razredima i vektora logita na točnim razredima. To možete napisati kao običnu razliku jer za
-tenzore različitih dimenzija Tensorflow po defaultu napravi *broadcasting* ako je to
-moguće.
+Zatim unutar `tf.maximum` računate razliku 
+između matrice logita na netočnim razredima 
+i vektora logita na točnim razredima. 
+To možete napisati kao običnu razliku 
+jer za tenzore različitih dimenzija 
+Tensorflow po defaultu napravi *broadcasting* 
+ako je to moguće.
 
 <a name='add'></a>
 
