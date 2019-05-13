@@ -134,8 +134,8 @@ te istražite kao se te funkcije koriste.
 Proučite i skicirajte model zadan objektom `net` u skripti `train.py`.
 Odredite veličine tenzora te broj parametara u svakom sloju.
 Odredite veličinu receptivnog polja značajki iz posljednjeg (drugog) konvolucijskog sloja.
-Procijenite ukupnu količinu memorije za pohranjivanje međurezultata 
-koji su potrebni za provođenje backpropa
+Procijenite ukupnu količinu memorije za pohranjivanje aktivacija 
+koje su potrebne za provođenje backpropa
 ako učimo s mini-grupama od 50 slika.
 
 Napokon, pokrenite učenje modela pozivom skripte `train.py`. 
