@@ -4,7 +4,7 @@ mathjax: true
 permalink: /lab2/
 ---
 
-- [Konvolucijska neuronska mreža](#cnn)
+- [Konvolucijski modeli](#cnn)
 - [Vježba](#vjezba)
   - [1. zadatak](#1zad)
   - [2. zadatak](#2zad)
@@ -15,7 +15,7 @@ permalink: /lab2/
 
 <a name='cnn'></a>
 
-## 2. vježba: konvolucijske neuronske mreže (CNN)
+## 2. vježba: konvolucijski modeli (CNN)
 
 U ovoj vježbi bavimo se konvolucijskim modelima. 
 Ti modeli prikladni su za obradu podataka s topologijom rešetke, 
@@ -56,14 +56,13 @@ mogli bismo ostvariti dijeljenjem parametara
 aktivacija na različitim prostornim lokacijama. 
 U takvoj organizaciji, latentne aktivacije sadrže 
 izlaz istog podmodela na različitim lokacijama slike. 
-Dijelove modela koji određuju aktivacije
-konvolucijskih slojeva mreže obično nazivamo filtrima.
-Filtri odgovaraju afinoj transformaciji
+Težine konvolucijskih slojeva obično nazivamo filtrima.
+Svaki filtar definira afinu transformaciju
 malenog lokalnog susjedstva prethodnog sloja 
-ulančenoj s nelinearnom aktivacijskom funkcijom.
-Tipično, lokalno susjedstvo je kvadratno 
+koja se naknadno ulančava s nelinearnom aktivacijskom funkcijom.
+Tipično, lokalno susjedstvo filtra ima kvadratni oblik 
 k✕k, k ∈ {3,5,7}, a nelinearnost je zglobnica.
-Da zaključimo, konvolucijske mreže koriste tri važne ideje: 
+Da zaključimo, konvolucijski modeli koriste tri važne ideje: 
 rijetku povezanost, dijeljenje parametara i
 ekvivarijantnost reprezentacije.
 
@@ -205,7 +204,7 @@ Dovršite implementaciju sloja `L2Regularizer`
 te naučite regularizirani model iz
 prethodnog zadatka koji se nalazi u `train_l2reg.py`.
 Proučite efekte regularizacijskog hiper-parametra
-tako da naučite tri različite mreže s
+tako da naučite tri različita modela s
 \\( \lambda = 1e^{-3}, \lambda=1e^{-2}, \lambda=1e^{-1} \\)
 te usporedite naučene filtre u prvom sloju i dobivenu točnost.
 
@@ -341,7 +340,8 @@ test_x = (test_x - data_mean) / data_std
 ```
 
 Vaš zadatak je da u Tensorflowu naučite CNN na ovom skupu.
-U nastavku je prijedlog jednostavne mreže s kojom biste trebali dobiti ukupnu točnost oko 70%:
+U nastavku je prijedlog jednostavnog modela 
+s kojom biste trebali dobiti ukupnu točnost oko 70%:
 
 ```
 conv(16,5) -> relu() -> pool(3,2) -> conv(32,5) -> relu() -> pool(3,2) -> fc(256) -> relu() -> fc(128) -> relu() -> fc(10)
@@ -420,8 +420,8 @@ def draw_conv_filters(epoch, step, weights, save_dir):
   <div class="figcaption figcenter">CIFAR-10: slučajno inicijalizirani filtri u prvom sloju na početku učenja (iznad) i naučeni filtri (ispod) s regularizacijom lambda = 0.0001.</div>
 </div>
 
-Prikažite 20 netočno klasificiranih slika s najvećim gubitkom te ispišite njihov točan razred
-i top-3 razreda za koje je mreža dala najveću vjerojatnost.
+Prikažite 20 netočno klasificiranih slika s najvećim gubitkom te ispišite njihov točan razred,
+kao i top-3 razreda za koje je model dao najveću vjerojatnost.
 Da biste prikazali sliku, morate najprije poništiti normalizaciju srednje vrijednosti i
 varijance:
 
