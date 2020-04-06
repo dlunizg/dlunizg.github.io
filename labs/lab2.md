@@ -73,7 +73,7 @@ ekvivarijantnost reprezentacije.
   <div class="figcaption figcenter">Primjer konvolucijskog modela za klasifikaciju slika. 
     Tipično se izmjenjuju konvolucijski slojevi i slojevi sažimanja. 
     Na kraju se dolazi do vektora značajki koji se potpuno povezanim slojem 
-    preslikava u konačnu kategoričku distribuciju preko poznatih razreda.<br>
+    preslikava u konačnu kategoričku distribuciju preko poznatih razreda.
     (Preuzeto iz diplomskog rada 
      <a href="http://www.zemris.fer.hr/~ssegvic/project/pubs/vukotic14ms.pdf">Vedrana Vukotića</a>.)</div>
 </div>
