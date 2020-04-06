@@ -83,11 +83,17 @@ ekvivarijantnost reprezentacije.
 
 ## Vježba
 
-Kod za prva dva zadatka nalazi se [ovdje](https://github.com/ivankreso/fer-deep-learning/tree/master/lab2).
-Biblioteke koje su vam potrebne za ovu vježbu su PyTorch, 
+Kod za prva dva zadatka nalazi se 
+[ovdje](https://github.com/ivankreso/fer-deep-learning/tree/master/lab2).
+Biblioteke koje su vam potrebne za ovu vježbu su 
+[PyTorch](http://pytorch.org), 
+[torchvision](https://pytorch.org/docs/stable/torchvision/index.html),
 NumPy, [Cython](http://cython.org), 
 [matplotlib](http://matplotlib.org/) i [scikit-image](http://scikit-image.org/).
-Pazite da sve biblioteke instalirate za Python 3.
+Module Pythona najlakše je povući iz pipa.
+Druga opcija je koristiti distribucijske pakete. 
+Pazite da odaberete verzije za Python 3.
+
 U datoteci `layers.py` nalaze se definicije slojeva 
 od kojih se mogu graditi duboki konvolucijski modeli.
 Svaki sloj sadrži tri metode potrebne za izvođenje backpropagation algoritma.
@@ -106,19 +112,26 @@ Podsjetimo se, gubitak unakrsne entropije računa udaljenost između
 točne distribucije i distribucije koju predviđa model i definiran je kao:
 
 $$
-L = - \sum_{i=1}^{C} y_i log(s_i(\mathbf{x})) \\
+L = - \sum_{i=1}^{C} y_i log(s_i(\mathbf{x})) \; .\\
 $$
 
-gdje je C broj razreda,
-\\( \mathbf{x} \\) ulaz funkcije softmaks
-kojeg možemo zvati klasifikacijska mjera ili logit,
-\\( \mathbf{y} \\) točna distribucija preko svih razreda za dani primjer (najčešće one-hot vektor), a \\( s_i(\mathbf{x}) \\)
-izlaz Softmax funkcije za razred \\(i\\).
-Radi jednostavosti prikazali smo funkciju gubitka za samo jedan primjer dok u praksi definiramo gubitak nad skupom primjera
-pa će ukupan gubitak obično biti jednak prosječnom gubitku preko svih primjera.
+U prikazanoj jednadžbi C predstavlja broj razreda,
+a \\( \mathbf{x} \\) ulaz funkcije softmaks
+kojeg možemo zvati klasifikacijska mjera ili logit.
+Vektor \\( \mathbf{y} \\) sadrži točnu distribuciju 
+preko svih razreda za dani primjer.
+Tu distribuciju najčešće zadajemo 
+jednojediničnim (eng. one-hot) vektorom. 
+Vektor \\( s_i(\mathbf{x}) \\) predstavlja 
+izlaz funkcije softmax za razred \\(i\\).
+Radi jednostavnosti, jednadžba prikazuje 
+gubitak za samo jedan primjer,
+dok ćemo u praksi obično razmatrati 
+prosječan gubitak preko svih primjera mini-grupe.
 Da biste izveli unazadni prolazak kroz sloj potrebno je najprije izračunati
-gradijent ove funkcije s obzirom na ulaz \\( \frac{∂L}{∂\mathbf{x}} \\).
-Postupak derivacije možemo pojednostavniti tako da uvrstimo definiciju Softmax funkcije:
+gradijent gubitka s obzirom na logite \\( \frac{∂L}{∂\mathbf{x}} \\).
+Izvod možemo pojednostavniti tako da 
+unaprijed raspišemo funkciju softmax:
 
 $$
 log(s_i(x)) = log \left(\frac{e^{x_i}}{\sum_{j=1}^{C} e^{x_j}}\right) = x_i - log \sum_{j=1}^{C} e^{x_j} \\
@@ -132,7 +145,8 @@ L = log \left(\sum_{j=1}^{C} e^{x_j}\right) - \sum_{i=1}^{C} y_i x_i \\
 -->
 
 
-Sada možemo jednostavno izračunati derivaciju funkcije cilja s obzirom na ulazni skalar \\( x_k \\):
+Sada možemo jednostavno izračunati derivaciju 
+funkcije cilja s obzirom na k-ti logit \\( x_k \\):
 
 $$
 \frac{∂L}{∂x_k} = \frac{∂}{∂x_k} log \left(\sum_{j=1}^{C} e^{x_j}\right) - \frac{∂}{∂x_k} \sum_{i=1}^{C} y_i x_i \\
@@ -142,42 +156,49 @@ $$
 \frac{∂L}{∂x_k} = s_k(\mathbf{x}) - y_k \\
 $$
 
-Konačno, gradijent s obzirom na sve ulaze sloja
-dobivamo tako da izračunamo razliku
-između vektora distribucije iz modela i točne distribucije:
+Konačno, gradijent s obzirom na sve logite
+dobivamo kao vektorsku razliku između  
+predikcije modela i točne distribucije:
 
 $$
 \frac{∂L}{∂\mathbf{x}} = s(\mathbf{x}) - \mathbf{y} \\
 $$
 
-Kako biste bili sigurni da ste ispravno napisali sve slojeva testirajte gradijente pozivom skripte `check_grads.py`.
-Zadovoljavajuća relativna greška bi trebala biti manja od \\(10^{-5}\\) ako vaši tenzori imaju dvostruku preciznost.
-Proučite izvorni kod te skripte jer će vam slična skripta biti vrlo korisna za treću vježbu.
-Razmislite zašto duboke modele radije učimo analitičkima gradijentima nego numeričkim gradijentima.
+Kako biste bili sigurni da ste ispravno napisali sve slojeve 
+testirajte gradijente pozivom skripte `check_grads.py`.
+Zadovoljavajuća relativna greška bi trebala biti manja od \\(10^{-5}\\) 
+ako vaši tenzori imaju dvostruku preciznost.
+Proučite izvorni kod te skripte jer će vam 
+ta funkcionalnost biti vrlo korisna za treću vježbu.
+Razmislite zašto pri učenju dubokih modela radije koristimo 
+analitičke nego numeričke gradijente.
 
-Sada postavite odgovarajuće puteve u varijable
-`DATA_DIR` i `SAVE_DIR` te prevedite Cython modul `im2col_cython.pyx` 
-tako da izvršite `python3 setup_cython.py build_ext --inplace`.
+Sada prevedite Cython modul `im2col_cython.pyx` 
+pozivom `python3 setup_cython.py build_ext --inplace`
+te po potrebi izmijenite varijable `DATA_DIR` i `SAVE_DIR`. 
 Proučite izvorni kod funkcija `col2im_cython` i `im2col_cython`
 te istražite kao se te funkcije koriste.
 
 Proučite i skicirajte model zadan objektom `net` u skripti `train.py`.
 Odredite veličine tenzora te broj parametara u svakom sloju.
-Odredite veličinu receptivnog polja značajki iz posljednjeg (drugog) konvolucijskog sloja.
+Odredite veličinu receptivnog polja značajki 
+iz posljednjeg (drugog) konvolucijskog sloja.
 Procijenite ukupnu količinu memorije za pohranjivanje aktivacija 
 koje su potrebne za provođenje backpropa
 ako učimo s mini-grupama od 50 slika.
 
 Napokon, pokrenite učenje modela pozivom skripte `train.py`. 
 Odredite vezu između početnog iznosa funkcije gubitka i broja razreda C.
-Tijekom učenja možete promatrati vizualizaciju filtara koji se spremaju u `SAVE_DIR` direktorij.
+Tijekom učenja možete promatrati vizualizaciju filtara 
+koji se spremaju u kazalo `SAVE_DIR`.
 Budući da svaka težina odgovara jednom pikselu slike, 
-u vašem pregledniku isključite automatsko glađenje slike da biste mogli bolje vidjeti.
+u vašem pregledniku isključite automatsko glađenje slike.
 Preporuka je da na Linuxu koristite preglednik Geeqie.
 
 <a name='2zad'></a>
 
 ### 2. zadatak (25%)
+
 U ovom zadatku trebate dodati podršku za
 L2 regularizaciju parametara.
 Dovršite implementaciju sloja `L2Regularizer`
@@ -500,6 +521,48 @@ Bez ovih trikova je jako teško preći preko 90% ukupne točnosti.
 
 ### Bonus zadatak - Multiclass hinge loss (max 20%)
 
+Pokušajte u posljednjem zadatku unakrsnu entropiju zamijeniti
+višerazrednom inačicom gubitka zglobnice.
+Objašnjenje tog gubitka možete pronaći 
+[ovdje](http://cs231n.github.io/linear-classify/#svm).
+Za sve bodove zadatak je potrebno ostvariti
+primjenom osnovnih Pytorch operacija nad tenzorima
+te usporediti postignute rezultate.
+
+Pomoć: sučelje funkcije moglo bi izgledati ovako
+```
+def multiclass_hinge_loss(logits: torch.Tensor, target: torch.Tensor, delta=1.):  
+    """
+        Args:
+            logits: torch.Tensor with shape (B, C), where B is batch size, and C is number of classes.
+            target: torch.LongTensor with shape (B, ) representing ground truth labels.
+            delta: Hyperparameter.
+        Returns:
+            Loss as scalar torch.Tensor.
+    """
+```
+Rješenje možete započeti razdvajanjem 
+izlaza posljednjeg potpuno povezanog sloja
+na vektor logita točnih razreda
+i matricu logita netočnih razreda.
+To možete provesti pozivom funkcije
+[torch.masked_select](https://pytorch.org/docs/stable/torch.html#torch.masked_select)
+pri čemu masku zadajete regularnom odnosno invertiranom 
+verzijom matrice s jednojediničnim oznakama podataka.
+Sada razliku između matrice logita netočnih razreda
+i vektora logita točnih razreda
+možemo izračunati običnim oduzimanjem,
+jer Pytorch automatski umnaža (eng. broadcast) operand nižeg reda.
+Pripazite da sve tenzore preoblikujete na ispravni oblik,
+jer funkcija torch.masked_select vraća tenzor prvog reda.
+Maksimum po elementima možete računati 
+odgovarajućom varijantom funkcije 
+[torch.max](https://pytorch.org/docs/stable/torch.html#torch.max).
+
+<!--
+  [torch.nn.functional.one_hot](https://pytorch.org/docs/stable/nn.functional.html#one-hot)
+ -->
+<!--
 Pokušajte u zadnjem zadatku unakrsnu entropiju zamijeniti 
 višerazrednim gubitkom zglobnice te usporedite rezultate. 
 Objašnjenje tog gubitka možete pronaći [ovdje](http://cs231n.github.io/linear-classify/#svm).
@@ -517,6 +580,7 @@ To možete napisati kao običnu razliku
 jer za tenzore različitih dimenzija 
 Tensorflow po defaultu napravi *broadcasting* 
 ako je to moguće.
+-->
 
 <a name='add'></a>
 
