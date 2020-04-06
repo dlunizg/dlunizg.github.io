@@ -521,15 +521,19 @@ Bez ovih trikova je jako teško preći preko 90% ukupne točnosti.
 
 ### Bonus zadatak - Multiclass hinge loss (max 20%)
 
-Pokušajte u posljednjem zadatku unakrsnu entropiju zamijeniti
+Ovaj zadatak razmatra učenje modela za slike iz CIFARA
+s alternativnom formulacijom gubitka
+koju nismo obradili na predavanjima.
+Cilj je zamijeniti unakrsnu entropiju 
 višerazrednom inačicom gubitka zglobnice.
 Objašnjenje tog gubitka možete pronaći 
 [ovdje](http://cs231n.github.io/linear-classify/#svm).
-Za sve bodove zadatak je potrebno ostvariti
+Za sve bodove zadatak je potrebno riješiti
 primjenom osnovnih Pytorch operacija nad tenzorima
 te usporediti postignute rezultate.
 
-Pomoć: sučelje funkcije moglo bi izgledati ovako
+Pomoć: sučelje nove funkcije gubitka
+moglo bi izgledati ovako:
 ```
 def multiclass_hinge_loss(logits: torch.Tensor, target: torch.Tensor, delta=1.):  
     """
@@ -554,7 +558,7 @@ i vektora logita točnih razreda
 možemo izračunati običnim oduzimanjem,
 jer Pytorch automatski umnaža (eng. broadcast) operand nižeg reda.
 Pripazite da sve tenzore preoblikujete na ispravni oblik,
-jer funkcija torch.masked_select vraća tenzor prvog reda.
+jer funkcija `torch.masked_select` vraća tenzor prvog reda.
 Maksimum po elementima možete računati 
 odgovarajućom varijantom funkcije 
 [torch.max](https://pytorch.org/docs/stable/torch.html#torch.max).
