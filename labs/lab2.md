@@ -70,9 +70,12 @@ ekvivarijantnost reprezentacije.
 <div class="fig figcenter fighighlight">
   <img src="/assets/lab2/convnet1.png" width="100%">
   <img src="/assets/lab2/convnet2.png" width="30%">
-  <div class="figcaption figcenter">Primjer konvolucijske mreže za klasifikaciju slika. Tipično se izmjenjuju konvolucijski slojevi
-  i slojevi sažimanja (izvlačenja). Na kraju se dolazi do vektora značajki koji se potpuno povezanim slojem preslikava u konačnu distribuciju preko razreda.<br>
-  (Preuzeto iz <a href="http://www.zemris.fer.hr/~ssegvic/project/pubs/vukotic14ms.pdf">diplomskog rada</a>.)</div>
+  <div class="figcaption figcenter">Primjer konvolucijskog modela za klasifikaciju slika. 
+    Tipično se izmjenjuju konvolucijski slojevi i slojevi sažimanja (izvlačenja). 
+    Na kraju se dolazi do vektora značajki koji se potpuno povezanim slojem 
+    preslikava u konačnu distribuciju preko razreda.<br>
+    (Preuzeto iz diplomskog rada 
+     <a href="http://www.zemris.fer.hr/~ssegvic/project/pubs/vukotic14ms.pdf">Vedrana Vukotića</a>.)</div>
 </div>
 
 <a name='vjezba'></a>
