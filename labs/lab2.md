@@ -68,14 +68,15 @@ rijetku povezanost, dijeljenje parametara i
 ekvivarijantnost reprezentacije.
 
 <div class="fig figcenter fighighlight">
-  <img src="/assets/lab2/convnet1.png" width="100%">
-  <img src="/assets/lab2/convnet2.png" width="30%">
+  <img src="/assets/lab2/vv_convnet2.png" width="100%">
+  <!--<img src="/assets/lab2/convnet2.png" width="30%">-->
   <div class="figcaption figcenter">Primjer konvolucijskog modela za klasifikaciju slika. 
     Tipično se izmjenjuju konvolucijski slojevi i slojevi sažimanja. 
     Na kraju se dolazi do vektora značajki koji se potpuno povezanim slojem 
     preslikava u konačnu kategoričku distribuciju preko poznatih razreda.
-    (Preuzeto iz diplomskog rada 
-     <a href="http://www.zemris.fer.hr/~ssegvic/project/pubs/vukotic14ms.pdf">Vedrana Vukotića</a>.)</div>
+    Slika je preuzeta iz diplomskog rada 
+     <a href="http://www.zemris.fer.hr/~ssegvic/project/pubs/vukotic14ms.pdf">Vedrana Vukotića</a>.
+  </div>
 </div>
 
 <a name='vjezba'></a>
