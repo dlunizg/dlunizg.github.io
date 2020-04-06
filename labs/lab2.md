@@ -17,32 +17,54 @@ permalink: /lab2/
 
 ## 2. vježba: konvolucijske neuronske mreže (CNN)
 
-U ovoj vježbi bavimo se konvolucijskim neuronskim mrežama. Konvolucijske mreže zamišljene
-su za obradu podataka koji imaju posebnu topologiju gdje je osobito važno ostvariti
-invarijantnost na translaciju (problem miješanja dimenzija u podacima).
-Dobar primjer takvih podataka su slike gdje se obično isti objekt može pojaviti na bilo kojem
-mjestu unutar slike. Ako bismo takvu sliku poslali na ulaz potpuno povezanog sloja tada bi
-jedan neuron vidio sve piksele slike. Takav pristup bi omogućio svim neuronima da se
-specijaliziraju za značajke objekta u djelovima slike u kojem se objekt pojavio što bi
-na kraju rezultiralo prenaučenosti i model bi loše generalizirao.
-Osim toga dodatni problem je što slike obično sadrže puno piksela. Na primjer, prosječne dimenzije
-slike iz poznatog dataseta ImageNet iznose 3x200x200 što znači da bi u tom slučaju jedan
-neuron u prvom sloju morao imati 3\*200\*200=120,000 težina. S većim brojem neurona bismo
-jako brzo ostali bez memorije.
+U ovoj vježbi bavimo se konvolucijskim modelima. 
+Ti modeli prikladni su za obradu podataka s topologijom rešetke, 
+gdje je osobito važno ostvariti kovarijantnost na translaciju.
+<!--(problem miješanja dimenzija u podacima).-->
+Dobar primjer takvih podataka su tipične RGB slike 
+u kojima se isti objekt može pojaviti na mnogim prostornim lokacijama. 
+Potpuno povezani slojevi nisu prikladni za analizu takvih slika
+jer svaka aktivacija ovisi o svim pikselima 
+i tako od šume ne vidi stabla. 
+Takav pristup bi ohrabrivao specijalizaciju aktivacija 
+na pojedine dijelove slike, što bi značilo da bi model
+morao odvojeno učiti kako jedan te isti objekt
+izgleda u različitim dijelovima slike.
+Takva situacija pogodovala bi prenaučenosti 
+odnosno vodila bi na lošu generalizaciju.
+Osim toga dodatni problem je što slike 
+tipično sadrže puno piksela. 
+Na primjer, prosječne dimenzije slike 
+iz poznatog dataseta ImageNet iznose 3x200x200 
+što znači da bi svaka aktivacija iz prvog sloja
+trebala imati 3\*200\*200=120,000 težina. 
+Takva situacija je neodrživa 
+jer je broj parametara ograničen GPU memorijom.
 
-Vidimo da bismo bili u puno boljoj situaciji ako bismo ostvarili da svaki neuron
-djeluje lokalno na samo jedan dio slike. Na taj način bi neuron imao rijetku povezanost
-sa slikom što bi uvelike smanjilo broj težina. Ideja je da neuroni imaju jako
-mala receptivna polja što znači da bi u prvom sloju mogli opisivati samo značajke jako
-niske razine poput linija i rubova. Kasniji slojevi bi imali sve veće receptivno polje
-što bi omogućilo da hijerarhijski grade kompleksnije značajke na temelju jednostavnijih.
-Dodatno, budući da želimo postići invarijantnost na translacije unutar slike
-i dalje želimo da svaki neuron djeluje nad čitavom slikom. To možemo ostvariti tako da
-za svaki neuron umjesto jednog izlaza kao do sada imamo više izlaza. Svaki izlaz tada
-bi odgovarao odzivu na drugom položaju u slici. Ovime smo postigli da se parametri jednog neurona
-dijele preko čitave slike.
-Neurone u konvolucijskim slojevima mreže obično nazivamo i filtrima.
-Konvolucijske mreže koriste tri važne ideje: rijetku povezanost, dijeljenje parametara i
+Vidimo da bi puno bolje za nas bilo 
+kad bi svaka aktivacija bila lokalno povezana 
+s malenim susjedstvom prethodnog sloja, 
+jer bi to uvelike smanjilo broj težina. 
+Aktivacije u ranim slojevima imale bi malo receptivno polje
+i mogle bi modelirati samo jednostavne značajke 
+koje bi detektirale jednostavne uzorke poput linija i rubova. 
+Kasniji slojevi hijerarhijski bi gradili 
+sve kompleksnije i kompleksnije značajke
+koje bi imale sve veće i veće receptivno polje.
+Nadalje, kovarijantnost na translacije unutar slike
+mogli bismo ostvariti dijeljenjem parametara 
+aktivacija na različitim prostornim lokacijama. 
+U takvoj organizaciji, latentne aktivacije sadrže 
+izlaz istog podmodela na različitim lokacijama slike. 
+Dijelove modela koji određuju aktivacije
+konvolucijskih slojeva mreže obično nazivamo filtrima.
+Filtri odgovaraju afinoj transformaciji
+malenog lokalnog susjedstva prethodnog sloja 
+ulančenoj s nelinearnom aktivacijskom funkcijom.
+Tipično, lokalno susjedstvo je kvadratno 
+k✕k, k ∈ {3,5,7}, a nelinearnost je zglobnica.
+Da zaključimo, konvolucijske mreže koriste tri važne ideje: 
+rijetku povezanost, dijeljenje parametara i
 ekvivarijantnost reprezentacije.
 
 <div class="fig figcenter fighighlight">
