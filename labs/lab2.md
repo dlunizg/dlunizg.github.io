@@ -71,9 +71,9 @@ ekvivarijantnost reprezentacije.
   <img src="/assets/lab2/convnet1.png" width="100%">
   <img src="/assets/lab2/convnet2.png" width="30%">
   <div class="figcaption figcenter">Primjer konvolucijskog modela za klasifikaciju slika. 
-    Tipično se izmjenjuju konvolucijski slojevi i slojevi sažimanja (izvlačenja). 
+    Tipično se izmjenjuju konvolucijski slojevi i slojevi sažimanja. 
     Na kraju se dolazi do vektora značajki koji se potpuno povezanim slojem 
-    preslikava u konačnu distribuciju preko razreda.<br>
+    preslikava u konačnu kategoričku distribuciju preko poznatih razreda.<br>
     (Preuzeto iz diplomskog rada 
      <a href="http://www.zemris.fer.hr/~ssegvic/project/pubs/vukotic14ms.pdf">Vedrana Vukotića</a>.)</div>
 </div>
@@ -83,13 +83,17 @@ ekvivarijantnost reprezentacije.
 ## Vježba
 
 Kod za prva dva zadatka nalazi se [ovdje](https://github.com/ivankreso/fer-deep-learning/tree/master/lab2).
-Biblioteke koje su vam potrebne za ovu vježbu su Tensorflow, NumPy, [Cython](http://cython.org), [matplotlib](http://matplotlib.org/) i [scikit-image](http://scikit-image.org/).
+Biblioteke koje su vam potrebne za ovu vježbu su PyTorch, 
+NumPy, [Cython](http://cython.org), 
+[matplotlib](http://matplotlib.org/) i [scikit-image](http://scikit-image.org/).
 Pazite da sve biblioteke instalirate za Python 3.
-U datoteci `layers.py` nalaze se slojevi od kojih se tipično sastoji CNN.
-Svaki sloj sadrži dvije metode potrebne za izvođenje backpropagation algoritma.
+U datoteci `layers.py` nalaze se definicije slojeva 
+od kojih se mogu graditi duboki konvolucijski modeli.
+Svaki sloj sadrži tri metode potrebne za izvođenje backpropagation algoritma.
 Metoda `forward` izvodi unaprijedni prolazak kroz sloj i vraća rezultat.
-Metode `backward_inputs` i `backward_params` izvode unazadni prolazak.
-Metoda `backward_inputs` računa gradijent s obzirom na ulazne podatke (\\( \frac{∂L}{∂\mathbf{x}} \\) gdje je \\(\mathbf{x}\\) ulaz u sloj).
+Metode `backward_inputs` i `backward_params` izvode unatražni prolaz.
+Metoda `backward_inputs` računa gradijent s obzirom na ulazne podatke 
+(\\( \frac{∂L}{∂\mathbf{x}} \\) gdje je \\(\mathbf{x}\\) ulaz u sloj).
 Metoda  `backward_params` računa gradijent s obzirom na parametre sloja (\\( \frac{∂L}{∂\mathbf{w}} \\) gdje vektor \\(\mathbf{w}\\) vektor predstavlja sve parametre sloja)).
 
 <a name='1zad'></a>
