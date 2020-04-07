@@ -311,14 +311,18 @@ def unpickle(file):
 
 DATA_DIR = '/path/to/data/'
 
+img_height = 32
+img_width = 32
+num_channels = 3
+num_classes = 10
 
-train_x = np.ndarray((0, img_height * img_width * num_channels), dtype=np.float32)
+train_x = np.ndarray((0, img_height * img_width * num_channels), dtype=np.float32).transpose(0,2,3,1)
 train_y = []
 for i in range(1, 6):
   subset = unpickle(os.path.join(DATA_DIR, 'data_batch_%d' % i))
   train_x = np.vstack((train_x, subset['data']))
   train_y += subset['labels']
-train_x = train_x.reshape((-1, num_channels, img_height, img_width)).transpose(0,2,3,1)
+train_x = train_x.reshape((-1, num_channels, img_height, img_width))
 train_y = np.array(train_y, dtype=np.int32)
 
 subset = unpickle(os.path.join(DATA_DIR, 'test_batch'))
@@ -337,18 +341,23 @@ data_std = train_x.std((0,1,2))
 train_x = (train_x - data_mean) / data_std
 valid_x = (valid_x - data_mean) / data_std
 test_x = (test_x - data_mean) / data_std
+
+train_x = train_x.transpose(0,3,1,2)
+valid_x = valid_x.transpose(0,3,1,2)
+test_x = test_x.transpose(0,3,1,2)
 ```
 
-Vaš zadatak je da u Tensorflowu naučite CNN na ovom skupu.
+Vaš zadatak je da u Pytorch-u naučite CNN na ovom skupu.
 U nastavku je prijedlog jednostavnog modela 
-s kojom biste trebali dobiti ukupnu točnost oko 70%:
+s kojom biste trebali dobiti ukupnu točnost oko 70% na validacijskom skupu:
 
 ```
 conv(16,5) -> relu() -> pool(3,2) -> conv(32,5) -> relu() -> pool(3,2) -> fc(256) -> relu() -> fc(128) -> relu() -> fc(10)
 ```
 gdje `conv(16,5)` predstavlja konvoluciju sa 16 mapa te dimenzijom filtra 5x5,
 a `pool(3,2)` max-pooling sloj s oknom veličine 3x3 i pomakom (*stride*) 2.
-
+Prilikom treniranja padajuću stopu učenja možete implementirati korištenjem
+`torch.optim.lr_scheduler.ExponentialLR`
 
 Napišite funkciju `evaluate` koja na temelju predviđenih i točnih indeksa razreda određuje pokazatelje klasifikacijske performanse:
 ukupnu točnost klasifikacije, matricu zabune (engl. confusion matrix) u kojoj retci odgovaraju točnim razredima a stupci predikcijama te mjere preciznosti
@@ -356,35 +365,27 @@ i odziva pojedinih razreda. U implementaciji prvo izračunajte matricu zabune, a
 Tijekom učenja pozivajte funkciju `evaluate` nakon svake epohe na skupu za učenje i
 validacijskom skupu te na grafu pratite sljedeće vrijednosti: prosječnu vrijednost
 funkcije gubitka, stopu učenja te ukupnu točnost klasifikacije.
-Preporuka je da funkciji proslijedite podatke i potrebne Tensorflow operacije kako bi mogli izvesti
-samo unaprijedni prolazak kroz dane primjere i pritom izracunati matricu zabune.
+Preporuka je da funkciji provedete samo
+samo unaprijedni prolazak kroz dane primjere koristeći `torch.no_grad()` i pritom izracunati matricu zabune.
 Pazite da slučajno ne pozovete i operaciju koja provodi učenje tijekom evaluacije.
 Na kraju funkcije možete izračunati ostale pokazatelje te ih isprintati.
 
 <div class="fig figcenter fighighlight">
   <img src="/assets/lab2/training_plot.png" width="100%">
-  <div class="figcaption figcenter">Primjer kako bi trebao izgledati dobar graf tijekom učenja.</div>
+  <div class="figcaption figcenter">Primjer grafa učenja za nvedeni model uz veličinu grupe od 50</div>
 </div>
 
 Vizualizirajte slučajno inicijalizirane
-i naučene filtre u prvom sloju.
-Da biste dohvatili varijablu u kojoj se
-nalaze težine prvog konvolucijskog sloja
-možete pozvati metodu
-`tf.contrib.framework.get_variables`
-kojoj kao argument predate *scope* pod kojim se
-varijabla nalazi u vašem modelu.
-U nastavku je primjer kako to može izgledati, gdje će
-*scope* u vašem slučaju ovisiti o tome
-kako ste ga nazvali tijekom definiranja grafa.
+Težine konvolucijskog sloja možeze dohvatiti
+korištenjem 
+`conv.weights`.
+U nastavku je primjer kako to može izgledati, ovisno
+o načinu implementiranj konvolucijske mreže.
 
 ```python
-sess = tf.Session()
-sess.run(tf.initialize_all_variables())
+net = ConvNet()
 
-conv1_var = tf.contrib.framework.get_variables('model/conv1_1/weights:0')[0]
-conv1_weights = conv1_var.eval(session=sess)
-draw_conv_filters(0, 0, conv1_weights, SAVE_DIR)
+draw_conv_filters(0, 0, net.conv1.weight.detach().numpy(), SAVE_DIR)
 ```
 
 U nastavku se nalazi kod koji možete
@@ -393,11 +394,11 @@ koristiti za vizualizaciju:
 ```python
 def draw_conv_filters(epoch, step, weights, save_dir):
   w = weights.copy()
-  num_filters = w.shape[3]
-  num_channels = w.shape[2]
-  k = w.shape[0]
-  assert w.shape[0] == w.shape[1]
-  w = w.reshape(k, k, num_channels, num_filters)
+  num_filters = w.shape[0]
+  num_channels = w.shape[1]
+  k = w.shape[2]
+  assert w.shape[3] == w.shape[2]
+  w = w.transpose(2,3,1,0)
   w -= w.min()
   w /= w.max()
   border = 1
@@ -430,6 +431,7 @@ import skimage as ski
 import skimage.io
 
 def draw_image(img, mean, std):
+  img = img.transposse(1,2,0)
   img *= std
   img += mean
   img = img.astype(np.uint8)
@@ -467,7 +469,7 @@ def plot_training_progress(save_dir, data):
            linewidth=linewidth, linestyle='-', label='learning_rate')
   ax3.legend(loc='upper left', fontsize=legend_size)
 
-  save_path = os.path.join(save_dir, 'training_plot.pdf')
+  save_path = os.path.join(save_dir, 'training_plot.png')
   print('Plotting in: ', save_path)
   plt.savefig(save_path)
 ```
@@ -479,34 +481,39 @@ plot_data['valid_loss'] = []
 plot_data['train_acc'] = []
 plot_data['valid_acc'] = []
 plot_data['lr'] = []
-for epoch_num in range(1, num_epochs + 1):
-  train_x, train_y = shuffle_data(train_x, train_y)
-  for step in range(num_batches):
-    offset = step * batch_size 
-    # s ovim kodom pazite da je broj primjera djeljiv s batch_size
-    batch_x = train_x[offset:(offset + batch_size), ...]
-    batch_y = train_y[offset:(offset + batch_size)]
-    feed_dict = {node_x: batch_x, node_y: batch_y}
-    start_time = time.time()
-    run_ops = [train_op, loss, logits]
-    ret_val = sess.run(run_ops, feed_dict=feed_dict)
-    _, loss_val, logits_val = ret_val
-    duration = time.time() - start_time
-    if (step+1) % 50 == 0:
-      sec_per_batch = float(duration)
-      format_str = 'epoch %d, step %d / %d, loss = %.2f (%.3f sec/batch)'
-      print(format_str % (epoch_num, step+1, num_batches, loss_val, sec_per_batch))
 
-  print('Train error:')
-  train_loss, train_acc = evaluate(logits, loss, train_x, train_y)
-  print('Validation error:')
-  valid_loss, valid_acc = evaluate(logits, loss, valid_x, valid_y)
-  plot_data['train_loss'] += [train_loss]
-  plot_data['valid_loss'] += [valid_loss]
-  plot_data['train_acc'] += [train_acc]
-  plot_data['valid_acc'] += [valid_acc]
-  plot_data['lr'] += [lr.eval(session=sess)]
-  plot_training_progress(SAVE_DIR, plot_data)
+for epoch in range(num_epochs):
+    X, Yoh = shuffle_data(train_x, train_labels)
+    X = torch.FloatTensor(X)
+    Yoh = torch.FloatTensor(Yoh)
+    for batch in range(n_batch):
+        # broj primjera djeljiv bsz
+        batch_X = X[batch*bsz:(batch+1)*bsz, :]
+        batch_Yoh = Yoh[batch*bsz:(batch+1)*bsz, :]
+
+        loss = model.get_loss(batch_X, batch_Yoh)
+        loss.backward()
+        optimizer.step()
+        optimizer.zero_grad()
+
+        if batch%100==0:
+            print("epoch: {}, step: {}/{}, batch_loss: {}".format(epoch, batch, n_batch, loss))
+
+        if batch%200==0:
+            draw_conv_filters(epoch, batch, model.conv1.weight.detach().cpu().numpy(), SAVE_DIR)
+
+
+    train_loss, train_acc = evaluate(model, train_x, train_labels)
+    val_loss, val_acc = evaluate(model, valid_x, valid_labels)
+
+    plot_data['train_loss'] += [train_loss]
+    plot_data['valid_loss'] += [val_loss]
+    plot_data['train_acc'] += [train_acc]
+    plot_data['valid_acc'] += [val_acc]
+    plot_data['lr'] += [lr_scheduler.get_lr()]
+    lr_scheduler.step()
+
+plot_training_progress(SAVE_DIR, plot_data)
 ```
 
 Ukoliko imate GPU, možda će vam biti zanimljivo pokušati dobiti bolje rezultate s moćnijom
