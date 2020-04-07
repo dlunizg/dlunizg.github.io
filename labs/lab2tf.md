@@ -1,7 +1,7 @@
 ---
 layout: page
 mathjax: true
-permalink: /lab2/
+permalink: /lab2tf/
 ---
 
 - [Konvolucijska neuronska mreža](#cnn)
