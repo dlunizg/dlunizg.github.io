@@ -30,16 +30,16 @@ Takav pristup bi ohrabrivao specijalizaciju aktivacija
 na pojedine dijelove slike, što bi značilo da bi model
 morao odvojeno učiti kako jedan te isti objekt
 izgleda u različitim dijelovima slike.
-Takva situacija pogodovala bi prenaučenosti 
+Takva situacija pogodovala bi prenaučenosti, 
 odnosno vodila bi na lošu generalizaciju.
 Osim toga dodatni problem je što slike 
 tipično sadrže puno piksela. 
 Na primjer, prosječne dimenzije slike 
-iz poznatog dataseta ImageNet iznose 3x200x200 
+iz poznatog skupa ImageNet iznose 3x200x200 
 što znači da bi svaka aktivacija iz prvog sloja
 trebala imati 3\*200\*200=120,000 težina. 
 Takva situacija je neodrživa 
-jer je broj parametara ograničen GPU memorijom.
+jer je broj parametara ograničen memorijom GPU-a.
 
 Vidimo da bi puno bolje za nas bilo 
 kad bi svaka aktivacija bila lokalno povezana 
@@ -95,7 +95,7 @@ Pazite da odaberete verzije za Python 3.
 
 U datoteci `layers.py` nalaze se definicije slojeva 
 od kojih se mogu graditi duboki konvolucijski modeli.
-Svaki sloj sadrži tri metode potrebne za izvođenje backpropagation algoritma.
+Svaki sloj sadrži tri metode potrebne za izvođenje algoritma backprop.
 Metoda `forward` izvodi unaprijedni prolazak kroz sloj i vraća rezultat.
 Metode `backward_inputs` i `backward_params` izvode unatražni prolaz.
 Metoda `backward_inputs` računa gradijent s obzirom na ulazne podatke 
@@ -111,7 +111,7 @@ Podsjetimo se, gubitak unakrsne entropije računa udaljenost između
 točne distribucije i distribucije koju predviđa model i definiran je kao:
 
 $$
-L = - \sum_{i=1}^{C} y_i log(s_i(\mathbf{x})) \; .\\
+L = - \sum_{j=1}^{C} y_j \log(p_j(\mathbf{x})) \; .\\
 $$
 
 U prikazanoj jednadžbi C predstavlja broj razreda,
@@ -121,38 +121,65 @@ Vektor \\( \mathbf{y} \\) sadrži točnu distribuciju
 preko svih razreda za dani primjer.
 Tu distribuciju najčešće zadajemo 
 jednojediničnim (eng. one-hot) vektorom. 
-Vektor \\( s_i(\mathbf{x}) \\) predstavlja 
-izlaz funkcije softmax za razred \\(i\\).
+Skalar \\( p_j = \text{softmax}_j(\mathbf{x}) \\) predstavlja 
+izlaz funkcije softmax za razred \\(j\\).
 Radi jednostavnosti, jednadžba prikazuje 
 gubitak za samo jedan primjer,
 dok ćemo u praksi obično razmatrati 
 prosječan gubitak preko svih primjera mini-grupe.
-Da biste izveli unazadni prolazak kroz sloj potrebno je najprije izračunati
+Da biste izveli unatražni prolazak kroz sloj potrebno je najprije izračunati
 gradijent gubitka s obzirom na logite \\( \frac{∂L}{∂\mathbf{x}} \\).
 Izvod možemo pojednostavniti tako da 
 unaprijed raspišemo funkciju softmax:
 
 $$
-log(s_i(x)) = log \left(\frac{e^{x_i}}{\sum_{j=1}^{C} e^{x_j}}\right) = x_i - log \sum_{j=1}^{C} e^{x_j} \\
-L = - \sum_{i=1}^{C} y_i \left(x_i - log \sum_{j=1}^{C} e^{x_j}\right) = - \sum_{i=1}^{C} y_i x_i + log \left(\sum_{j=1}^{C} e^{x_j}\right) \sum_{i=1}^{C} y_i \;\; ; \;\;\;\; \sum_{i=1}^{C} y_i = 1 \\
-L = log \left(\sum_{j=1}^{C} e^{x_j}\right) - \sum_{i=1}^{C} y_i x_i \\
+\log(\text{softmax}_j(x)) 
+  = \log \left(
+    \frac{e^{x_j}}{\sum_{k=1}^{C} e^{x_k}}
+   \right) 
+  = x_j - \log \sum_{j=1}^{C} e^{x_j} 
+\\
+L 
+  = - \sum_{j=1}^{C} y_j 
+   \left(
+    x_j - \log \sum_{k=1}^{C} e^{x_k}\right) 
+  = - \sum_{j=1}^{C} y_j x_j + 
+    \log \left(
+      \sum_{k=1}^{C} e^{x_k}
+     \right) 
+    \sum_{j=1}^{C} y_j \;\; ; 
+    \;\;\;\; 
+    \sum_{j=1}^{C} y_j = 1 
+\\
+L = 
+ \log \left(
+  \sum_{k=1}^{C} e^{x_k}
+ \right) 
+ - \sum_{j=1}^{C} y_j x_j \\
 $$
-
-<!---
-\sum_{i=1}^{C} y_i log(s_j(x)) \\
-L = log \left(\sum_{j=1}^{C} e^{x_j}\right) - \sum_{i=1}^{C} y_i x_i \\
--->
-
 
 Sada možemo jednostavno izračunati derivaciju 
 funkcije cilja s obzirom na k-ti logit \\( x_k \\):
 
 $$
-\frac{∂L}{∂x_k} = \frac{∂}{∂x_k} log \left(\sum_{j=1}^{C} e^{x_j}\right) - \frac{∂}{∂x_k} \sum_{i=1}^{C} y_i x_i \\
-\frac{∂}{∂x_k} log \left(\sum_{j=1}^{C} e^{x_j}\right)
-  = \frac{1}{\sum_{j=1}^{C} e^{x_j}} \cdot e^{x_k}
-  = s_k(\mathbf{x}) \\
-\frac{∂L}{∂x_k} = s_k(\mathbf{x}) - y_k \\
+  \frac{∂L}{∂x_l} = 
+    \frac{∂}{∂x_l} 
+    \log \left(
+     \sum_{k=1}^{C} e^{x_k}
+    \right) 
+    - 
+    \frac{∂}{∂x_l} \sum_{j=1}^{C} y_j x_j 
+  \\
+  \frac{∂}{∂x_l} 
+    log \left(
+     \sum_{k=1}^{C} e^{x_k}
+    \right)
+    = \frac{1}{
+       \sum_{k=1}^{C} e^{x_k}} \cdot e^{x_l}
+    = \text{softmax}_l(\mathbf{x}) 
+  \\
+  \frac{∂L}{∂x_l} 
+    = \text{softmax}_l(\mathbf{x}) - y_l \\
 $$
 
 Konačno, gradijent s obzirom na sve logite
@@ -160,7 +187,7 @@ dobivamo kao vektorsku razliku između
 predikcije modela i točne distribucije:
 
 $$
-\frac{∂L}{∂\mathbf{x}} = s(\mathbf{x}) - \mathbf{y} \\
+\frac{∂L}{∂\mathbf{x}} = \text{softmax}(\mathbf{x}) - \mathbf{y} \\
 $$
 
 Kako biste bili sigurni da ste ispravno napisali sve slojeve 
