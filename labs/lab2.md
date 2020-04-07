@@ -226,67 +226,67 @@ konvolucijskih i potpuno povezanih slojeva.
 
 <a name='3zad'></a>
 
-### 3. zadatak - usporedba s Tensorflowom (25%)
 
-U Tensorflowu definirajte i naučite model koji je ekvivalentan regulariziranom modelu iz 2. zadatka.
+### 3. zadatak - usporedba s PyTorchem (25%)
+U PyTorchu definirajte i naučite model koji je ekvivalentan regulariziranom modelu iz 2. zadatka.
 Koristite identičnu arhitekturu i parametre učenja da biste reproducirali rezultate.
-Konvoluciju zadajte operacijama `tf.nn.conv2d` ili `tf.contrib.layers.convolution2d`.
-U nastavku teksta navodimo primjer korištenja
-konvolucije iz paketa `tf.contrib.layers`.
+Konvoluciju zadajte operacijama [`torch.nn.Conv2d`](https://pytorch.org/docs/stable/nn.html#torch.nn.Conv2d)
+ili [`torch.nn.functional.conv2d`](https://pytorch.org/docs/stable/nn.functional.html#torch.nn.functional.conv2d).
+U nastavku teksta navodimo primjer korištenja konvolucije razredom `torch.nn.Conv2d`.
 
 ```python
-import tensorflow.contrib.layers as layers
-
-def build_model(inputs, labels, num_classes):
-  weight_decay = ...
-  conv1sz = ...
-  fc3sz = ...
-  with tf.contrib.framework.arg_scope([layers.convolution2d],
-      kernel_size=5, stride=1, padding='SAME', activation_fn=tf.nn.relu,
-      weights_initializer=layers.variance_scaling_initializer(),
-      weights_regularizer=layers.l2_regularizer(weight_decay)):
-
-    net = layers.convolution2d(inputs, conv1sz, scope='conv1')
-    # ostatak konvolucijskih i pooling slojeva
+import torch
+from torch import nn
+ 
+class CovolutionalModel(nn.Module):
+  _init__(self, in_channels, conv1_width, ..., fc1_width, class_vount):
+    self.conv1 = nn.Conv2d(in_channels, conv1_width, kernel_size=5, stride=1, padding=2, bias=True)
+    # ostatak konvolucijskih slojeva i slojeva sažimanja
     ...
+	  # potpuno povezani slojevi
+    self.fc1 = nn.Linear(..., fc1_width, bias=True)
+    self.fc_logits = nn.Linear(fc1_width, class_count, bias=True)
 
-  with tf.contrib.framework.arg_scope([layers.fully_connected],
-      activation_fn=tf.nn.relu,
-      weights_initializer=layers.variance_scaling_initializer(),
-      weights_regularizer=layers.l2_regularizer(weight_decay)):
+    # parametri su već inicijalizirani pozivima Conv2d i Linear
+    # ali možemo ih drugačije inicijalizirati
+    self.reset_parameters()
 
-    # sada definiramo potpuno povezane slojeve
-    # ali najprije prebacimo 4D tenzor u matricu
-    net = layers.flatten(inputs)
-    net = layers.fully_connected(net, fc3sz, scope='fc3')
+  def reset_parmeters(self)
+    for m in self.modules():
+      if isinstance(m, nn.Conv2d):
+        nn.init.kaiming_normal_(m.weight, mode='fan_in', nonlinearity='relu')
+        nn.init.constant_(m.bias, 0)
+      elif isinstance(m, nn.Linear) and m is not self.fc_logits:
+        nn.init.kaiming_normal_(m.weight, mode='fan_in', nonlinearity='relu')
+        nn.init.constant_(m.bias, 0)
+    self.fc_logits.reset_parameters()
 
-  logits = layers.fully_connected(net, num_classes, activation_fn=None, scope='logits')
-  loss = ...
+  def forward(self, x):
+    h = self.conv1(x)
+    h = torch.relu(h)  # može i h.relu() ili nn.functional.relu(h)
+    ...
+    h = h.view(h.shape[0], -1)
+    h = self.fc1(h)
+    h = torch.relu(h)
+    logits = self.fc_logits(h)
+    return logits
 
-  return logits, loss
 ```
 
-Ako želite koristiti `tf.nn.conv2d` onda će vam od pomoći biti službeni
-[tutorial](https://www.tensorflow.org/tutorials/estimators/cnn)
-i [dokumentacija](https://www.tensorflow.org/versions/master/api_docs/python/nn.html#convolution).
+Ako želite koristiti `torch.nn.functional.conv2d`, vodite računa o ručnom definiranju parametara
+tipa [`torch.nn.Parameter`](https://pytorch.org/docs/stable/nn.html#torch.nn.Parameter).
+Pritom se poslužite slijedećim [primjerom](https://pytorch.org/docs/stable/notes/extending.html#adding-a-module).
+Vodite računa o odgovarajućoj dimenzionalnosti tenzora konvolucijskih jezgara te tenzora pomaka.
 
 Tijekom učenja vizualizirajte filtre u prvom sloju kao u prethodnoj vježbi.
-Nakon svake epohe učenja pohranite filtre i gubitak u datoteku (ili koristite Tensorboard).
-Na kraju učenja prikažite kretanje gubitka kroz epohe (matplotlib).
+Nakon svake epohe učenja pohranite filtre i gubitak u datoteku (ili koristite [Tensorboard](https://pytorch.org/docs/stable/tensorboard.html)).
 
-<!---
-Dodajte u model normalizaciju podataka po slojevima nakon svakog konvolucijskog sloja ([Batch
-normalization](https://arxiv.org/abs/1502.03167)). To najlakše možete
-napraviti tako da konvoluciji zadate
-`tf.contrib.layers.batch_norm`
-kao parametar normalizacije kako je prikazano ispod:
--->
-
+Na kraju učenja prikažite kretanje gubitka kroz epohe (Matplotlib).
 
 
 <a name='4zad'></a>
-### 4. zadatak - Klasifikacija na CIFAR-10 skupu (25%)
-[CIFAR-10](https://www.cs.toronto.edu/~kriz/cifar.html) dataset sastoji se od 50000 slika za učenje i validaciju te 10000 slika za
+### 4. zadatak - Klasifikacija na skupu CIFAR-10 (25%)
+Skup podataka [CIFAR-10](https://www.cs.toronto.edu/~kriz/cifar.html) sastoji se od 50000 slika za učenje i validaciju te 10000 slika za
 testiranje dimenzija 32x32 podijeljenih u 10 razreda.
 Najprije skinite dataset pripremljen za Python [ovdje](https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz).
 Iskorisite sljedeći kod kako biste učitali podatke i pripremili ih.
@@ -354,10 +354,10 @@ s kojom biste trebali dobiti ukupnu točnost oko 70% na validacijskom skupu:
 ```
 conv(16,5) -> relu() -> pool(3,2) -> conv(32,5) -> relu() -> pool(3,2) -> fc(256) -> relu() -> fc(128) -> relu() -> fc(10)
 ```
-gdje `conv(16,5)` predstavlja konvoluciju sa 16 mapa te dimenzijom filtra 5x5,
+gdje `conv(16,5)` predstavlja konvoluciju sa 16 mapa te dimenzijom filtra 5x5, 
 a `pool(3,2)` max-pooling sloj s oknom veličine 3x3 i pomakom (*stride*) 2.
 Prilikom treniranja padajuću stopu učenja možete implementirati korištenjem
-`torch.optim.lr_scheduler.ExponentialLR`
+`torch.optim.lr_scheduler.ExponentialLR`.
 
 Napišite funkciju `evaluate` koja na temelju predviđenih i točnih indeksa razreda određuje pokazatelje klasifikacijske performanse:
 ukupnu točnost klasifikacije, matricu zabune (engl. confusion matrix) u kojoj retci odgovaraju točnim razredima a stupci predikcijama te mjere preciznosti
@@ -366,7 +366,7 @@ Tijekom učenja pozivajte funkciju `evaluate` nakon svake epohe na skupu za uče
 validacijskom skupu te na grafu pratite sljedeće vrijednosti: prosječnu vrijednost
 funkcije gubitka, stopu učenja te ukupnu točnost klasifikacije.
 Preporuka je da funkciji provedete samo
-samo unaprijedni prolazak kroz dane primjere koristeći `torch.no_grad()` i pritom izracunati matricu zabune.
+unaprijedni prolazak kroz dane primjere koristeći `torch.no_grad()` i pritom izračunati matricu zabune.
 Pazite da slučajno ne pozovete i operaciju koja provodi učenje tijekom evaluacije.
 Na kraju funkcije možete izračunati ostale pokazatelje te ih isprintati.
 
@@ -376,11 +376,11 @@ Na kraju funkcije možete izračunati ostale pokazatelje te ih isprintati.
 </div>
 
 Vizualizirajte slučajno inicijalizirane
-Težine konvolucijskog sloja možeze dohvatiti
+težine konvolucijskog sloja možeze dohvatiti
 korištenjem 
-`conv.weights`.
+`conv.weight`.
 U nastavku je primjer kako to može izgledati, ovisno
-o načinu implementiranj konvolucijske mreže.
+o načinu implementacije konvolucijske mreže.
 
 ```python
 net = ConvNet()
@@ -422,7 +422,7 @@ def draw_conv_filters(epoch, step, weights, save_dir):
 </div>
 
 Prikažite 20 netočno klasificiranih slika s najvećim gubitkom te ispišite njihov točan razred,
-kao i top-3 razreda za koje je model dao najveću vjerojatnost.
+kao i 3 razreda za koje je model dao najveću vjerojatnost.
 Da biste prikazali sliku, morate najprije poništiti normalizaciju srednje vrijednosti i
 varijance:
 
@@ -487,7 +487,7 @@ for epoch in range(num_epochs):
     X = torch.FloatTensor(X)
     Yoh = torch.FloatTensor(Yoh)
     for batch in range(n_batch):
-        # broj primjera djeljiv bsz
+        # broj primjera djeljiv s veličinom grupe bsz
         batch_X = X[batch*bsz:(batch+1)*bsz, :]
         batch_Yoh = Yoh[batch*bsz:(batch+1)*bsz, :]
 
