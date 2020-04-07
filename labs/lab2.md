@@ -243,7 +243,7 @@ class CovolutionalModel(nn.Module):
     self.conv1 = nn.Conv2d(in_channels, conv1_width, kernel_size=5, stride=1, padding=2, bias=True)
     # ostatak konvolucijskih slojeva i slojeva sažimanja
     ...
-	  # potpuno povezani slojevi
+    # potpuno povezani slojevi
     self.fc1 = nn.Linear(..., fc1_width, bias=True)
     self.fc_logits = nn.Linear(fc1_width, class_count, bias=True)
 
