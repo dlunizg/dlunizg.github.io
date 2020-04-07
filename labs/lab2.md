@@ -372,7 +372,7 @@ Na kraju funkcije možete izračunati ostale pokazatelje te ih isprintati.
 
 <div class="fig figcenter fighighlight">
   <img src="/assets/lab2/training_plot.png" width="100%">
-  <div class="figcaption figcenter">Primjer grafa učenja za nvedeni model uz veličinu grupe od 50</div>
+  <div class="figcaption figcenter">Primjer grafa učenja za navedeni model uz veličinu grupe od 50</div>
 </div>
 
 Vizualizirajte slučajno inicijalizirane
@@ -431,7 +431,7 @@ import skimage as ski
 import skimage.io
 
 def draw_image(img, mean, std):
-  img = img.transposse(1,2,0)
+  img = img.transpose(1,2,0)
   img *= std
   img += mean
   img = img.astype(np.uint8)
