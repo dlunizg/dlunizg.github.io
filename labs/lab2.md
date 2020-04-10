@@ -203,7 +203,7 @@ Sada prevedite Cython modul `im2col_cython.pyx`
 pozivom `python3 setup_cython.py build_ext --inplace`
 te po potrebi izmijenite varijable `DATA_DIR` i `SAVE_DIR`. 
 Proučite izvorni kod funkcija `col2im_cython` i `im2col_cython`
-te istražite kao se te funkcije koriste.
+te istražite kako se te funkcije koriste.
 
 Proučite i skicirajte model zadan objektom `net` u skripti `train.py`.
 Odredite veličine tenzora te broj parametara u svakom sloju.
