@@ -266,7 +266,7 @@ import torch
 from torch import nn
  
 class CovolutionalModel(nn.Module):
-  _init__(self, in_channels, conv1_width, ..., fc1_width, class_vount):
+  _init__(self, in_channels, conv1_width, ..., fc1_width, class_count):
     self.conv1 = nn.Conv2d(in_channels, conv1_width, kernel_size=5, stride=1, padding=2, bias=True)
     # ostatak konvolucijskih slojeva i slojeva sažimanja
     ...
