@@ -85,8 +85,8 @@ ekvivarijantnost reprezentacije.
 Kod za prva dva zadatka nalazi se 
 [ovdje](https://github.com/ivankreso/fer-deep-learning/tree/master/lab2).
 Biblioteke koje su vam potrebne za ovu vježbu su 
-[PyTorch](http://PyTorch.org), 
-[torchvision](https://PyTorch.org/docs/stable/torchvision/index.html),
+[PyTorch](http://pytorch.org), 
+[torchvision](https://pytorch.org/docs/stable/torchvision/index.html),
 NumPy, [Cython](http://cython.org), 
 [matplotlib](http://matplotlib.org/) i [scikit-image](http://scikit-image.org/).
 Module Pythona najlakše je povući iz pipa.
@@ -257,8 +257,8 @@ konvolucijskih i potpuno povezanih slojeva.
 ### 3. zadatak - usporedba s PyTorchem (25%)
 U PyTorchu definirajte i naučite model koji je ekvivalentan regulariziranom modelu iz 2. zadatka.
 Koristite identičnu arhitekturu i parametre učenja da biste reproducirali rezultate.
-Konvoluciju zadajte operacijama [`torch.nn.Conv2d`](https://PyTorch.org/docs/stable/nn.html#torch.nn.Conv2d)
-ili [`torch.nn.functional.conv2d`](https://PyTorch.org/docs/stable/nn.functional.html#torch.nn.functional.conv2d).
+Konvoluciju zadajte operacijama [`torch.nn.Conv2d`](https://pytorch.org/docs/stable/nn.html#torch.nn.Conv2d)
+ili [`torch.nn.functional.conv2d`](https://pytorch.org/docs/stable/nn.functional.html#torch.nn.functional.conv2d).
 U nastavku teksta navodimo primjer korištenja konvolucije razredom `torch.nn.Conv2d`.
 
 ```python
@@ -301,12 +301,12 @@ class CovolutionalModel(nn.Module):
 ```
 
 Ako želite koristiti `torch.nn.functional.conv2d`, vodite računa o ručnom definiranju parametara
-tipa [`torch.nn.Parameter`](https://PyTorch.org/docs/stable/nn.html#torch.nn.Parameter).
-Pritom se poslužite slijedećim [primjerom](https://PyTorch.org/docs/stable/notes/extending.html#adding-a-module).
+tipa [`torch.nn.Parameter`](https://pytorch.org/docs/stable/nn.html#torch.nn.Parameter).
+Pritom se poslužite slijedećim [primjerom](https://pytorch.org/docs/stable/notes/extending.html#adding-a-module).
 Vodite računa o odgovarajućoj dimenzionalnosti tenzora konvolucijskih jezgara te tenzora pomaka.
 
 Tijekom učenja vizualizirajte filtre u prvom sloju kao u prethodnoj vježbi.
-Nakon svake epohe učenja pohranite filtre i gubitak u datoteku (ili koristite [Tensorboard](https://PyTorch.org/docs/stable/tensorboard.html)).
+Nakon svake epohe učenja pohranite filtre i gubitak u datoteku (ili koristite [Tensorboard](https://pytorch.org/docs/stable/tensorboard.html)).
 
 Na kraju učenja prikažite kretanje gubitka kroz epohe (Matplotlib).
 
@@ -319,7 +319,7 @@ o kojem [ovdje](https://pytorch.org/docs/stable/data.html) možete naći više.
 Skup podataka [CIFAR-10](https://www.cs.toronto.edu/~kriz/cifar.html) sastoji se od 50000 slika za učenje i validaciju te 10000 slika za
 testiranje dimenzija 32x32 podijeljenih u 10 razreda.
 Najprije skinite dataset pripremljen za Python [odavde](https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz) ili korištenjem [`torchvision.datasets.CIFAR10`](https://pytorch.org/docs/stable/torchvision/datasets.html#cifar).
-Možete iskorisite sljedeći kod kako biste učitali podatke i pripremili ih.
+Možete iskoristiti sljedeći kod kako biste učitali podatke i pripremili ih.
 
 ```python
 import os
@@ -587,7 +587,7 @@ izlaza posljednjeg potpuno povezanog sloja
 na vektor logita točnih razreda
 i matricu logita netočnih razreda.
 To možete provesti pozivom funkcije
-[torch.masked_select](https://PyTorch.org/docs/stable/torch.html#torch.masked_select),
+[torch.masked_select](https://pytorch.org/docs/stable/torch.html#torch.masked_select),
 pri čemu masku zadajete regularnom odnosno invertiranom 
 verzijom matrice s jednojediničnim oznakama podataka.
 Sada razliku između matrice logita netočnih razreda
@@ -598,10 +598,10 @@ Pripazite da sve tenzore preoblikujete na ispravni oblik,
 jer funkcija `torch.masked_select` vraća tenzor prvog reda.
 Maksimum po elementima možete računati 
 odgovarajućom varijantom funkcije 
-[torch.max](https://PyTorch.org/docs/stable/torch.html#torch.max).
+[torch.max](https://pytorch.org/docs/stable/torch.html#torch.max).
 
 <!--
-  [torch.nn.functional.one_hot](https://PyTorch.org/docs/stable/nn.functional.html#one-hot)
+  [torch.nn.functional.one_hot](https://pytorch.org/docs/stable/nn.functional.html#one-hot)
  -->
 <!--
 Pokušajte u zadnjem zadatku unakrsnu entropiju zamijeniti 
