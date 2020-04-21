@@ -290,6 +290,7 @@ class CovolutionalModel(nn.Module):
 
   def forward(self, x):
     h = self.conv1(x)
+    ...
     h = torch.relu(h)  # može i h.relu() ili nn.functional.relu(h)
     ...
     h = h.view(h.shape[0], -1)
