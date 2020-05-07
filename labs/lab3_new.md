@@ -59,7 +59,7 @@ Konvencija je češćim riječima pridodjeljivati niže indekse. No, prije nego 
 **Posebni znakovi** su tokeni koji se **ne** nalaze u našem skupu podataka ali su nužni našem modelu za numerikalizaciju podataka. Primjeri ovih znakova koje ćemo koristiti u laboratorijskoj vježbi su znak punjenja `<PAD>` (eng. padding) i nepoznati znak `<UNK>`. 
 Znak punjenja nam je potreban kako bi naše batcheve (koji se sastoje od primjera različite duljine) sveli na jednaku duljinu, dok nam nepoznati znak služi za riječi koje nisu u našem vokabularu -- bilo zbog ograničenja veličine ili jer se nisu pojavile dovoljno puta u podacima.
 
-Posebni znakovi uvijek imaju najniže indekse, a radi konzistentnosti s praksom ćemo znaku punjenja uvijek dati indeks $0$, a nepoznatom znaku indeks $1$. Preostalim rječima se indeksi trebaju dodijeliti prema njihovoj frekvenciji po principu da riječ koja se češće pojavljuje ima niži indeks. Posebni znakovi se koriste **samo u tekstnom polju**.
+Posebni znakovi uvijek imaju najniže indekse, a radi konzistentnosti s praksom ćemo znaku punjenja uvijek dati indeks 0, a nepoznatom znaku indeks 1. Preostalim rječima se indeksi trebaju dodijeliti prema njihovoj frekvenciji po principu da riječ koja se češće pojavljuje ima niži indeks. Posebni znakovi se koriste **samo u tekstnom polju**.
 
 Primjer riječi i njihovih indeksa u našem `stoi` rječniku vokabulara polja ulaznog teksta:
 ```
@@ -98,7 +98,7 @@ print(f"Numericalized label: {label_vocab.encode(instance_label)}")
 Također, vaša implementacija razreda `Vocab` mora primati iduće parametre:
 
 - `max_size`: maksimalni broj tokena koji se sprema u vokabular (uključuje i posebne znakove). `-1` označava da se spremaju svi tokeni.
-- `min_freq`: minimalna frekvencija koju token mora imati da bi ga se spremilo u vokabular ($\ge$). Posebni znakovi ne prolaze ovu provjeru.
+- `min_freq`: minimalna frekvencija koju token mora imati da bi ga se spremilo u vokabular (\ge). Posebni znakovi ne prolaze ovu provjeru.
 
 Primjer izgradnje vokabulara sa svim tokenima (duljina uključuje i posebne znakove):
 
@@ -122,17 +122,17 @@ Primjer prvog retka:
 the 0.04656 0.21318 -0.0074364 -0.45854 -0.035639 ...
 ```
 
-Vaš zadatak je implementirati funkciju koja će za zadani vokabular (iterable stringova) generirati embedding matricu. Vaša funkcija treba podržavati dva načina genriranja embedding matrice: nasumična inicijalizacija iz standardne normalne razdiobe ($\mathbb{N}(0,1)$) i učitavanjem iz datoteke.
+Vaš zadatak je implementirati funkciju koja će za zadani vokabular (iterable stringova) generirati embedding matricu. Vaša funkcija treba podržavati dva načina genriranja embedding matrice: nasumična inicijalizacija iz standardne normalne razdiobe \\((\mathbb{N}(0,1))\\) i učitavanjem iz datoteke.
 Pri učitavanju iz datoteke, ako ne pronađete vektorsku reprezentaciju za neku riječ, inicijalizirajte ju normalno. Vektorsku reprezentaciju za znak punjenja (na indeksu 0) **morate** inicijalizirati na vektor nula.
 Jednostavan način na koji možete implementirati ovo učitavanje je da inicijalirate matricu iz standardne normalne razdiobe, a potom prebrišete inicijalnu reprezentaciju u retku za svaku riječ koju učitate. 
 **Bitno:** Pripazite da redoslijed vektorskih reprezentacija u matrici odgovara redoslijedu riječi u vokabularu! Npr., na indeksu 0 mora biti reprezentacija za posebni znak punjenja.
 
-Jednom kad ste uspješno učitali vašu $V\times d$ embedding matricu, iskoristite [`torch.nn.Embedding.from_pretrained()`](https://pytorch.org/docs/stable/nn.html#torch.nn.Embedding.from_pretrained) kako bi vašu matricu spremili u optimizirani omotač za vektorske reprezentacije.
+Jednom kad ste uspješno učitali vašu \\(V\times d\\) embedding matricu, iskoristite [`torch.nn.Embedding.from_pretrained()`](https://pytorch.org/docs/stable/nn.html#torch.nn.Embedding.from_pretrained) kako bi vašu matricu spremili u optimizirani omotač za vektorske reprezentacije.
 Postavite parametar funkcije `padding_idx` na 0 (indeks znaka punjenja u vašoj embedding matrici).
 
 #### Nadjačavanje metoda `torch.utils.data.Dataset`
 
-Da bi naša implementacija razreda `NLPDataset` bila potpuna, potrebno je nadjačati `__getitem__` metodu koja omogućava indeksiranje razreda. Za potrebe vježbe, ta metoda treba vraćati numerikalizirani text i labelu referencirane instance.
+Da bi naša implementacija razreda `NLPDataset` bila potpuna, potrebno je nadjačati `__getitem__` metodu koja omogućava indeksiranje razreda. Za potrebe vježbe, ta metoda treba vraćati numerikalizirani text i labelu referencirane instance. Također, dovoljno je napraviti da se numerikalizacija radi "on-the-fly", i nije ju nužno cachirati.
 
 Primjer numerikalizacije s nadjačavanjem:
 
@@ -207,6 +207,64 @@ print(f"Lengths: {lengths}")
 
 U stvarnoj implementaciji postavite veličinu batcha na veći broj i zastavicu shuffle na `True` za podatke skupa za učenje.
 
-### Zadatak 2. Implementacija baseline modela
+### Zadatak 2. Implementacija baseline modela (25% bodova)
+
+Prvi korak kod svakog zadatka strojnog učenja bi trebao biti implementacija baseline modela. Baseline model nam služi za procjenu performansi koje naš stvarni, uobičajeno *skuplji* model mora moći preći kao plitak potok. Također, baseline modeli će nam pokazati kolika je stvarno cijena izvođenja naprednijih modela.
+
+Vaš zadatak u laboratorijskoj vježbi je implementirati model koji će koristiti sažimanje usrednjavanjem (*eng. mean pooling*) kako bi eliminirao problematičnu varijabilnu dimenziju. Pri primjeni sažimanja usrednjavanjem odmah eliminirajte **cijelu** vremensku dimenziju (tzv. *okno* je veličine T).
+
+Osnovni model koji implementirate mora izgledati ovako:
+
+```
+avg_pool() -> fc(300, 150) -> ReLU -> fc(150, 150) -> ReLU -> fc(150,1)
+```
+
+Kao gubitak predlažemo da koristite [BCEWithLogitsLoss](https://pytorch.org/docs/stable/nn.html#bcewithlogitsloss), u kojem slučaju ne morate primjeniti sigmoidu na izlaznim logitima.
+Alternativno, možete staviti da vam je izlazna dimenzionalnost broj klasa te koristiti gubitak unakrsne entropije. Oba pristupa su korištena u praksi ovisno o osobnim preferencama.
+
+Kao algoritam optimizacije koristite [Adam](https://pytorch.org/docs/stable/optim.html#torch.optim.Adam).
+
+Implementirajte metrike praćenja performansi modela. Osim gubitka na skupu podataka, zanimaju nas preciznost (*eng. accuracy*), [f1 mjera](https://en.wikipedia.org/wiki/F1_score) i matrica zabune (*eng. confusion matrix*). Nakon svake epohe ispišite performanse modela po svim metrikama na skupu za validaciju, a nakon zadnje epohe ispišite performanse modela na skupu za testiranje.
+
+Naša implementacija osnovnog modela za vokabular koji koristi sve riječi (`max_size=-1, min_freq=1`) te inicijaliza njihove reprezentacije s predtreniranima, `seed=7052020`, `lr=1e-4`, `batch_size=10` na skupu za treniranje i `batch_size=32` na skupovima za validaciju i testiranje ostvaruje iduće rezultate:
+
+```
+
+Epoch 1: valid accuracy = 64.031
+Epoch 2: valid accuracy = 66.941
+Epoch 3: valid accuracy = 72.268
+Epoch 4: Valid accuracy = 75.563
+Epoch 5: Valid accuracy = 78.199
+
+Test accuracy = 77.646
+```
+
+Postavljanje random seeda za pytorch operacije na CPU se vrši sa `torch.manual_seed(seed)`, dok istu stvar napravite i ukoliko u vašem kodu koristite numpy sa `np.random.seed(seed)`.
+Ako pokrećete kod na grafičkoj kartici, obratite pozornost na upozorenja [ovdje](https://pytorch.org/docs/stable/notes/randomness.html#cudnn). Povratne neuronske mreže su CUDNN optimizirane, te je moguće da reproducibilnost nije 100% osigurana osim ako ne pratite upute s poveznice nauštrb brzine.
+
+**Bitno:** Dok god rezultati vašeg koda ne variraju iznimno puno, točne izlazne brojke ne moraju biti savršeno jednake. Kako bi provjerili varijancu (tj. stabilnost) vašeg modela, vaš konačni model pokrenite barem **5** puta s istim hiperparametrima, ali različitim seedom. Zapišite (u excel tablicu ili neki dokument) rezultate izvođenja (sve navedene metrike) za svaki seed. U komentar dodajte i hiperparametre za pokretanje modela.
 
 
+#### Organizacija koda za modele implementirane u Pytorchu
+
+Zbog "syntactic sugara" koji prati treniranje i evaluaciju Pytorch modela, implementacija treniranja modela se dosta često odvaja u tri semantičke cjeline:
+
+1. Inicijalizacija
+  - Parsiranje argumenata
+  - Učitavanje podataka
+  - Inicijalizacija mreže
+2. Petlja za treniranje
+  - `train` metoda koja izvršava jednu epohu na skupu za treniranje
+  - Syntactic sugar:
+    - `model.train()`: omogućava dropout
+    - `model.zero_grad()` za svaki batch: brisanje prethodnih gradijenata na parametre se ne provodi automatski
+    - `loss.backward()`:propagacija lossa na parametre
+    - **[Opcionalno]** `torch.nn.utils.clip_grad_norm_(model.parameters(), clip_value)`: podrezivanje gradijenata po normi
+    - `optimizer.step()`: ažuriranje parametara na temelju optimizacijskog algoritma i vrijednosti gradijenata 
+3. Petlja za evaluaciju
+  - `evaluate` metoda koja izvšava jednu epohu na skupu za validaciju ili testiranje
+  - Syntactic sugar:
+    - `with torch.no_grad():`: gradijenti se ne prate (memorijska i vremenska efikasnost)
+    - `model.eval()`: onemogućava dropout
+
+### Zadatak 3. Implementacija povratne neuronske mreže (25% bodova)
