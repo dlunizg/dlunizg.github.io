@@ -226,7 +226,7 @@ Kao algoritam optimizacije koristite [Adam](https://pytorch.org/docs/stable/opti
 
 **Implementirajte** metrike praćenja performansi modela. Osim gubitka na skupu podataka, zanimaju nas **preciznost** (*eng. accuracy*), [**f1 mjera**](https://en.wikipedia.org/wiki/F1_score) i **matrica zabune** (*eng. confusion matrix*). Nakon svake epohe ispišite performanse modela po svim metrikama na skupu za validaciju, a nakon zadnje epohe ispišite performanse modela na skupu za testiranje.
 
-Radi usporedbe, naša implementacija osnovnog modela za vokabular koji koristi sve riječi (`max_size=-1, min_freq=1`) te inicijaliza njihove reprezentacije s predtreniranima, `seed=7052020`, `lr=1e-4`, `batch_size=10` na skupu za treniranje i `batch_size=32` na skupovima za validaciju i testiranje ostvaruje iduću preciznost:
+Radi usporedbe, naša implementacija osnovnog modela za vokabular koji koristi sve riječi (`max_size=-1, min_freq=1`) te inicijalizira njihove reprezentacije s predtreniranima, `seed=7052020`, `lr=1e-4`, `batch_size=10` na skupu za treniranje i `batch_size=32` na skupovima za validaciju i testiranje ostvaruje iduću preciznost:
 
 ```
 
@@ -267,6 +267,47 @@ Zbog "syntactic sugara" koji prati treniranje i evaluaciju Pytorch modela, imple
         - `with torch.no_grad():`- gradijenti se ne prate (memorijska i vremenska efikasnost)
         - `model.eval()`- onemogućava dropout
 
+Konkretni kosturi ovih metoda mogli bi izgledati kao u nastavku:
+
+```python
+def train(model, data, optimizer, criterion, args):
+  model.train()
+  for batch_num, batch in enumerate(data):
+    model.zero_grad()
+    # ...
+    logits = model(x)
+    loss = criterion(logits, y)
+    loss.backward()
+    torch.nn.utils.clip_grad_norm_(model.parameters(), args.clip)
+    optimizer.step()
+    # ...
+
+
+def evaluate(model, data, criterion, args):
+  model.eval()
+  with torch.no_grad():
+    for batch_num, batch in enumerate(data):
+      # ...
+      logits = model(x)
+      loss = criterion(logits, y)
+      # ...
+
+def main(args):
+  seed = args.seed
+  np.random.seed(seed)
+  torch.manual_seed(seed)
+
+  train_dataset, valid_dataset, test_dataset = load_dataset(...)
+  model = initialize_model(args, ...)
+
+  criterion = nn.BCEWithLogitsLoss()
+  optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
+
+  for epoch in range(args.epochs):
+    train(...)
+    evaluate(...)
+```
+
 ### Zadatak 3. Implementacija povratne neuronske mreže (25% bodova)
 
 Nakon što ste uspješno implementirali vaš baseline model, vrijeme je da isprobamo neki model baziran na povratnim neuronskim mrežama. Vaš zadatak je implementirati osnovni model povratne neuronske meže **po izboru**. 
@@ -286,7 +327,7 @@ rnn(150) -> rnn(150) -> fc(150, 150) -> ReLU() -> fc(150,1)
 
 Vaš osnovni model RNN ćelije bi trebao biti jednosmjeran i imati dva sloja. Za višeslojni RNN iskoristite argument `num_layers` pri konstrukciji RNN mreže.
 
-Radi usporedbe, naša implementacija GRU povratne mreže za vokabular koji koristi sve riječi (`max_size=-1, min_freq=1`) te inicijaliza njihove reprezentacije s predtreniranima, `seed=7052020`, `lr=1e-4`, `batch_size=10`, `gradient_clip=0.25` na skupu za treniranje i `batch_size=32` na skupovima za validaciju i testiranje ostvaruje iduću preciznost:
+Radi usporedbe, naša implementacija GRU povratne mreže za vokabular koji koristi sve riječi (`max_size=-1, min_freq=1`) te inicijalizira njihove reprezentacije s predtreniranima, `seed=7052020`, `lr=1e-4`, `batch_size=10`, `gradient_clip=0.25` na skupu za treniranje i `batch_size=32` na skupovima za validaciju i testiranje ostvaruje iduću preciznost:
 
 ```
 Epoch 1: valid accuracy = 67.930
@@ -328,7 +369,7 @@ Ulazne vektorske reprezentacije su jedan jako bitan hiperparametar, za koji u ok
 U ovom dijelu laboratorijske vježbe trebate odabrati **barem 5** od idućih hiperparametara te provjeriti kako modeli funkcioniraju za njihove izmjene. Ako hiperparametar utječe i na baseline model, kao i povratnu neuronsku mrežu, pokrenite eksperimente na oba modela. 
 Za ćeliju povratne neuronske mreže odaberite onu koja ostvaruje (po vama) bolje rezultate na prošlom dijelu vježbe. 
 
-Za hiperparametre označene s nekim brojem zvjezdica (\*), odaberite **samo jedan** od onih s istim brojem zvjezdica, a ne oba.
+Za hiperparametre označene s nekim brojem zvjezdica (\*), odaberite **samo jedan** od onih s istim brojem zvjezdica.
 
 Hiperparametri:
 
@@ -338,11 +379,11 @@ Hiperparametri:
 - (\*\*) Veličina batcha
 - Dropout
 - Broj slojeva
-- Dimenzionalnost skrivenog sloja (za svaki skriveni sloj)
-- Funkcija nelinearnosti u potpuno povezanim slojevima
+- Dimenzionalnost skrivenih slojeva
+- Optimizacijski algoritam (probajte nešto osim Adama)
+- Funkcija nelinearnosti (u potpuno povezanim slojevima)
+- Iznos na koji se podrezuju vrijednosti gradijenata
 - Vrsta sažimanja (Baseline)
-- Optimizacijski algoritam (da, probajte nešto drugo osim Adama)
-- Vrijednost gradient clippinga
 - Zamrzavanje ulaznih vektorskih reprezentacije (argument `freeze` funkcije `from_pretrained`)
 
 Za svaki od odabranih hiperparametara isprobajte barem tri njegove različite vrijednosti (osim ako je binaran). Rezultate eksperimenata zapisujte. Pokrenite baseline i povratni model s najboljim hiperparametrima barem 5 puta i zapišite prosjek i devijaciju svih praćenih metrika. Čini li vam se neki parametar kao najutjecajniji za uspjeh? Nemojte se bojati raditi agresivne izmjene u vrijednostima hiperparametara jer će vas one lakše dovesti do zaključaka.
