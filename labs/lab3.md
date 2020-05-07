@@ -1,7 +1,7 @@
 ---
 layout: page
 mathjax: true
-permalink: /lab3/
+permalink: /lab3_old/
 ---
 
 ## 3. vježba: modeliranje nizova povratnim neuronskim mrežama 

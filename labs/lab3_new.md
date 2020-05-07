@@ -1,7 +1,7 @@
 ---
 layout: page
 mathjax: true
-permalink: /lab3new/
+permalink: /lab3/
 ---
 
 ## 3. vježba: analiza klasifikacije sentimenta
@@ -12,7 +12,7 @@ Kao skup podataka analizirati ćemo [Stanford Sentiment Treebank](https://nlp.st
 Skup podataka **nemojte** skidati sa službenog repozitorija budući da je zapis u stablastom formatu. Uz vježbu su priložene predprocesirane verzije skupa podataka gdje su podaci pretvoreni u lowercase, a neki tokeni su filtrirani.
 Osim skupa podataka, za potrebe laboratorijske vježbe dobiti ćete i set vektorskih reprezentacija za sve riječi koje su prisutne u **train** splitu SST dataseta.
 
-Train, test i validacijski skup podataka za SST možete naći [ovdje](https://github.com/dlunizg/dlunizg.github.io/tree/master/code/lab3). Vektorske reprezentacije možete preuzeti [ovdje](https://drive.google.com/open?id=12mA5QEN4nFcxfEzOS8Nqj5afOmkuclc7).
+Train, test i validacijski skup podataka za SST možete naći [ovdje](https://github.com/dlunizg/dlunizg.github.io/tree/master/data/lab3). Vektorske reprezentacije možete preuzeti [ovdje](https://drive.google.com/open?id=12mA5QEN4nFcxfEzOS8Nqj5afOmkuclc7).
 
 Vaš zadatak u trećoj laboratorijskoj vježbi je provjeriti koliko je SST stvarno jednostavan skup podataka te evaluirati povratne neuronske mreže kao i alternativne pristupe bazirane na sažimanju. Kroz pripremu postoji niz kontrolnih ispisa, koji bi trebali biti isti u vašoj implementaciji osim ako nije navedeno drukčije.
 
@@ -128,7 +128,7 @@ Jednostavan način na koji možete implementirati ovo učitavanje je da inicijal
 **Bitno:** Pripazite da redoslijed vektorskih reprezentacija u matrici odgovara redoslijedu riječi u vokabularu! Npr., na indeksu 0 mora biti reprezentacija za posebni znak punjenja.
 
 Jednom kad ste uspješno učitali vašu \\(V\times d\\) embedding matricu, iskoristite [`torch.nn.Embedding.from_pretrained()`](https://pytorch.org/docs/stable/nn.html#torch.nn.Embedding.from_pretrained) kako bi vašu matricu spremili u optimizirani omotač za vektorske reprezentacije.
-Postavite parametar funkcije `padding_idx` na 0 (indeks znaka punjenja u vašoj embedding matrici).
+Postavite parametar funkcije `padding_idx` na 0 (indeks znaka punjenja u vašoj embedding matrici), a parametar funkcije `freeze` ostavite na `True` ako koristite predtrenirane reprezentacije, a postavite na `False` inače.
 
 #### Nadjačavanje metoda `torch.utils.data.Dataset`
 
@@ -216,7 +216,7 @@ Vaš zadatak u laboratorijskoj vježbi je implementirati model koji će koristit
 Osnovni model koji implementirate mora izgledati ovako:
 
 ```
-avg_pool() -> fc(300, 150) -> ReLU -> fc(150, 150) -> ReLU -> fc(150,1)
+avg_pool() -> fc(300, 150) -> ReLU() -> fc(150, 150) -> ReLU() -> fc(150,1)
 ```
 
 Kao gubitak predlažemo da koristite [BCEWithLogitsLoss](https://pytorch.org/docs/stable/nn.html#bcewithlogitsloss), u kojem slučaju ne morate primjeniti sigmoidu na izlaznim logitima.
@@ -224,9 +224,9 @@ Alternativno, možete staviti da vam je izlazna dimenzionalnost broj klasa te ko
 
 Kao algoritam optimizacije koristite [Adam](https://pytorch.org/docs/stable/optim.html#torch.optim.Adam).
 
-Implementirajte metrike praćenja performansi modela. Osim gubitka na skupu podataka, zanimaju nas preciznost (*eng. accuracy*), [f1 mjera](https://en.wikipedia.org/wiki/F1_score) i matrica zabune (*eng. confusion matrix*). Nakon svake epohe ispišite performanse modela po svim metrikama na skupu za validaciju, a nakon zadnje epohe ispišite performanse modela na skupu za testiranje.
+**Implementirajte** metrike praćenja performansi modela. Osim gubitka na skupu podataka, zanimaju nas **preciznost** (*eng. accuracy*), [**f1 mjera**](https://en.wikipedia.org/wiki/F1_score) i **matrica zabune** (*eng. confusion matrix*). Nakon svake epohe ispišite performanse modela po svim metrikama na skupu za validaciju, a nakon zadnje epohe ispišite performanse modela na skupu za testiranje.
 
-Naša implementacija osnovnog modela za vokabular koji koristi sve riječi (`max_size=-1, min_freq=1`) te inicijaliza njihove reprezentacije s predtreniranima, `seed=7052020`, `lr=1e-4`, `batch_size=10` na skupu za treniranje i `batch_size=32` na skupovima za validaciju i testiranje ostvaruje iduće rezultate:
+Radi usporedbe, naša implementacija osnovnog modela za vokabular koji koristi sve riječi (`max_size=-1, min_freq=1`) te inicijaliza njihove reprezentacije s predtreniranima, `seed=7052020`, `lr=1e-4`, `batch_size=10` na skupu za treniranje i `batch_size=32` na skupovima za validaciju i testiranje ostvaruje iduću preciznost:
 
 ```
 
@@ -242,7 +242,7 @@ Test accuracy = 77.646
 Postavljanje random seeda za pytorch operacije na CPU se vrši sa `torch.manual_seed(seed)`, dok istu stvar napravite i ukoliko u vašem kodu koristite numpy sa `np.random.seed(seed)`.
 Ako pokrećete kod na grafičkoj kartici, obratite pozornost na upozorenja [ovdje](https://pytorch.org/docs/stable/notes/randomness.html#cudnn). Povratne neuronske mreže su CUDNN optimizirane, te je moguće da reproducibilnost nije 100% osigurana osim ako ne pratite upute s poveznice nauštrb brzine.
 
-**Bitno:** Dok god rezultati vašeg koda ne variraju iznimno puno, točne izlazne brojke ne moraju biti savršeno jednake. Kako bi provjerili varijancu (tj. stabilnost) vašeg modela, vaš konačni model pokrenite barem **5** puta s istim hiperparametrima, ali različitim seedom. Zapišite (u excel tablicu ili neki dokument) rezultate izvođenja (sve navedene metrike) za svaki seed. U komentar dodajte i hiperparametre za pokretanje modela.
+**Bitno:** Dok god rezultati vašeg koda ne variraju iznimno puno (za različita pokretanja), točne izlazne brojke ne moraju biti savršeno jednake. Kako bi provjerili varijancu (tj. stabilnost) vašeg modela, vaš konačni model pokrenite barem **5** puta s istim hiperparametrima, ali različitim seedom. Zapišite (u excel tablicu, word dokument ili slično) rezultate izvođenja (sve navedene metrike) za svaki seed. U komentar dodajte i hiperparametre za pokretanje modela.
 
 
 #### Organizacija koda za modele implementirane u Pytorchu
@@ -256,15 +256,103 @@ Zbog "syntactic sugara" koji prati treniranje i evaluaciju Pytorch modela, imple
 2. Petlja za treniranje
   - `train` metoda koja izvršava jednu epohu na skupu za treniranje
   - Syntactic sugar:
-    - `model.train()`: omogućava dropout
-    - `model.zero_grad()` za svaki batch: brisanje prethodnih gradijenata na parametre se ne provodi automatski
-    - `loss.backward()`:propagacija lossa na parametre
-    - **[Opcionalno]** `torch.nn.utils.clip_grad_norm_(model.parameters(), clip_value)`: podrezivanje gradijenata po normi
-    - `optimizer.step()`: ažuriranje parametara na temelju optimizacijskog algoritma i vrijednosti gradijenata 
+        - `model.train()` - omogućava dropout
+        - `model.zero_grad()` za svaki batch - brisanje prethodnih gradijenata na parametre se ne provodi automatski
+        - `loss.backward()`-propagacija lossa na parametre
+        - **[Opcionalno]** `torch.nn.utils.clip_grad_norm_(model.parameters(), clip_value)`- podrezivanje gradijenata po normi
+        - `optimizer.step()`- ažuriranje parametara na temelju optimizacijskog algoritma i vrijednosti gradijenata 
 3. Petlja za evaluaciju
-  - `evaluate` metoda koja izvšava jednu epohu na skupu za validaciju ili testiranje
+  - `evaluate` metoda koja izvrcd šava jednu epohu na skupu za validaciju ili testiranje
   - Syntactic sugar:
-    - `with torch.no_grad():`: gradijenti se ne prate (memorijska i vremenska efikasnost)
-    - `model.eval()`: onemogućava dropout
+        - `with torch.no_grad():`- gradijenti se ne prate (memorijska i vremenska efikasnost)
+        - `model.eval()`- onemogućava dropout
 
 ### Zadatak 3. Implementacija povratne neuronske mreže (25% bodova)
+
+Nakon što ste uspješno implementirali vaš baseline model, vrijeme je da isprobamo neki model baziran na povratnim neuronskim mrežama. Vaš zadatak je implementirati osnovni model povratne neuronske meže **po izboru**. 
+Na izboru su vam iduće ćelije: [["Vanilla" RNN](https://pytorch.org/docs/master/generated/torch.nn.RNN.html#torch.nn.RNN), [GRU](https://pytorch.org/docs/master/generated/torch.nn.GRU.html#torch.nn.GRU), [LSTM](https://pytorch.org/docs/master/generated/torch.nn.LSTM.html#torch.nn.LSTM)].
+
+Za odabrani model, detaljno pročitajte njegovu dokumentaciju. U nastavku ćemo vam samo skrenuti pozornost na nekoliko bitnih detalja:
+
+- Svaka RNN mreža kao izlaz svoje `forward` metode vraća (1) niz skrivenih stanja posljednjeg sloja i (2) skriveno stanje (tj., skrivena stanja u slučaju LSTMa) za sve slojeve zadnjeg vremenskog koraka. Kao ulaz u dekoder obično želite staviti skriveno stanje iz zadnjeg sloja u zadnjem vremenskom koraku. Kod LSTMa, to je `h` komponenta dualnog `(h, c)` skrivenog stanja.
+- Radi brzine, RNN mreže preferiraju inpute u `time-first` formatu (budući da je brže *iterirati* po prvoj dimenziji tenzora). Transponirajte ulaze prije nego ih šaljete RNN ćeliji.
+- Tenzori koji su ulaz u RNN ćelije se često "[pakiraju](https://pytorch.org/docs/master/generated/torch.nn.utils.rnn.pack_padded_sequence.html#torch.nn.utils.rnn.pack_padded_sequence)". Pakiranje je zapis tenzora kojemu su pridružene stvarne duljine svakog elementa u batchu. Ako koristite pakiranje, RNN mreža se neće odmatati za vremenske korake koji sadrže padding u elementima batcha. Ovdje osim efikasnosti možete dobiti i na preciznosti, ali ovaj dio **nije** nužan dio vaše implementacije.
+- Implementirajte [gradient clipping](https://pytorch.org/docs/master/generated/torch.nn.utils.clip_grad_norm_.html#torch.nn.utils.clip_grad_norm_) prije optimizacijskog koraka
+Osnovni model vaše odabrane RNN ćelije treba izgledati ovako:
+
+```
+rnn(150) -> rnn(150) -> fc(150, 150) -> ReLU() -> fc(150,1)
+```
+
+Vaš osnovni model RNN ćelije bi trebao biti jednosmjeran i imati dva sloja. Za višeslojni RNN iskoristite argument `num_layers` pri konstrukciji RNN mreže.
+
+Radi usporedbe, naša implementacija GRU povratne mreže za vokabular koji koristi sve riječi (`max_size=-1, min_freq=1`) te inicijaliza njihove reprezentacije s predtreniranima, `seed=7052020`, `lr=1e-4`, `batch_size=10`, `gradient_clip=0.25` na skupu za treniranje i `batch_size=32` na skupovima za validaciju i testiranje ostvaruje iduću preciznost:
+
+```
+Epoch 1: valid accuracy = 67.930
+Epoch 2: valid accuracy = 77.155
+Epoch 3: valid accuracy = 78.254
+Epoch 4: valid accuracy = 79.517
+Epoch 5: valid accuracy = 80.011
+
+Test accuracy = 79.985
+```
+
+Neovisno o tome koju ćeliju odaberete, pokrenite postupak učenja barem **5** puta s istim hiperparametrima ali različitim seedom. Pratite sve implementirane metrike i zapišite ih u datoteku.
+
+
+### Zadatak 4. Usporedba modela i pretraga hiperparametara (25% bodova)
+
+Kao što vidimo, naše incijalne implementacije modela su dosta slične po preciznosti. Kako rezultati pokretanja modela za jedan skup hiperparametara mogu biti čista sreća ili nesreća, u ovom dijelu laboratorijske vježbe ćemo implementirati iscrpnu pretragu kroz varijante modela i njihove hiperparametre.
+
+#### Usporedba RNN ćelija
+
+Neovisno o tome koju RNN ćeliju ste odabrali u trećem zadatku, proširite vaš kod na način da vrsta RNN ćelije bude argument. Pokrenite vaš kod za preostale vrste RNN ćelija i zapišite rezultate. Je li neka ćelija očiti pobjednik? Je li neka ćelija očiti gubitnik?
+
+Ponovite ovu usporedbu uz izmjenu hiperparametara povratnih neuronskih mreža. Idući hiperparametri povratnih neuronskih mreža su nam interesantni:
+
+- hidden_size
+- num_layers
+- dropout: primjenjen **između** uzastopnih slojeva RNNa (funkcionira samo za 2+ slojeva)
+- bidirectional: dimenzionalnost izlaza dvosmjerne rnn ćelije je **dvostruka**
+
+Isprobajte **barem** 3 različite vrijednosti za svaki hiperparametar (osim bidirectional, koji ima samo dvije vrijednosti). Način na koji ćete kombinirati te vrijednosti je potpuno na vama (iscrpna rešetkasta pretraga je vremenski previše zahtjevna). Pokrenite svaku vrstu ćelije za svaku kombinaciju hiperparametara i zapišite rezultate (relevantne metrike). Nemojte se bojati raditi agresivne izmjene u vrijednostima hiperparametara (male izmjene vam neće dati puno informacija). Primjećujete li da neki hiperparametar bitno utječe na performanse ćelija? Koji?
+
+Zapamtite / zapišite set hiperparametara koji vam daje najbolje rezultate. Za njega pokrenite učenje barem 5 puta s različitim seedovima i zapišite dobivene metrike.
+
+#### Optimizacija hiperparametara
+
+Probajte pokrenuti povratne neuronske mreže za najbolji set hiperparametara bez da koristite prednaučene vektorske reprezentacije. Probajte isto za vaš baseline model. Koji model više "pati" od gubitka prednaučenih reprezentacija?
+
+Ulazne vektorske reprezentacije su jedan jako bitan hiperparametar, za koji u okviru laboratorijske vježbe imamo samo dvije vrijednosti -- koristimo li ih ili ne. U analizi teksta su ulazne vektorske reprezentacije veoma velik dio uspješnosti algoritma.
+U ovom dijelu laboratorijske vježbe trebate odabrati **barem 5** od idućih hiperparametara te provjeriti kako modeli funkcioniraju za njihove izmjene. Ako hiperparametar utječe i na baseline model, kao i povratnu neuronsku mrežu, pokrenite eksperimente na oba modela. 
+Za ćeliju povratne neuronske mreže odaberite onu koja ostvaruje (po vama) bolje rezultate na prošlom dijelu vježbe. 
+
+Za hiperparametre označene s nekim brojem zvjezdica (\*), odaberite **samo jedan** od onih s istim brojem zvjezdica, a ne oba.
+
+Hiperparametri:
+
+- (\*) Veličina vokabulara **V**
+- (\*) Minimalna frekvencija riječi **min_freq**
+- (\*\*) Stopa učenja
+- (\*\*) Veličina batcha
+- Dropout
+- Broj slojeva
+- Dimenzionalnost skrivenog sloja (za svaki skriveni sloj)
+- Funkcija nelinearnosti u potpuno povezanim slojevima
+- Vrsta sažimanja (Baseline)
+- Optimizacijski algoritam (da, probajte nešto drugo osim Adama)
+- Vrijednost gradient clippinga
+- Zamrzavanje ulaznih vektorskih reprezentacije (argument `freeze` funkcije `from_pretrained`)
+
+Za svaki od odabranih hiperparametara isprobajte barem tri njegove različite vrijednosti (osim ako je binaran). Rezultate eksperimenata zapisujte. Pokrenite baseline i povratni model s najboljim hiperparametrima barem 5 puta i zapišite prosjek i devijaciju svih praćenih metrika. Čini li vam se neki parametar kao najutjecajniji za uspjeh? Nemojte se bojati raditi agresivne izmjene u vrijednostima hiperparametara jer će vas one lakše dovesti do zaključaka.
+
+#### Upute oko eksperimenata i zapisivanja
+
+Način i format zapisa rezultata je namjerno ostavljen otvoren. Cilj vježbe nije natjerati vas da radite u nekom okviru, već probajte ovo shvatiti kao istraživački projekt iz kojeg na kraju trebate nekome prezentirati svoja saznanja i potkrijepiti ih brojevima. Ti brojevi mogu biti zapis u tablici, kao dio slobodnog teksta s opisom eksperimenata ili vizualizirani. Rezultate ćete prezentirati verbalno, tako da odaberite format koji vam najviše paše za to.
+
+**Broj epoha** je namjerno nedefiniran zbog različitih kapaciteta hardvera na vašim osobnim računalima. Skup podataka SST je odabran najviše jer je malen i čak ni izvođenje na CPU ne uzima previše vremena. Idejno bi se svaki eksperiment trebao pokrenuti na barem 5 epoha. Ukoliko vam to hardver vremenski ili prostorno ne dopušta, molimo vas da nam to javite.
+
+### Bonus zadataci: napredni baseline modeli i pozornost (max 20% bodova)
+
+Coming soon!
