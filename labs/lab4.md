@@ -18,7 +18,9 @@ permalink: /lab4/
 <a name='gm'></a>
 
 ## 4. vježba: Generativni modeli (GM)
-_v1.2-2018_
+_v1.3-2020_
+
+NAPOMENA: Ukoliko brzina izvršavanja zadataka predstavlja problem zbog nedostpunosti GPUa, napominjemo da Google unutar svoje Google Colab usluge nudi besplatno GPU na korištenje.
 
 U ovoj vježbi pozabavit ćete se s generativnim modelima. Njihova glavna razlika u odnosu na diskriminativne modele je u tome što su predviđeni za generiranje uzoraka karakterističnih za distribuciju uzoraka korištenih pri treniranju. Da bi to mogli raditi na odgovarajući način, nužno je da mogu naučiti bitne karakteristike uzoraka iz skupa za treniranje. Jedna moguća reprezentacija tih bitnih karakteristika je distribucija ulaznih vektora, a model bi uz pomoć takve informacije mogao generirati više uzoraka koji su vjerojatniji (više zastupljeni u skupu za treniranje), a manje uzoraka koji su manje vjerojatni.
 
@@ -108,9 +110,7 @@ _{i=1}^{N}w_{\mathit{ji}}v_{i}+b_{j}\right)$$ za skriveni sloj
 Uzorkovanje vrijednosti pojedine varijable provodi se prema gornje dvije jednadžbe i pomoću generatora slučajnih brojeva.
 
 ```python
-def sample_prob(probs):
-    """Uzorkovanje vektora x prema vektoru vjerojatnosti p(x=1) = probs"""
-    return tf.to_float(tf.random_uniform(tf.shape(probs)) <= probs)
+sampled_tensor = probability_tensor.bernoulli()
 ```
 
 **Učenje RBM-a**
@@ -194,205 +194,50 @@ Implementirajte RBM koji koristi CD-1 za učenje. Ulazni podaci neka su MNIST br
 5. Povećajte broj Gibsovih uzorkovanja k u CD-k. Koje su razlike?
 6. Ispitajte efekt variranja koeficijenta učenja.
 7. Slučajno inicijalizirjte skriveni sloj, provedite nekoliko Gibbsovih uzorkovanje te vizualizirajte generirane uzorke vidljivog sloja
-8. Provedite prethodne eksperimente za manji i veći broj skrivenih neurona. Što opažate kod težina i rekonstrukcija?
-
-Koristite sljedeći predložak s pomoćnom datotekom [utils.py](/assets/lab4/utils.py). 
+8. Provedite prethodne eksperimente za manji i veći broj skrivenih neurona. Što opažate kod težina i rekonstrukcija? 
 
 **NAPOMENA**: Osim nadopunjavanja koda koji nedostaje, predložak se treba prilagođavati prema potrebi, a može i prema vlastitim preferencijama. Stoga **budite oprezni s tvrdnjama da vam neki dio koda ne radi!**
 
 ```python
-import tensorflow as tf
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import torchvision
+import torch.optim as optim
+
+from torchvision import datasets, transforms
+import tqdm
+from torchvision.utils import make_grid
+
+import torch.distributions as tdist
+
 import numpy as np
-from tensorflow.examples.tutorials.mnist import input_data
-from utils import tile_raster_images
-import math
+import tqdm
+
 import matplotlib.pyplot as plt
-%matplotlib inline
-plt.rcParams['image.cmap'] = 'jet'
 
-mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
-trX, trY, teX, teY = mnist.train.images, mnist.train.labels, mnist.test.images,\
-    mnist.test.labels
+BATCH_SIZE = 100
+EPOCHS = 100
+VISIBLE_SIZE = 784
+HIDDEN_SIZE = 100
 
-def weights(shape):
-    initial = tf.truncated_normal(shape, stddev=0.1)
-    return tf.Variable(initial)
-
-def bias(shape):
-    initial = tf.zeros(shape, dtype=tf.float32)
-    return tf.Variable(initial)
-
-def sample_prob(probs):
-    """Uzorkovanje vektora x prema vektoru vjerojatnosti p(x=1) = probs"""
-    return tf.to_float(tf.random_uniform(tf.shape(probs)) <= probs)
-
-def draw_weights(W, shape, N, stat_shape, interpolation="bilinear"):
-    """Vizualizacija težina
-    W -- vektori težina
-    shape -- tuple dimenzije za 2D prikaz težina - obično dimenzije ulazne slike, npr. (28,28)
-    N -- broj vektora težina
-    shape_state -- dimezije za 2D prikaz stanja (npr. za 100 stanja (10,10)
-    """
-    image = (tile_raster_images(
-        X=W.T,
-        img_shape=shape,
-        tile_shape=(int(math.ceil(N/stat_shape[0])), stat_shape[0]),
-        tile_spacing=(1, 1)))
-    plt.figure(figsize=(10, 14))
-    plt.imshow(image, interpolation=interpolation)
-    plt.axis('off')
-    
-def draw_reconstructions(ins, outs, states, shape_in, shape_state, N):
-    """Vizualizacija ulaza i pripadajućih rekonstrukcija i stanja skrivenog sloja
-    ins -- ualzni vektori
-    outs -- rekonstruirani vektori
-    states -- vektori stanja skrivenog sloja
-    shape_in -- dimezije ulaznih slika npr. (28,28)
-    shape_state -- dimezije za 2D prikaz stanja (npr. za 100 stanja (10,10)
-    N -- broj uzoraka
-    """
-    plt.figure(figsize=(8, int(2 * N)))
-    for i in range(N):
-        plt.subplot(N, 4, 4*i + 1)
-        plt.imshow(ins[i].reshape(shape_in), vmin=0, vmax=1, interpolation="nearest")
-        plt.title("Test input")
+def visualize_RBM_weights(weights, grid_width, grid_height, slice_shape=(28, 28)):
+    for idx in range(0, grid_width * grid_height):
+        plt.subplot(grid_height, grid_width, idx+1)
+        plt.imshow(weights[..., idx].reshape(slice_shape))
         plt.axis('off')
-        plt.subplot(N, 4, 4*i + 2)
-        plt.imshow(outs[i][0:784].reshape(shape_in), vmin=0, vmax=1, interpolation="nearest")
-        plt.title("Reconstruction")
-        plt.axis('off')
-        plt.subplot(N, 4, 4*i + 3)
-        plt.imshow(states[i].reshape(shape_state), vmin=0, vmax=1, interpolation="nearest")
-        plt.title("States")
-        plt.axis('off')
-    plt.tight_layout()
 
-def draw_generated(stin, stout, gen, shape_gen, shape_state, N):
-    """Vizualizacija zadanih skrivenih stanja, konačnih skrivenih stanja i pripadajućih rekonstrukcija
-    stin -- početni skriveni sloj 
-    stout -- rekonstruirani vektori
-    gen -- vektori stanja skrivenog sloja
-    shape_gen -- dimezije ulaznih slika npr. (28,28)
-    shape_state -- dimezije za 2D prikaz stanja (npr. za 100 stanja (10,10)
-    N -- broj uzoraka
-    """
-    plt.figure(figsize=(8, int(2 * N)))
-    for i in range(N):
-
-        plt.subplot(N, 4, 4*i + 1)
-        plt.imshow(stin[i].reshape(shape_state), vmin=0, vmax=1, interpolation="nearest")
-        plt.title("set state")
-        plt.axis('off')
-        plt.subplot(N, 4, 4*i + 2)
-        plt.imshow(stout[i][0:784].reshape(shape_state), vmin=0, vmax=1, interpolation="nearest")
-        plt.title("final state")
-        plt.axis('off')
-        plt.subplot(N, 4, 4*i + 3)
-        plt.imshow(gen[i].reshape(shape_gen), vmin=0, vmax=1, interpolation="nearest")
-        plt.title("generated visible")
-        plt.axis('off')
-    plt.tight_layout()
-    
-Nh = 100 # Broj elemenata prvog skrivenog sloja
-h1_shape = (10,10)
-Nv = 784 # Broj elemenata vidljivog sloja
-v_shape = (28,28)
-Nu = 5000 # Broj uzoraka za vizualizaciju rekonstrukcije
-
-gibbs_sampling_steps = 1
-alpha = 0.1
-
-g1 = tf.Graph()
-with g1.as_default():
-        
-    X1 = tf.placeholder("float", [None, 784])
-    w1 = weights([Nv, Nh])
-    vb1 = bias([Nv])
-    hb1 = bias([Nh])
-    
-    h0_prob = 
-    h0 = sample_prob(h0_prob)
-    h1 = h0
-
-    for step in range(gibbs_sampling_steps):
-        v1_prob = 
-        v1 = 
-        h1_prob = 
-        h1 = 
-        
-    
-    w1_positive_grad = 
-    w1_negative_grad = 
-
-    dw1 = (w1_positive_grad - w1_negative_grad) / tf.to_float(tf.shape(X1)[0])
-
-    update_w1 = tf.assign_add(w1, alpha * dw1)
-    update_vb1 = tf.assign_add(vb1, alpha * tf.reduce_mean(X1 - v1, 0))
-    update_hb1 = tf.assign_add(hb1, alpha * tf.reduce_mean(h0 - h1, 0)) 
-
-    out1 = (update_w1, update_vb1, update_hb1)
-    
-    v1_prob = 
-    v1 = 
-    
-    err1 = X1 - v1_prob
-    err_sum1 = tf.reduce_mean(err1 * err1)
-    
-    initialize1 = tf.global_variables_initializer()
-
-batch_size = 100
-epochs = 100
-n_samples = mnist.train.num_examples
-total_batch = int(n_samples / batch_size) * epochs
-
-sess1 = tf.Session(graph=g1)
-sess1.run(initialize1)
-
-for i in range(total_batch):
-    batch, label = mnist.train.next_batch(batch_size)
-    err, _ = sess1.run([err_sum1, out1], feed_dict={X1: batch})
-        
-    if i%(int(total_batch/10)) == 0:
-        print(i, err)
-
-w1s = w1.eval(session=sess1)
-vb1s = vb1.eval(session=sess1)
-hb1s = hb1.eval(session=sess1)
-vr, h1s = sess1.run([v1_prob, h1], feed_dict={X1: teX[0:Nu,:]})
-
-# vizualizacija težina
-draw_weights(w1s, v_shape, Nh, h1_shape)
-
-# vizualizacija rekonstrukcije i stanja
-draw_reconstructions(teX, vr, h1s, v_shape, h1_shape, 200)
-
-# vizualizacija jedne rekonstrukcije s postepenim dodavanjem doprinosa aktivnih skrivenih elemenata
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 
 def draw_rec(inp, title, size, Nrows, in_a_row, j):
-    """ Iscrtavanje jedne iteracije u kreiranju vidljivog sloja
-    inp - vidljivi sloj
-    title - naslov sličice
-    size - 2D dimenzije vidljiovg sloja
-    Nrows - maks. broj redaka sličica
-    in-a-row . broj sličica u jednom redu
-    j - pozicija sličice u gridu
-    """
     plt.subplot(Nrows, in_a_row, j)
     plt.imshow(inp.reshape(size), vmin=0, vmax=1, interpolation="nearest")
     plt.title(title)
     plt.axis('off')
     
     
-def reconstruct(ind, states, orig, weights, biases):
-    """ Slijedno iscrtavanje rekonstrukcije vidljivog sloja
-    ind - indeks znamenke u orig (matrici sa znamenkama kao recima)
-    states - vektori stanja ulaznih vektora
-    orig - originalnalni ulazni vektori
-    weights - matrica težina
-    biases - vektori pomaka vidljivog sloja
-    """
+def reconstruct(ind, states, orig, weights, biases, h1_shape=(10, 10), v_shape=(28,28)):
     j = 1
     in_a_row = 6
     Nimg = states.shape[1] + 3
@@ -408,31 +253,160 @@ def reconstruct(ind, states, orig, weights, biases):
     j += 1
     draw_rec(sigmoid(reconstr), 'biases', v_shape, Nrows, in_a_row, j)
     
-    for i in range(Nh):
+    for i in range(h1_shape[0] * h1_shape[1]):
         if states[ind,i] > 0:
             j += 1
             reconstr = reconstr + weights[:,i]
             titl = '+= s' + str(i+1)
             draw_rec(sigmoid(reconstr), titl, v_shape, Nrows, in_a_row, j)
     plt.tight_layout()
+
+train_loader = torch.utils.data.DataLoader(
+    torchvision.datasets.MNIST('./files', train=True, download=True,
+                               transform=torchvision.transforms.Compose([
+                                   torchvision.transforms.ToTensor()
+                               ])), batch_size=BATCH_SIZE, shuffle=True)
+
+test_loader = torch.utils.data.DataLoader(
+    torchvision.datasets.MNIST('./files', train=False, download=True,
+                               transform=torchvision.transforms.Compose([
+                                   torchvision.transforms.ToTensor()
+                               ])), batch_size=BATCH_SIZE)
+
+class RBM():
     
-reconstruct(0, h1s, teX, w1s, vb1s) # prvi argument je indeks znamenke u matrici znamenki
+    def __init__(self, visible_size, hidden_size, cd_k=1):
+        self.v_size = visible_size
+        self.h_size = hidden_size
+        self.cd_k = cd_k
+        
+        normal_dist = tdist.Normal(0, 0.1)
+        
+        self.W = torch.Tensor(normal_dist.sample(sample_shape=(self.v_size, self.h_size)))
+        self.v_bias = torch.Tensor(torch.zeros(self.v_size))
+        self.h_bias = torch.Tensor(torch.zeros(self.h_size))
+
+    
+    def forward(self, batch):
+        return self._cd_pass(batch)
+    
+    
+    def __call__(self, batch):
+        return self.forward(batch)
+    
+    
+    def _cd_pass(self, batch):
+        batch = batch.view(-1, 784)
+        h0_prob = 
+        h0 = 
+
+        h1 = h0
+
+        for step in range(0, self.cd_k):
+            v1_prob = 
+            v1 = 
+            h1_prob = 
+            h1 = 
+            
+        return h0_prob, h0, h1_prob, h1, v1_prob, v1
+    
+    def reconstruct(self, h, gibbs_steps=None):
+        h1 = h
+        
+        steps_to_do = self.cd_k
+        if gibbs_steps is not None:
+            steps_to_do = gibbs_steps
+
+        for step in range(0, steps_to_do):
+            v1_prob = 
+            v1 = 
+            h1_prob = 
+            h1 = 
+
+        return h1_prob, h1, v1_prob, v1
+
+    
+    def update_weights_for_batch(self, batch, learning_rate=0.01):
+        h0_prob, h0, h1_prob, h1, v1_prob, v1 = self._cd_pass(batch)
+
+        w_positive_grad = 
+        w_negative_grad = 
+
+        dw = (w_positive_grad - w_negative_grad) / batch.shape[0]
+
+        self.W = self.W + 
+        self.v_bias = self.v_bias + 
+        self.h_bias = self.h_bias + 
+
+
+model = RBM(visible_size=VISIBLE_SIZE, hidden_size=HIDDEN_SIZE, cd_k=1)
+for curr_epoch in tqdm.tqdm(range(0, EPOCHS)):
+    for sample, label in train_loader:
+        sample = sample.view(-1, 784)
+        model.update_weights_for_batch(sample, 0.1)
+
+
+plt.figure(figsize=(12, 12), facecolor='w')
+visualize_RBM_weights(model.W.data, 10, 10)
+
+
+sample, _ = next(iter(test_loader))
+sample = sample.view(-1, 784)
+
+for idx in range(0, 20): 
+    h0_prob, h0, h1_prob, h1, v1_prob, v1 = model(sample)
+
+
+    plt.figure(figsize=(8, 4), facecolor='w')
+    plt.subplot(1, 3, 1)
+    plt.imshow(sample[idx, ...].view(28, 28).cpu())
+    if idx == 0:
+        plt.title("Original image")
+
+    plt.subplot(1, 3, 2)
+    recon_image = v1_prob[idx, ...].view(28, 28)
+    plt.imshow(recon_image.cpu().data)
+    if idx == 0:
+        plt.title("Reconstruction")
+    
+    plt.subplot(1, 3, 3)
+    state_image = h1[idx, ...].view(10, 10)
+    plt.imshow(state_image.cpu().data)
+    if idx == 0:
+        plt.title("Hidden state")
+
+sample, _ = next(iter(test_loader))
+sample = sample[0, ...].view(-1, 784)
+
+h0_prob, h0, h1_prob, h1, v1_prob, v1 = model(sample)
+
+reconstruct(0, h1.numpy(), sample.numpy(), model.W.numpy(), model.v_bias.numpy())
+
+
+sample, _ = next(iter(test_loader))
+sample = sample.view(-1, 784)
+
+h0_prob, h0, h1_prob, h1, v1_prob, v1 = model(sample)
+
+h0_prob, h0, h1_prob, h1, v1_prob, v1, model_weights, model_v_biases = list(map(lambda x: x.numpy(), [h0_prob, h0, h1_prob, h1, v1_prob, v1, model.W, model.v_bias]))
+
 
 # Vjerojatnost da je skriveno stanje uključeno kroz Nu ulaznih uzoraka
-plt.figure()
-tmp = (h1s.sum(0)/h1s.shape[0]).reshape(h1_shape)
+plt.figure(figsize=(9, 4))
+tmp = (h1.sum(0)/h1.shape[0]).reshape((10, 10))
 plt.imshow(tmp, vmin=0, vmax=1, interpolation="nearest")
 plt.axis('off')
 plt.colorbar()
 plt.title('vjerojatnosti (ucestalosti) aktivacije pojedinih neurona skrivenog sloja')
 
 # Vizualizacija težina sortitranih prema učestalosti
+plt.figure(figsize=(16, 16))
 tmp_ind = (-tmp).argsort(None)
-draw_weights(w1s[:, tmp_ind], v_shape, Nh, h1_shape)
-plt.title('Sortirane matrice tezina - od najucestalijih do najmanje koristenih')
+visualize_RBM_weights(model_weights[:, tmp_ind], 10, 10)
+plt.suptitle('Sortirane matrice tezina - od najucestalijih do najmanje koristenih')
 
-# Generiranje uzoraka iz slučajnih vektora
-r_input = np.random.rand(100, Nh)
+
+r_input = np.random.rand(100, HIDDEN_SIZE)
 r_input[r_input > 0.9] = 1 # postotak aktivnih - slobodno varirajte
 r_input[r_input < 1] = 0
 r_input = r_input * 20 # pojačanje za slučaj ako je mali postotak aktivnih
@@ -460,24 +434,40 @@ i += 1
 r_input[i,:] = 0
 r_input[i,i]= s
 
-out_1 = sess1.run((v1), feed_dict={h0: r_input})
+h1_prob, h1, v1_prob, v1 = model.reconstruct(torch.from_numpy(r_input).float(), 19)
 
-# Emulacija dodatnih Gibbsovih uzorkovanja pomoću feed_dict
-for i in range(1000):
-    out_1_prob, out_1, hout1 = sess1.run((v1_prob, v1, h1), feed_dict={X1: out_1})
-
-draw_generated(r_input, hout1, out_1_prob, v_shape, h1_shape, 50)
+plt.figure(figsize=(16, 16))
+for idx in range(0, 19):
+    plt.figure(figsize=(14, 4))
+    
+    plt.subplot(1, 3, 1)
+    plt.imshow(r_input[idx, ...].reshape(10, 10))
+    if idx == 0:
+        plt.title("Set state")
+    plt.axis('off')
+    
+    plt.subplot(1, 3, 2)
+    plt.imshow(h1[idx, ...].view(10, 10))
+    if idx == 0:
+        plt.title("Final state")
+    plt.axis('off')
+    
+    plt.subplot(1, 3, 3)
+    plt.imshow(v1_prob[idx, ...].view(28, 28))
+    if idx == 0:
+        plt.title("Reconstruction")
+    plt.axis('off')
 ```
 
 <a name='2zad'></a>
 
 ### 2. zadatak
 
-Deep beleif Network (DBN) je duboka mreža koja se dobije slaganjem više RBM-ova jednog na drugi, pri čemu se svaki sljedeći RBM pohlepno trenira pomoću skrivenog ("izlaznog") sloja prethodnog RBM-a (osim prvog RBM-a koji se trenira direktno s ulaznim uzorcima). Teoretski, tako izgrađen DBN trebao bi povećati $$p(\mathbf v)$$ što nam je i cilj. Korištenje DBN, odnosno rekonstrukcija ulaznog uzorka provodi se prema donjoj shemi. U prolazu prema gore određuju se skriveni slojevi iz vidljivog sloja dok se ne dođe do najgornjeg RBM-a, zatim se na njemu provede CD-k algoritam, nakon čega se, u prolasku prema dolje, određuju niži skriveni slojevi dok se ne dođe do rekonstruiranog vidljivog sloja. Težine između pojedinih slojeva su iste u prolazu gore kao i u prolazu prema dolje. Implementirajte troslojni DBN koji se sastoji od dva pohlepno pretrenirana RBM-a. Prvi RBM neka je isit kao i u 1. zadatku, a drugi RBM neka ima skriveni sloj od 100 elemenata.
+Deep belief Network (DBN) je duboka mreža koja se dobije slaganjem više RBM-ova jednog na drugi, pri čemu se svaki sljedeći RBM pohlepno trenira pomoću skrivenog ("izlaznog") sloja prethodnog RBM-a (osim prvog RBM-a koji se trenira direktno s ulaznim uzorcima). Teoretski, tako izgrađen DBN trebao bi povećati $$p(\mathbf v)$$ što nam je i cilj. Korištenje DBN, odnosno rekonstrukcija ulaznog uzorka provodi se prema donjoj shemi. U prolazu prema gore određuju se skriveni slojevi iz vidljivog sloja dok se ne dođe do najgornjeg RBM-a, zatim se na njemu provede CD-k algoritam, nakon čega se, u prolasku prema dolje, određuju niži skriveni slojevi dok se ne dođe do rekonstruiranog vidljivog sloja. Težine između pojedinih slojeva su iste u prolazu gore kao i u prolazu prema dolje. Implementirajte troslojni DBN koji se sastoji od dva pohlepno pretrenirana RBM-a. Prvi RBM neka je isit kao i u 1. zadatku, a drugi RBM neka ima skriveni sloj od 100 elemenata.
 
 **Podzadaci:**
 
-1. Vizualizirajte težine $$\mathbf W_1$$ i $$\mathbf W_2$$ ostvarene treniranjem.
+1. Vizualizirajte težine $$\mathbf W_2$$ ostvarene treniranjem.
 2. Vizualizirajte rezultate rekonstrukcije prvih 20 testnih uzoraka MNIST baze. 
 3. Slučajno inicijalizirjte krovni skriveni sloj, provedite nekoliko Gibbsovih uzorkovanje te vizualizirajte generirane uzorke vidljivog sloja - usporedite s prethodnim zadatkom.
 4. Postavite broj skrivenih varijabli gornjeg RBM-a jednak broju elemenata vidljivog sloja donjeg RBM-a, a inicijalne težine $$\mathbf W_2$$ postavite na $$\mathbf W_1^T$$. Koji su efekti promjene? Vizualizirajte uzorke krovnog skrivenog sloja kao matrice 28x28.
@@ -486,91 +476,173 @@ Deep beleif Network (DBN) je duboka mreža koja se dobije slaganjem više RBM-ov
   <img src="/assets/lab4/DBN1.svg" width="100%">
 </div>
 
-Koristite sljedeći predložak uz prtedložak 1. zadatka:
+Koristite sljedeći predložak uz predložak 1. zadatka:
 
 **NAPOMENA**: Osim nadopunjavanja koda koji nedostaje, predložak se treba prilagođavati prema potrebi, a može i prema vlastitim preferencijama. Stoga **budite oprezni s tvrdnjama da vam neki dio koda ne radi!**
 
 ```python
-Nh2 = Nh # Broj elemenata drugog skrivenog sloja
-h2_shape = h1_shape 
+class DBN():
 
-gibbs_sampling_steps = 2
-alpha = 0.1
+    def __init__(self, first_rbm: RBM, second_hidden_size, cd_k=1):
+        self.v_size = first_rbm.v_size
+        self.h1_size = first_rbm.h_size
+        self.h2_size = second_hidden_size
+        self.cd_k = cd_k
+        
+        normal_dist = tdist.Normal(0, 0.1)
+        
+        self.W1 = first_rbm.W
+        self.v_bias = first_rbm.v_bias.clone()
+        self.h1_bias = first_rbm.h_bias.clone()
+        
+        self.W2 = torch.Tensor(normal_dist.sample(sample_shape=(self.h1_size, self.h2_size)))
+        self.h2_bias = torch.Tensor(torch.zeros(self.h2_size))
+    
+    
+    def forward(self, batch, steps=None):
+        batch = batch.view(-1, 784)
+        
+        h1up_prob = 
+        h1up = 
+        
+        h2up_prob = 
+        h2up = 
+        
+        h1down_prob, h1down, h2down_prob, h2down = self.gibbs_sampling(???, steps)
+        
+        return h1up_prob, h1up, h2up_prob, h2up, h1down_prob, h1down, h2down_prob, h2down
 
-g2 = tf.Graph()
-with g2.as_default():
     
-    X2 = tf.placeholder("float", [None, Nv])
-    w1a = tf.Variable(w1s)
-    vb1a = tf.Variable(vb1s)
-    hb1a = tf.Variable(hb1s)
-    w2 = weights([Nh, Nh2])
-    hb2 = bias([Nh2])
+    def gibbs_sampling(self, h2, steps=None):
+        h2down = h2
+        
+        steps_to_do = self.cd_k
+        
+        if steps is not None:
+            steps_to_do = steps
+
+        for step in range(0, steps_to_do):
+            h1down_prob = 
+            h1down = 
+            
+            h2down_prob = 
+            h2down = 
+            
+        return h1down_prob, h1down, h2down_prob, h2down 
     
-    h1up_prob  = 
-    h1up = 
-    h2up_prob = 
-    h2up = 
-    h2down = h2up
-    
-    for step in range(gibbs_sampling_steps):
+    def reconstruct(self, h2, steps=None):
+        _, _, h2down_prob, h2down = self.gibbs_sampling(???, steps)
+        
         h1down_prob = 
         h1down = 
-        h2down_prob = 
-        h2down = 
-    
-    w2_positive_grad = 
-    w2_negative_grad = 
-
-    dw2 = (w2_positive_grad - w2_negative_grad) / tf.to_float(tf.shape(h1up)[0])
-
-    update_w2 = tf.assign_add(w2, alpha * dw2)
-    update_hb1a = tf.assign_add(hb1a, alpha * tf.reduce_mean(h1up - h1down, 0))
-    update_hb2 = tf.assign_add(hb2, alpha * tf.reduce_mean(h2up - h2down, 0))
-
-    out2 = (update_w2, update_hb1a, update_hb2)
-
-    # rekonsturkcija ulaza na temelju krovnog skrivenog stanja h3
-    # ...
-    # ...
-    v_out_prob = 
-    v_out = 
-    
-    err2 = X2 - v_out_prob
-    err_sum2 = tf.reduce_mean(err2 * err2)
-    
-    initialize2 = tf.global_variables_initializer()
-
-batch_size = 100
-epochs = 100
-n_samples = mnist.train.num_examples
-
-total_batch = int(n_samples / batch_size) * epochs
-
-sess2 = tf.Session(graph=g2)
-sess2.run(initialize2)
-for i in range(total_batch):
-    # iteracije treniranja 
-    #...
-    #...
-    if i%(int(total_batch/10)) == 0:
-        print(i, err)
         
-    w2s, hb1as, hb2s = sess2.run([w2, hb1a, hb2], feed_dict={X2: batch})
-    vr2, h2downs = sess2.run([v_out_prob, h2down], feed_dict={X2: teX[0:Nu,:]})
+        v_prob = 
+        v_out = 
+        
+        return v_prob, v_out, h2down_prob, h2down
+    
+    def update_weights_for_batch(self, batch, learning_rate=0.01):
+        h1up_prob, h1up, h2up_prob, h2up, h1down_prob, h1down, h2down_prob, h2down = self.forward(batch)
 
-# vizualizacija težina
-draw_weights(w2s, h1_shape, Nh2, h2_shape, interpolation="nearest")
+        w2_positive_grad = 
+        w2_negative_grad = 
 
-# vizualizacija rekonstrukcije i stanja
-draw_reconstructions(teX, vr2, h2downs, v_shape, h2_shape, 200)
+        dw2 = (w2_positive_grad - w2_negative_grad) / h1up.shape[0]
 
-# Generiranje uzoraka iz slučajnih vektora krovnog skrivenog sloja
-#...
-#...
-# Emulacija dodatnih Gibbsovih uzorkovanja pomoću feed_dict
-#...
-#...
+        self.W2 = self.W2 + 
+        self.h1_bias = self.h1_bias + 
+        self.h2_bias = self.h2_bias + 
+        
+                
+    
+    def __call__(self, batch):
+        return self.forward(batch)
+
+
+dbnmodel = DBN(model, second_hidden_size=100, cd_k=2)
+for curr_epoch in tqdm.tqdm(range(0, EPOCHS)):
+    for sample, label in train_loader:
+        sample = sample.view(-1, 784)
+        dbnmodel.update_weights_for_batch(sample, learning_rate=0.1)
+
+plt.figure(figsize=(12, 12), facecolor='w')
+visualize_RBM_weights(dbnmodel.W2.data.cpu(), 10, 10, slice_shape=(10, 10))
+
+sample, _ = next(iter(test_loader))
+sample = sample.view(-1, 784)
+
+for idx in range(0, 20):
+    h1up_prob, h1up, h2up_prob, h2up, h1down_prob, h1down, h2down_prob, h2down = dbnmodel(sample[idx, ...])
+    v_prob, v, _, _ = dbnmodel.reconstruct(h2down)
+
+    plt.figure(figsize=(4*3, 4))
+    plt.subplot(1, 3, 1)
+    plt.imshow(sample[idx,...].view(28, 28))
+    if idx == 0:
+        plt.title("Test input")
+    
+    plt.subplot(1, 3, 2)
+    plt.imshow(v_prob[0, ...].view(28, 28))
+    if idx == 0:
+        plt.title("Reconstruction")
+    
+    plt.subplot(1, 3, 3)
+    plt.imshow(h2down.view(10, 10))
+    if idx == 0:
+        plt.title("Hidden state")
+
+
+r_input = np.random.rand(100, HIDDEN_SIZE)
+r_input[r_input > 0.9] = 1 # postotak aktivnih - slobodno varirajte
+r_input[r_input < 1] = 0
+r_input = r_input * 20 # pojačanje za slučaj ako je mali postotak aktivnih
+
+s = 10
+i = 0
+r_input[i,:] = 0
+r_input[i,i]= s
+i += 1
+r_input[i,:] = 0
+r_input[i,i]= s
+i += 1
+r_input[i,:] = 0
+r_input[i,i]= s
+i += 1
+r_input[i,:] = 0
+r_input[i,i]= s
+i += 1
+r_input[i,:] = 0
+r_input[i,i]= s
+i += 1
+r_input[i,:] = 0
+r_input[i,i]= s
+i += 1
+r_input[i,:] = 0
+r_input[i,i]= s
+
+v_out_prob, v_out, h2down_prob, h2down = dbnmodel.reconstruct(torch.from_numpy(r_input).float(), 100)
+
+plt.figure(figsize=(16, 16))
+for idx in range(0, 19):
+    plt.figure(figsize=(14, 4))
+    
+    plt.subplot(1, 3, 1)
+    plt.imshow(r_input[idx, ...].reshape(10, 10))
+    if idx == 0:
+        plt.title("Set state")
+    plt.axis('off')
+    
+    plt.subplot(1, 3, 2)
+    plt.imshow(h2down[idx, ...].view(10, 10))
+    if idx == 0:
+        plt.title("Final state")
+    plt.axis('off')
+    
+    plt.subplot(1, 3, 3)
+    plt.imshow(v_out_prob[idx, ...].view(28, 28))
+    if idx == 0:
+        plt.title("Reconstruction")
+    plt.axis('off')
 ```
 
 Kako bi se dodatno poboljšala generativna svojstva DBN-a, može se provesti generativni fine-tuning parametara mreže. U 2. zadatku, prilikom rekonstruiranja korištene su iste težine i pomaci u prolascima prema dolje i prema gore. Kod fine-tuninga, parametri koji vežu sve slojeve osim dva najgornja, razdvajaju se u dva skupa. Matrice težina između nižih slojeva dijele se na: $$\mathbf R_n$$ za prolaz prema gore i $$\mathbf W'_n$$ za prolaz prema dolje. Inicijalno su obje matrice jednake originalnoj matrici $$\mathbf W_n$$. Kod prolaza prema gore (faza budnosti - wake phase) određuju se nova stanja viših skrivenih slojeva $$\mathbf s^{(n)}$$ iz nižih stanja $$\mathbf s^{(n-1)}$$ pomoću matrica $$\mathbf R$$ postupkom uzorkovanja ($$sample \left(\sigma \left(\mathbf R_n \mathbf s^{(n-1)} + \mathbf b^{up}_n\right)\right) \to \mathbf s^{(n)}$$) . Pri prolasku prema dolje (faza spavanja - sleep phase) određuju se "rekonstrukcije" nižih stanja $$\mathbf s^{(n-1)}$$ iz $$\mathbf s^{(n)}$$ i matrica $$\mathbf W'$$ ($$sample \left( \sigma \left(\mathbf W'_n \mathbf s^{(n)} + \mathbf b^{down}_{n-1} \right) \right) \to \mathbf s^{(n-1)}$$). Najgornja dva sloja su klasični RBM i dijele istu matricu težina za prolaske u oba smjera, a modificiranje tih težina provodi se na isti način kao u 1.zadatku.
@@ -605,9 +677,9 @@ Implementirajte postupak generativnog fine-tuninga na DBN iz 2. zadatka. Za tren
 
 **Podzadaci:**
 
-1. Vizualizirajte konačne varijante matrica $$\mathbf W'$$ i $$\mathbf R$$.
+1. Vizualizirajte konačne varijante matrica $$\mathbf W'$$, $$\mathbf R$$ i njihovu apsolutnu razliku.
 2. Vizualizirajte rezultate rekonstrukcije prvih 20 testnih uzoraka MNIST baze.
-3. Slučajno inicijalizirjte krovnni skriveni sloj, provedite nekoliko Gibbsovih uzorkovanje te vizualizirajte generirane uzorke vidljivog sloja - usporedite s prethodnim zadacima
+3. Slučajno inicijalizirajte krovni skriveni sloj, provedite nekoliko Gibbsovih uzorkovanje te vizualizirajte generirane uzorke vidljivog sloja - usporedite s prethodnim zadacima
 
 <div class="fig figcenter fighighlight">
   <img src="/assets/lab4/DBN2.svg" width="40%">
@@ -618,121 +690,214 @@ Koristite sljedeći predložak, kao i predloške 1. i 2. zadatka.
 **NAPOMENA**: Osim nadopunjavanja koda koji nedostaje, predložak se treba prilagođavati prema potrebi, a može i prema vlastitim preferencijama. Stoga **budite oprezni s tvrdnjama da vam neki dio koda ne radi!**
 
 ```python
-#
-beta = 0.01
+class DBNWithFineTuning():
 
-g3 = tf.Graph()
-with g3.as_default():
-
-    X3 = tf.placeholder("float", [None, Nv])
-    r1_up = tf.Variable(w1s)
-    w1_down = tf.Variable(tf.transpose(w1s))
-    w2a = tf.Variable(w2s)
-    hb1_up = tf.Variable(hb1s)
-    hb1_down = tf.Variable(hb1as)
-    vb1_down = tf.Variable(vb1s)
-    hb2a = tf.Variable(hb2s)
-    
-    # wake pass
-    h1_up_prob = 
-    h1_up = # s^{(n)} u pripremi
-    v1_up_down_prob = 
-    v1_up_down = # s^{(n-1)\mathit{novo}} u tekstu pripreme
-    
-    
-    # top RBM Gibs passes
-    h2_up_prob = 
-    h2_up = 
-    h2_down = h2_up
-    for step in range(gibbs_sampling_steps):
-        h1_down_prob = 
-        h1_down = 
-        h2_down_prob = 
-        h2_down = 
-       
-    # sleep pass
-    v1_down_prob = 
-    v1_down = # s^{(n-1)} u pripremi
-    h1_down_up_prob = 
-    h1_down_up = # s^{(n)\mathit{novo}} u pripremi
-    
-    
-    # generative weights update during wake pass
-    update_w1_down = tf.assign_add(w1_down, beta * tf.matmul(tf.transpose(h1_up), X3 - v1_up_down_prob) / tf.to_float(tf.shape(X3)[0]))
-    update_vb1_down = tf.assign_add(vb1_down, beta * tf.reduce_mean(X3 - v1_up_down_prob, 0))
-    
-    # top RBM update
-    w2_positive_grad = 
-    w2_negative_grad = 
-    dw3 = 
-    update_w2 = tf.assign_add(w2a, beta * dw3)
-    update_hb1_down = tf.assign_add(hb1_down, beta * tf.reduce_mean(h1_up - h1_down, 0))
-    update_hb2 = tf.assign_add(hb2a, beta * tf.reduce_mean(h2_up - h2_down, 0))
-    
-    # recognition weights update during sleep pass
-    update_r1_up = tf.assign_add(r1_up, beta * tf.matmul(tf.transpose(v1_down_prob), h1_down - h1_down_up) / tf.to_float(tf.shape(X3)[0]))
-    update_hb1_up = tf.assign_add(hb1_up, beta * tf.reduce_mean(h1_down - h1_down_up, 0))
-    
-    out3 = (update_w1_down, update_vb1_down, update_w2, update_hb1_down, update_hb2, update_r1_up, update_hb1_up)
-    
-    err3 = X3 - v1_down_prob
-    err_sum3 = tf.reduce_mean(err3 * err3)
-    
-    initialize3 = tf.global_variables_initializer()
-
-batch_size = 100
-epochs = 100
-n_samples = mnist.train.num_examples
-
-total_batch = int(n_samples / batch_size) * epochs
-
-sess3 = tf.Session(graph=g3)
-sess3.run(initialize3)
-for i in range(total_batch):
-    #...
-    err, _ = sess3.run([err_sum3, out3], feed_dict={X3: batch})
+    def __init__(self, base_dbn: DBN, cd_k=1):
+        self.v_size = base_dbn.v_size
+        self.h1_size = base_dbn.h1_size
+        self.h2_size = base_dbn.h2_size
+        self.cd_k = cd_k
         
-    if i%(int(total_batch/10)) == 0:
-        print(i, err)
+        normal_dist = tdist.Normal(0, 0.1)
+        
+        self.R1 = base_dbn.W1.clone()
+        self.W1_down = base_dbn.W1.T.clone()
+        self.v1_bias = base_dbn.v_bias.clone()
+        self.h1_up_bias = base_dbn.h1_bias.clone()
+        self.h1_down_bias = base_dbn.h1_bias.clone()
+        
+        self.W2 = base_dbn.W2.clone()
+        self.h2_bias = base_dbn.h2_bias.clone()
     
-    w2ss, r1_ups, w1_downs, hb2ss, hb1_ups, hb1_downs, vb1_downs = sess3.run(
-        [w2a, r1_up, w1_down, hb2a, hb1_up, hb1_down, vb1_down], feed_dict={X3: batch})
-    vr3, h2_downs, h2_down_probs = sess3.run([v1_down_prob, h2_down, h2_down_prob], feed_dict={X3: teX[0:Nu,:]})
+    
+    def forward(self, batch, steps=None):
+        batch = batch.view(-1, 784)
+        
+        h1_up_prob = 
+        h1_up = 
+        
+        v1_up_down_prob = 
+        v1_up_down = 
+        
+        h2_up_prob = 
+        h2_up = 
+        
+        h1_down_prob, h1_down, h2_down_prob, h2_down = self.gibbs_sampling(???, steps=steps)
+        
+        v1_down_prob = 
+        v1_down = 
+        
+        h1_down_up_prob = 
+        h1_down_up = 
+        
+        return h1_up_prob, h1_up, v1_up_down_prob, v1_up_down, h2_up_prob, h2_up, h1_down_prob, h1_down, h2_down_prob, h2_down, v1_down_prob, v1_down, h1_down_up_prob, h1_down_up
+    
+    def gibbs_sampling(self, h2, steps=None):
+        h2_down = h2
+        
+        steps_to_do = self.cd_k
+        
+        if steps is not None:
+            steps_to_do = steps
+        
+        
+        for step in range(0, self.cd_k):
+            h1_down_prob =
+            h1_down = 
+
+            h2_down_prob = 
+            h2_down = 
+            
+        return h1_down_prob, h1_down, h2_down_prob, h2_down
 
 
-# vizualizacija težina
-draw_weights(r1_ups, v_shape, Nh, h1_shape)
-draw_weights(w1_downs.T, v_shape, Nh, h1_shape)
-draw_weights(w2ss, h1_shape, Nh2, h2_shape, interpolation="nearest")
+    
+    def reconstruct(self, h2, steps=None):
+        h1_down_prob, h1_down, h2_down_prob, h2down = self.gibbs_sampling(???, steps)
+        
+        v_out_tmp_prob = 
+        v_out_tmp =
+        v_out_prob = 
+        v_out = 
+        
+        return v_out_prob, v_out, h2_down_prob, h2down
+    
+    def update_weights_for_batch(self, batch, learning_rate=0.01):
+        h1_up_prob, h1_up, v1_up_down_prob, v1_up_down, h2_up_prob, h2_up, h1_down_prob, h1_down, h2_down_prob, h2_down, v1_down_prob, v1_down, h1_down_up_prob, h1_down_up = self.forward(batch)
+        
+        self.W1_down = self.W1_down + 
+        self.R1 = self.R1 + 
+        
+        self.v1_bias = self.v1_bias +
+        
+        self.h1_down_bias = self.h1_down_bias + 
+        self.h1_up_bias = self.h1_up_bias + 
+        
+        
+        w2_positive_grad = 
+        w2_negative_grad = 
+        dw2 = (w2_positive_grad - w2_negative_grad) / h1_up.shape[0]
+        
+        self.W2 = self.W2 + 
+        self.h2_bias = self.h2_bias + 
+        
+    
+    def __call__(self, batch):
+        return self.forward(batch)
 
-# vizualizacija rekonstrukcije i stanja
-Npics = 5
-plt.figure(figsize=(8, 12*4))
-for i in range(20):
 
-    plt.subplot(20, Npics, Npics*i + 1)
-    plt.imshow(teX[i].reshape(v_shape), vmin=0, vmax=1)
-    plt.title("Test input")
-    plt.subplot(20, Npics, Npics*i + 2)
-    plt.imshow(vr[i][0:784].reshape(v_shape), vmin=0, vmax=1)
-    plt.title("Reconstruction 1")
-    plt.subplot(20, Npics, Npics*i + 3)
-    plt.imshow(vr2[i][0:784].reshape(v_shape), vmin=0, vmax=1)
-    plt.title("Reconstruction 2")
-    plt.subplot(20, Npics, Npics*i + 4)
-    plt.imshow(vr3[i][0:784].reshape(v_shape), vmin=0, vmax=1)
-    plt.title("Reconstruction 3")
-    plt.subplot(20, Npics, Npics*i + 5)
-    plt.imshow(h2_downs[i][0:Nh2].reshape(h2_shape), vmin=0, vmax=1, interpolation="nearest")
-    plt.title("Top states 3")
+dbnmodel_ft = DBNWithFineTuning(dbnmodel, cd_k=2)
+for curr_epoch in tqdm.tqdm(range(0, EPOCHS)):
+    for sample, label in train_loader:
+        sample = sample.view(-1, 784)
+        dbnmodel_ft.update_weights_for_batch(sample, 0.01)
+
+plt.figure(figsize=(12, 12), facecolor='w')
+visualize_RBM_weights(dbnmodel_ft.R1.data, 10, 10)
 plt.tight_layout()
 
-# Generiranje uzoraka iz slučajnih vektora krovnog skrivenog sloja
-#...
-#...
-# Emulacija dodatnih Gibbsovih uzorkovanja pomoću feed_dict
-#...
-#...
+
+plt.figure(figsize=(12, 12), facecolor='w')
+visualize_RBM_weights(dbnmodel_ft.W1_down.T.data, 10, 10)
+plt.tight_layout()
+
+difference = torch.abs(dbnmodel_ft.R1.data - dbnmodel_ft.W1_down.T.data)
+plt.figure(figsize=(12, 12), facecolor='w')
+visualize_RBM_weights(difference, 10, 10)
+plt.tight_layout()
+
+sample, _ = next(iter(test_loader))
+sample = sample.view(-1, 784)
+
+for idx in range(0, 20): 
+    # rbn reconstruct
+    _, _, _, _, recon1, _ = model(sample[idx, ...])
+    
+    # dbn reconstruct
+    _, _, _, _, _, _, _, h2down = dbnmodel.forward(sample[idx, ...])
+    recon2, _, _, _ = dbnmodel.reconstruct(h2down)
+    
+    # dbn fine tune reconstruct
+    _, _, _, _, _, _, _, _, _, h2_down, _, _, _, _ = dbnmodel_ft(sample[idx, ...])
+    recon3, _, _, _ = dbnmodel_ft.reconstruct(h2_down, 2)
+    
+    plt.figure(figsize=(5*3, 3))
+    plt.subplot(1, 5, 1)
+    plt.imshow(sample[idx, ...].view(28, 28))
+    if idx == 0:
+        plt.title("Original image")
+    
+    plt.subplot(1, 5, 2)
+    plt.imshow(recon1.view(28, 28))
+    if idx == 0:
+        plt.title("Reconstruction 1")
+    
+    plt.subplot(1, 5, 3)
+    plt.imshow(recon2.view(28, 28))
+    if idx == 0:
+        plt.title("Reconstruction 2")
+    
+    plt.subplot(1, 5, 4)
+    plt.imshow(recon3.view(28, 28))
+    if idx == 0:
+        plt.title("Reconstruction 3")
+    
+    plt.subplot(1, 5, 5)
+    plt.imshow(h2_down.view(10, 10))
+    if idx == 0:
+        plt.title("Top state 3")
+
+r_input = np.random.rand(100, 100)
+r_input[r_input > 0.9] = 1
+r_input[r_input < 1] = 0
+
+s = 10
+i = 0
+r_input[i,:] = 0
+r_input[i,i]= s
+i += 1
+r_input[i,:] = 0
+r_input[i,i]= s
+i += 1
+r_input[i,:] = 0
+r_input[i,i]= s
+i += 1
+r_input[i,:] = 0
+r_input[i,i]= s
+i += 1
+r_input[i,:] = 0
+r_input[i,i]= s
+i += 1
+r_input[i,:] = 0
+r_input[i,i]= s
+i += 1
+r_input[i,:] = 0
+r_input[i,i]= s
+
+    
+v_out_prob, v_out, h2_down_prob, h2down = dbnmodel_ft.reconstruct(torch.from_numpy(r_input).float(), 100)
+
+plt.figure(figsize=(16, 16))
+for idx in range(0, 19):
+    plt.figure(figsize=(14, 4))
+    
+    plt.subplot(1, 3, 1)
+    plt.imshow(r_input[idx, ...].reshape(10, 10))
+    if idx == 0:
+        plt.title("Set state")
+    plt.axis('off')
+    
+    plt.subplot(1, 3, 2)
+    plt.imshow(h2down[idx, ...].view(10, 10))
+    if idx == 0:
+        plt.title("Final state")
+    plt.axis('off')
+    
+    plt.subplot(1, 3, 3)
+    plt.imshow(v_out_prob[idx, ...].view(28, 28))
+    if idx == 0:
+        plt.title("Reconstruction")
+    plt.axis('off')
 ```
 
 
@@ -924,7 +1089,6 @@ p(x_{j}^{\mathit{out}}=1)+(1-x_{j}^{\text{in}})\log
 _{j}H\left(p(x_{j}=1),p(x_{j}^{\mathit{out}}=1)\right)
 $$
 
-$$H$$ je unakrsna entropija. Srećom, Tensorflow nudi gotovu funkciju za $$H(\mathbf x,\sigma(\mathbf y))$$: [`tf.nn.sigmoid_cross_entropy_with_logits(y,x)`](https://www.tensorflow.org/api_docs/python/tf/nn/sigmoid_cross_entropy_with_logits). Obratite pažnju da prvi argument funkcije nije $$p(x_j = 1)$$!
 
 <a name='4zad'></a>
 
@@ -944,324 +1108,224 @@ Koristite sljedeći predložak:
 **NAPOMENA**: Osim nadopunjavanja koda koji nedostaje, predložak se treba prilagođavati prema potrebi, a može i prema vlastitim preferencijama. Stoga **budite oprezni s tvrdnjama da vam neki dio koda ne radi!**
 
 ```python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import torchvision
+import torch.optim as optim
+
+from torchvision import datasets, transforms
+import tqdm
+from torchvision.utils import make_grid
+
+import torch.distributions as tdist
+
 import numpy as np
-import tensorflow as tf
-from tensorflow.examples.tutorials.mnist import input_data
-import os
+import tqdm
+
+import seaborn as sns
+import pandas as pd
+
 import matplotlib.pyplot as plt
-%matplotlib inline
-plt.rcParams['image.cmap'] = 'jet'
 
-mnist = input_data.read_data_sets('../MNIST_data/', one_hot=True)
-n_samples = mnist.train.num_examples
-
-learning_rate = 0.001
-batch_size = 100
-
-n_hidden_recog_1=200 # 1 sloj enkodera
-n_hidden_recog_2=200 # 2 sloj enkodera
-n_hidden_gener_1=200 # 1 sloj dekodera
-n_hidden_gener_2=200 # 2 sloj dekodera
-n_z=2 # broj skrivenih varijabli
-n_input=784 # MNIST data input (img shape: 28*28)
-in_shape = (28,28)
-
-def get_canvas(Z, ind, nx, ny, in_shape, batch_size, sess):
-    """Crtanje rekonstrukcija na odgovarajućim pozicijama u 2D prostoru skrivenih varijabli
-    Z -- skriveni vektori raspoređeni u gridu oko ishodišta
-    ind -- indeksi za rezanje Z-a na batch_size blokove za slanje u graf -zbog problema sa random generatorom
-    nx -- raspon grida po x osi - skrivena varijabla z0
-    ny -- raspon grida po y osi - skrivena varijabla z1
-    in_shape -- dimenzije jedne rekonstrukcije i.e. ulazne sličice
-    batch_size -- veličina minibatcha na koji je graf naviknut
-    sess -- session grafa mreže
-    """
-    # get reconstructions for visualiations
-    X = np.empty((0,in_shape[0]*in_shape[1])) # empty array for concatenation 
-    # split hidden vectors into minibatches of batch_size due to TF random generator limitation
-    for batch in np.array_split(Z,ind):
-        # fill up last batch to full batch_size if neccessary
-        # this addition will not be visualized, but is here to avoid TF error
-        if batch.shape[0] < batch_size:
-            batch = np.concatenate((batch, np.zeros((batch_size-batch.shape[0], batch.shape[1]))), 0)
-        # get batch_size reconstructions and add them to array of previous reconstructions
-        X = np.vstack((X, sess.run(x_reconstr_mean_out, feed_dict={z: batch})))
-    # make canvas with reconstruction tiles arranged by the hidden state coordinates of each reconstruction
-    # this is achieved for all reconstructions by clever use of reshape, swapaxes and axis inversion
-    return (X[0:nx*ny,:].reshape((nx*ny,in_shape[0],in_shape[1])).swapaxes(0,1)
-            .reshape((in_shape[0],ny,nx*in_shape[1])).swapaxes(0,1)[::-1,:,:]
-            .reshape((ny*in_shape[0],nx*in_shape[1])))
-
-def draw_reconstructions(ins, outs, states, shape_in, shape_state):
-    """Vizualizacija ulaza i pripadajućih rekonstrkcija i stanja skrivenog sloja
-    ins -- ualzni vektori
-    outs -- rekonstruirani vektori
-    states -- vektori stanja skrivenog sloja
-    shape_in -- dimezije ulaznih slika npr. (28,28)
-    shape_state -- dimezije za 2D prikaz stanja (npr. za 100 stanja (10,10)
-    """
-    plt.figure(figsize=(8, 12*4))
-    for i in range(20):
-
-        plt.subplot(20, 4, 4*i + 1)
-        plt.imshow(ins[i].reshape(shape_in), vmin=0, vmax=1, interpolation="nearest")
-        plt.title("Test input")
-        plt.subplot(20, 4, 4*i + 2)
-        plt.imshow(outs[i][0:784].reshape(shape_in), vmin=0, vmax=1, interpolation="nearest")
-        plt.title("Reconstruction")
-        plt.subplot(20, 4, 4*i + 3)
-        plt.imshow(states[i][0:(shape_state[0] * shape_state[1])].reshape(shape_state),
-                   vmin=-4, vmax=4, interpolation="nearest")
-        plt.colorbar()
-        plt.title("States")
-    plt.tight_layout()
+class VAE(nn.Module):
     
-def plot_latent(inmat, labels):
-    """Crtanje pozicija uzoraka u 2D latentnom prostoru
-    inmat -- matrica latentnih stanja
-    labels -- labela klas
-    """
-    plt.figure(figsize=(8, 6)) 
-    plt.axis([-4, 4, -4, 4])
-    plt.gca().set_autoscale_on(False)
-
-    plt.scatter(inmat[:, 0], inmat[:, 1], c=np.argmax(labels, 1))
-    plt.colorbar()
-    plt.xlabel('z0')
-    plt.ylabel('z1')
-
-def save_latent_plot(name):
-    """Spremanje trenutnog figure-a
-    name -- ime datoteke
-    """
-    plt.savefig(name)
-    
-def weight_variable(shape, name):
-    """Kreiranje težina"""
-    # http://andyljones.tumblr.com/post/110998971763/an-explanation-of-xavier-initialization
-    return tf.get_variable(name, shape=shape,
-            initializer=tf.contrib.layers.xavier_initializer())
-
-def bias_variable(shape):
-    """Kreiranje pomaka"""
-    initial = tf.zeros(shape, dtype=tf.float32)
-    return tf.Variable(initial)
-
-def variable_summaries(var, name):
-    """Prikupljanje podataka za Tensorboard"""
-    with tf.name_scope(name):
-        mean = tf.reduce_mean(var)
-        tf.summary.scalar('mean', mean)
-        stddev = tf.sqrt(tf.reduce_mean(tf.square(var - mean)))
-        tf.summary.scalar('stddev', stddev)
-        tf.summary.scalar('max', tf.reduce_max(var))
-        tf.summary.scalar('min', tf.reduce_min(var))
-        tf.summary.histogram(name, var)
-
-def vae_layer(input_tensor, input_dim, output_dim, layer_name, act=tf.nn.softplus):
-    """Kreiranje jednog skrivenog sloja"""
-    # Adding a name scope ensures logical grouping of the layers in the graph.
-    with tf.name_scope(layer_name):
-        # This Variable will hold the state of the weights for the layer
-        weights = weight_variable([input_dim, output_dim], layer_name + '/weights')
-        variable_summaries(weights,'weights')
-        tf.summary.tensor_summary('weightsT', weights)
-        biases = bias_variable([output_dim])
-        variable_summaries(biases, 'biases')
-        preactivate = tf.matmul(input_tensor, weights) + biases
-        tf.summary.histogram('pre_activations', preactivate)
-        activations = act(preactivate, name='activation')
-        tf.summary.histogram('activations', activations)
-    return activations
-
-tf.reset_default_graph() 
-    
-sess = tf.InteractiveSession()
+    def __init__(self, latent_size):
+        super(VAE, self).__init__()
         
-# definicije ulaznog tenzora
-x = 
-
-# definirajte enkoiderski dio
-layer_e1 = vae_layer(x, n_input, n_hidden_recog_1, 'layer_e1') 
-layer_e2 = 
-
-with tf.name_scope('z'):
-# definirajte skrivene varijable i pripadajući generator šuma
-    z_mean = vae_layer(layer_e2, n_hidden_recog_2, n_z, 'z_mean', act=tf.identity)
-    z_log_sigma_sq = 
-    eps = tf.random_normal((batch_size, n_z), 0, 1, dtype=tf.float32)
-                         
-    z = tf.add(z_mean, tf.multiply(tf.sqrt(tf.exp(z_log_sigma_sq)), eps))
-    tf.summary.histogram('activations', z)
-
-# definirajte dekoderski dio
-layer_d1 = vae_layer(z, n_z, n_hidden_gener_1, 'layer_d1') 
-layer_d2 = 
-            
-# definirajte srednju vrijednost rekonstrukcije
-x_reconstr_mean = 
-
-x_reconstr_mean_out = tf.nn.sigmoid(x_reconstr_mean)
-
-# definirajte dvije komponente funkcije cijene
-with tf.name_scope('cost'):
-    cost1 = 
-    tf.summary.histogram('cross_entropy', cost1)
-    cost2 = 
-    tf.summary.histogram('D_KL', cost2)
-    cost = tf.reduce_mean(tf.reduce_sum(cost1,1) + tf.reduce_sum(cost2,1))   # average over batch
-    tf.summary.histogram('cost', cost)
-                         
-# ADAM optimizer
-with tf.name_scope('train'):
-    optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
-
-# Prikupljanje podataka za Tensorboard
-merged = tf.summary.merge_all()
-
-init = tf.global_variables_initializer()
-
-saver = tf.train.Saver()
-
-n_epochs = 100
-train_writer = tf.summary.FileWriter('train', sess.graph)
-
-sess.run(init)
-
-total_batch = int(n_samples / batch_size)
-step = 0
-for epoch in range(n_epochs):
-    avg_cost = 0.
+        self.latent_size = latent_size
         
-    for i in range(total_batch):
-        batch_xs, _ = mnist.train.next_batch(batch_size)
-        # Fit training using batch data
-        opt, cos = sess.run((optimizer, cost), feed_dict={x: batch_xs})
-        # Compute average loss
-        avg_cost += cos / n_samples * batch_size
+        ???
         
-    # Display logs per epoch step
-    if epoch%(int(n_epochs/10)) == 0:
-        print("Epoch:", '%04d' % (epoch+1),
-              "cost=", "{:.9f}".format(avg_cost)) 
-        run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
-        run_metadata = tf.RunMetadata()
-        summary, _ = sess.run([merged, optimizer], feed_dict={x: batch_xs}, 
-                              options=run_options, run_metadata=run_metadata)
-        train_writer.add_run_metadata(run_metadata, 'epoch%03d' % epoch)
-        train_writer.add_summary(summary, i)
+    def encode(self, x):
+        # TODO!
+        return ???, ???
         
-        saver.save(sess, os.path.join('train', "model.ckpt"), epoch)
-
-train_writer.close()
-
-# vizualizacija rekonstrukcije i stanja
-x_sample = mnist.test.next_batch(100)[0]
-x_reconstruct, z_out = sess.run([x_reconstr_mean_out, z], feed_dict={x: x_sample})
-
-draw_reconstructions(x_sample, x_reconstruct, z_out, (28, 28), (4,5)) # prilagodite dimenzije prema potrebi
-
-# Vizualizacija raspored testnih uzoraka u 2D prostoru skrivenih varijabli - 1. način
-x_sample, y_sample = mnist.test.next_batch(5000)
-z_mu, z_sigma = sess.run((z_mean, z_log_sigma_sq), feed_dict={x: x_sample})
+    def reparametrize(self, mu, logvar):
+        # TODO!
+        return ???
     
-plot_latent(z_mu, y_sample)
-#save_latent_plot('trt.png')
-
-# Vizualizacija raspored testnih uzoraka u 2D prostoru skrivenih varijabli - 2. način
-
-nx = ny = 21
-x_values = np.linspace(-3, 3, nx)
-y_values = np.linspace(-3, 3, ny)
-
-canvas = np.empty((28*ny, 28*nx))
-
-# Trikovito popunjavanje rezultata za grid zbog fiksirane veličine z batcha u grafu
-# Valjda će se to riješiti u nekoj budućoj verziji TF
-Xi, Yi = np.meshgrid(x_values, y_values)
-Z = np.column_stack((Xi.flatten(), Yi.flatten()))
-X = np.empty((0,28*28))
-ind = list(range(batch_size, nx*ny, batch_size))
-for i in np.array_split(Z,ind):
-    if i.shape[0] < batch_size:
-        i = np.concatenate((i, np.zeros((batch_size-i.shape[0], i.shape[1]))), 0)
-    X = np.vstack((X, sess.run(x_reconstr_mean_out, feed_dict={z: i})))
+    def decode(self, z):
+        # TODO!
+        return ???
     
-for i, yi in enumerate(y_values):
-    for j, xi in enumerate(x_values):
-        canvas[(nx-i-1)*28:(nx-i)*28, j*28:(j+1)*28] = X[i*nx+j].reshape(28, 28)
-
-plt.figure(figsize=(8, 10))
-plt.imshow(canvas, origin="upper")
-plt.xticks( np.linspace(14,588-14,11), np.round(np.linspace(-3,3,11), 2) )
-plt.yticks( np.linspace(14,588-14,11), np.round(np.linspace(3,-3,11), 2) )
-plt.xlabel('z0')
-plt.ylabel('z1')
-plt.tight_layout()
-
-# Vizualizacija ugašenih elemenata skrivenog sloja - 1. način
-
-# Pomoćna funkcija za crtanje boxplot grafova
-def boxplot_vis(pos, input_data, label_x, label_y):
-    ax = fig.add_subplot(130+pos)
-    plt.boxplot(input_data, 0, '', 0, 0.75)
-    ax.set_xlabel(label_x)
-    ax.set_ylabel(label_y)
-    return ax
-   
-fig = plt.figure(figsize=(15,4))
-
-# Vizualizacija statistike za z_mean
-boxplot_vis(1,z_mu, 'Z mean values', 'Z elemets')
-
-# Vizualizacija statistike za z_sigma
-ax = boxplot_vis(2, np.square(np.exp(z_sigma)), 'Z sigma values', 'Z elemets')
-ax.set_xlim([-0.05,1.1])
-
-# Vizualizacija statistike za težine ulaza u dekoder
-test = tf.get_default_graph().get_tensor_by_name("layer_d1/weights:0")
-weights_d1 = test.eval(session=sess)
-boxplot_vis(3, weights_d1.T, 'Weights to decoder', 'Z elemets')
-
-
-# Vizualizacija ugašenih elemenata skrivenog sloja - 2. način
-
-from mpl_toolkits.mplot3d import Axes3D
-
-# Funkcija za crtanje 3D bar grafa
-def bargraph_vis(pos, input_data, dims, color, labels):
-    ax = fig.add_subplot(120+pos, projection='3d')
-    xpos, ypos = np.meshgrid(range(dims[0]), range(dims[1]))
-    xpos = xpos.flatten('F')
-    ypos = ypos.flatten('F')
-    zpos = np.zeros_like(xpos)
+    def forward(self, x):
+        mu, logvar = self.encode(x.view(-1, 784))
+        z = self.reparametrize(mu, logvar)
+        reconstruction = self.decode(z)
+        
+        return reconstruction, z, mu, logvar
     
-    dx = np.ones_like(zpos) 
-    dy = np.ones_like(zpos) * 0.5
-    dz = input_data.flatten()
-    
-    ax.bar3d(xpos, ypos, zpos, dx, dy, dz, color=color)
-    ax.view_init(elev=30., azim=5)
-    ax.set_xlabel(labels[0])
-    ax.set_ylabel(labels[1])
-    ax.set_zlabel(labels[2])
-                             
-fig = plt.figure(figsize=(15,7))
+    @staticmethod
+    def loss_fn(reconstruction, batch, mu, logvar):
+        crossentropy = 
+        kl_div = 
+        return ???
 
-# 3D bar graf za z_mean
-labels = ('Samples', 'Hidden elements', 'Z mean')
-bargraph_vis(1, z_mu, [200, z_mu.shape[1]], 'g', labels)
+LATENT_SIZE = 2
+model = VAE(LATENT_SIZE)
+model = train(model, batch_size=1024, device='cuda', n_epochs=100, log_epochs=10, learning_rate=3.24e-4)
 
-# 3D bar graf za težine iz z_mena u dekoder
-labels = ('Decoder elements', 'Hidden elements Z', 'Weights')
-bargraph_vis(2, weights_d1.T, weights_d1.T.shape, 'y', labels)
+plot_reconstructions('cuda', state_shape=(2, 1))
 
+_, test_loader = prepare_data_loaders()
+df_mu, df_logvar, df_dec1_weights = generate_latent_dataframes(test_loader)
+plt.figure(figsize=(16, 16))
+sns.scatterplot(x='mu_z0', y='mu_z1', hue='label', s=50, data=df_mu)
 
+plot_data_boxplots(df_mu, df_logvar, df_dec1_weights)
+
+walk_in_latent_space(latent_space_abs_limit=1.5, sqrt_sample_count=15, latent_size=LATENT_SIZE, dimensions_to_walk=(0,1))
 ```
 
-#### Bonus zadatak - Tensorboard
+Funkcije korištene u gornjem primjeru možete nakodirati sami, ili možete iskoristiti sljedeći predložak:
 
-Predložak za 4. zadatak sadrži kod za prikupljanje podataka koji se mogu prikazati pomoću [Tensorboard](https://www.tensorflow.org/versions/r0.12/how_tos/summaries_and_tensorboard/index.html). Pokrenite Tensorboard i provjerite koje su informacije dostupne o treniranom VAE.
+```python
+def prepare_data_loaders(batch_size=32):
+    train_loader = torch.utils.data.DataLoader(
+    torchvision.datasets.MNIST('./files', train=True, download=True,
+                               transform=torchvision.transforms.Compose([
+                                   torchvision.transforms.ToTensor()
+                               ])), batch_size=batch_size)
+
+    test_loader = torch.utils.data.DataLoader(
+        torchvision.datasets.MNIST('./files', train=False, download=True,
+                                   transform=torchvision.transforms.Compose([
+                                       torchvision.transforms.ToTensor()
+                                   ])), batch_size=batch_size)
+    
+    return train_loader, test_loader
+
+def train(model, n_epochs=10, log_epochs=1, batch_size=32, learning_rate=1e-3, device='cpu'):
+    train_loader, test_loader = prepare_data_loaders(batch_size)
+    
+    model = model.to(device)
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    
+    model.train()
+    
+    for epoch_idx in range(0, n_epochs):
+        
+        train_loss = 0
+        for batch_idx, (image_data, _) in enumerate(train_loader):
+            image_data = image_data.to(device)
+            
+            optimizer.zero_grad()
+            reconstructed_batch, batch_z, batch_mu, batch_logvar = model(image_data)
+            loss = model.loss_fn(reconstructed_batch, image_data, batch_mu, batch_logvar)
+            train_loss += loss.item()
+            loss.backward()
+            optimizer.step()
+            
+        if epoch_idx % log_epochs == 0:
+            print(f"Epoch {epoch_idx+1}/{n_epochs}: {train_loss / (len(train_loader) * train_loader.batch_size):.2f}")
+            
+    model.eval()
+    
+    return model
+
+def plot_reconstructions(device='cpu', number_of_samples=10, state_shape=(4, 5)):
+    train_loader, test_loader = prepare_data_loaders(batch_size=number_of_samples)
+    batch, _ = next(iter(test_loader))
+    recons, zs, mus, logvars = model(batch.to(device))
+    
+    for idx in range(0, number_of_samples):
+        original_image = batch[idx, ...].view(28, 28).data.cpu()
+        recon_image = recons[idx, ...].view(28, 28).data.cpu()
+        state = zs[idx, ...].view(*state_shape).data.cpu()
+
+        plt.figure(figsize=(8, 4))
+        plt.subplot(1, 3, 1)
+        plt.imshow(original_image)
+
+        plt.subplot(1, 3, 2)
+        plt.imshow(recon_image)
+        
+        plt.subplot(1, 3, 3)
+        plt.imshow(state)
+        plt.clim(-4, 4)
+        plt.colorbar()
+
+def generate_latent_dataframes(data_loader):
+    mu_acc = []
+    logvar_acc = []
+    label_acc = []
+
+    for image_data, label in tqdm.tqdm(data_loader):
+        mu, logvar = model.encode(image_data.view(-1, 784).to('cuda'))
+
+        mu_acc.extend(mu.data.cpu().numpy())
+        logvar_acc.extend(logvar.data.cpu().numpy())
+        label_acc.extend(label.data.cpu().numpy())
+
+    mu_acc = np.array(mu_acc)
+    logvar_acc = np.array(logvar_acc)
+
+
+    tmp = {
+        'label': label_acc
+    }
+    for idx in range(0, mu_acc.shape[1]):
+        tmp[f'mu_z{idx}'] = mu_acc[..., idx]
+
+    df_mu = pd.DataFrame(tmp)
+    df_mu['label'] = df_mu['label'].astype('category')
+
+
+    tmp = {
+        'label': label_acc
+    }
+    for idx in range(0, mu_acc.shape[1]):
+        tmp[f'logvar_z{idx}'] = np.square(np.exp(logvar_acc[..., idx]))
+
+    df_logvar = pd.DataFrame(tmp)
+    df_logvar['label'] = df_logvar['label'].astype('category')
+
+
+    tmp = {}
+    for idx in range(0, model.dec_fc1.weight.T.shape[0]):
+        tmp[f'w{idx}'] = list(model.dec_fc1.weight.T[idx, ...].data.cpu().numpy())
+
+    df_dec1_weights = pd.DataFrame(tmp)
+    
+    return df_mu, df_logvar, df_dec1_weights
+
+def plot_data_boxplots(df_mu, df_logvar, df_dec1_weights, baseline_figsize=(1.2, 6)):
+    figwidth, figheight = baseline_figsize
+    df_mu2 = df_mu.melt(['label'])
+    plt.figure(figsize=(int(figwidth * LATENT_SIZE), figheight))
+    sns.boxplot(x='variable', y='value', data=df_mu2)
+    plt.title("Distribution of $\mu$ in latent space")
+
+    df_logvar2 = df_logvar.melt(['label'])
+    plt.figure(figsize=(int(figwidth * LATENT_SIZE), figheight))
+    sns.boxplot(x='variable', y='value', data=df_logvar2)
+    plt.title("Distribution of $\sigma^2$ in latent space")
+
+    df_dec1_weights2 = df_dec1_weights.melt()
+    plt.figure(figsize=(int(figwidth * LATENT_SIZE), figheight))
+    sns.boxplot(x='variable', y='value', data=df_dec1_weights2)
+    plt.title("Weights going to decoder from latent space")
+
+def walk_in_latent_space(latent_space_abs_limit=3, sqrt_sample_count=20, latent_size=2, dimensions_to_walk=(0, 1), figsize=(16, 16)):
+    dim1, dim2 = dimensions_to_walk
+    canvas = np.zeros((sqrt_sample_count * 28, sqrt_sample_count * 28))
+
+    synthetic_representations = np.zeros((sqrt_sample_count * sqrt_sample_count, latent_size))
+
+    synthetic_representations[..., dim1] = np.linspace(-latent_space_abs_limit, latent_space_abs_limit, num=sqrt_sample_count * sqrt_sample_count)
+    synthetic_representations[..., dim2] = np.linspace(-latent_space_abs_limit, latent_space_abs_limit, num=sqrt_sample_count * sqrt_sample_count)
+
+    recons = model.decode(torch.from_numpy(synthetic_representations).float().to('cuda'))
+
+    for idx in range(0, sqrt_sample_count * sqrt_sample_count):
+        x, y = np.unravel_index(idx, (sqrt_sample_count, sqrt_sample_count))
+        canvas[y*28:((y+1) * 28), x*28:((x+1) * 28)] = recons[idx, ...].view(28, 28).data.cpu().numpy()
+
+    plt.figure(figsize=figsize)
+    plt.imshow(canvas)
+```
+
 
 <a name='gan'></a>
 
@@ -1298,13 +1362,12 @@ $$\min_G \max_D V(D,G) = E_{ \mathbf x \sim p_{data}(\mathbf x) } [\log D( \math
 
 Prvi pribrojnik predstavlja očekivanje procjene log vjerojatnosti da su uzorci iz skupa za treniranje stvarni. Drugi pribrojnik predstavlja očekivanje procjene log vjerojatnosti da generirani uzorci nisu stvarni, tj. da su umjetni. Diskriminator ima za cilj maksimizirati oba pribrojnika, dok generator ima za cilj minimizirati drugi pribrojnik. Svaki pribrojnik funkcije cilja može se jednostavno procijeniti za jednu mini grupu te se može procijeniti gradijent s obzirom na prametre obiju mreža. 
 
-Treniranje dviju mreža (G i D) može se provesti istovremeno ili se u jednoj iteraciji prvo može trenirati jedna mreža a zatim druga. Dodatno, neki autori preporučuju da se u nekoliko uzastopnih iteracija trenira jedna mreža, a nakon toga druga mreža samo jednu iteraciju. Odgovarajuće funkcije cijana ze obje mreže možete implementirati maštovitom upotrebom funkcije [`tf.nn.sigmoid_cross_entropy_with_logits(y,x)`](https://www.tensorflow.org/api_docs/python/tf/nn/sigmoid_cross_entropy_with_logits).
+Treniranje dviju mreža (G i D) može se provesti istovremeno ili se u jednoj iteraciji prvo može trenirati jedna mreža a zatim druga. Dodatno, neki autori preporučuju da se u nekoliko uzastopnih iteracija trenira jedna mreža, a nakon toga druga mreža samo jednu iteraciju.
 
 <div class="fig figcenter fighighlight">
   <img src="/assets/lab4/GAN2.svg" width="100%">
 </div>
 
-Kako diskriminator treba primati ulazne uzorke iz dva različita izvora, u TensorFlow okruženju možemo ga implementirati kao dvije identične mreže od kojih svaka prima ulazne uzorke iz jednog izvora, s time da oba diskriminatora dijele, odnosno koriste iste težine. Treniranje svakog pojedinog diskriminatora onda uzrokuje modifikacije istog skupa težina. Dijeljenje parametara mreže, odnosno varijabli se u TensorFlow okruženju postiže pomoću opsega varijable [`tf.variable_scope`](https://www.tensorflow.org/api_docs/python/tf/variable_scope) i ključne riječi `reuse`.
 
 Kod generiranja slika uspješnim se pokazao Deep Convolutional GAN (DCGAN) koji u skrivenim slojevima obiju mreža koristi konvolucijske slojeve. Za razliku od klasičnih konvolucijskih mreža, ovdje se ne koriste pooling slojevi nego se uzorkovanje provodi pomoću konvolucijskih slojeva koji imaju posmak veći od 1. Autori mreže preporučuju korištenje Batch normalizacije u svim slojevima osim u izlaznom sloju generatora te ulaznom i izlaznom sloju diskriminatora. Korištenje Leaky ReLU aktivacijskih funkcija u svim slojevima osim u izlaznim je još jedna specifičnost DCGAN-a kao i eliminacija potpuno povezanih slojeva.
 
@@ -1316,7 +1379,23 @@ Kod generiranja slika uspješnim se pokazao Deep Convolutional GAN (DCGAN) koji 
 
 ### 5. Zadatak
 
-Implementirajte DCGAN s generatorom (4 konvolucijska sloja) i diskriminatorom (3 konvolucijska sloja). U svim konvolucijama koristite veličinu jezgre [4,4], osim u izlaznom sloju diskriminatora, a broj kanala od ulaza prema izlazu neka bude G: 512, 256, 128, 1 i D: 64, 128, 1. Ulaz u generator $$\mathbf z$$ neka ima 100 elemenata prema normalnoj distribuciji $$N(0,1)$$. Ulazni podaci neka su MNIST brojevi skalirani na veličinu 32x32 te treniranje provedite kroz barem 20 epoha. U jednoj iteraciji provedite jednu optimizaciju generatora i jednu optimizaciju diskriminatora s po jednom mini grupom. Koristite tanh aktivacijsku funkciju za izlaz generatora i sigmoid aktivaciju za izlaz diskriminator.
+Implementirajte DCGAN s generatorom (4 konvolucijska sloja) i diskriminatorom (3 konvolucijska sloja). Arhitekura treba biti:
+    
+* Generator
+    * Sloj 1 - Broj izlaznih kanala = 512, veličina jezgre = 4, veličina koraka = 1
+    * Sloj 2 - Broj izlaznih kanala = 256, veličina jezgre = 4, veličina koraka = 2, padding = 1
+    * Sloj 3 - Broj izlaznih kanala = 128, veličina jezgre = 4, veličina koraka = 2, padding = 1
+    * Sloj 4 - Broj izlaznih kanala = 64, veličina jezgre = 4, veličina koraka = 2, padding = 1
+    * Sloj 5 - Broj izlaznih kanala = 1, veličina jezgre = 4, veličina koraka = 2, padding = 1
+
+* Diskriminator
+    * Sloj 1 - Broj izlaznih konvolucija = 64, veličina jezgre = 4, veličina koraka = 2, padding = 1
+    * Sloj 2 - Broj izlaznih konvolucija = 128, veličina jezgre = 4, veličina koraka = 2, padding = 1
+    * Sloj 3 - Broj izlaznih konvolucija = 256, veličina jezgre = 4, veličina koraka = 2, padding = 1
+    * Sloj 4 - Broj izlaznih konvolucija = 512, veličina jezgre = 4, veličina koraka = 2, padding = 1
+    * Sloj 5 - Broj izlaznih konvolucija = 1, veličina jezgre = 4, veličina koraka = 1, padding = 0
+
+Ulaz u generator $$\mathbf z$$ neka ima 100 elemenata prema normalnoj distribuciji $$N(0,1)$$. Ulazni podaci neka su MNIST brojevi skalirani na veličinu 32x32 te treniranje provedite kroz barem 20 epoha. U jednoj iteraciji provedite jednu optimizaciju generatora i jednu optimizaciju diskriminatora s po jednom mini grupom. Koristite tanh aktivacijsku funkciju za izlaz generatora i sigmoid aktivaciju za izlaz diskriminator, a za ostaje slojeve "propustljivi" ReLU sa "negative_slope" parametrom od 0.2. Batch noramlizacija (jedan od podzadataka) ide iza svakog sloja.
 
 **Podzadaci:**
 
@@ -1329,148 +1408,154 @@ Koristite sljedeći predložak:
 **NAPOMENA**: Osim nadopunjavanja koda koji nedostaje, predložak se treba prilagođavati prema potrebi, a može i prema vlastitim preferencijama. Stoga **budite oprezni s tvrdnjama da vam neki dio koda ne radi!**
 
 ```python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import torchvision
+import torch.optim as optim
+
+from torchvision import datasets, transforms
+import tqdm
+from torchvision.utils import make_grid
+
+import torch.distributions as tdist
+
 import numpy as np
-import tensorflow as tf
-from tensorflow.examples.tutorials.mnist import input_data
-from utils import tile_raster_images
+import tqdm
+
+import seaborn as sns
+import pandas as pd
+
 import matplotlib.pyplot as plt
-import math
 
-%matplotlib inline
-plt.rcParams['image.cmap'] = 'jet'
+def prepare_data_loaders(batch_size=32):
+    train_loader = torch.utils.data.DataLoader(
+    torchvision.datasets.MNIST('./files', train=True, download=True, 
+                               transform=torchvision.transforms.Compose([
+                                   torchvision.transforms.Resize((64, 64)),
+                                   torchvision.transforms.ToTensor()
+                               ])), batch_size=batch_size, shuffle=True)
 
-mnist = input_data.read_data_sets("MNIST_data/", one_hot=True, reshape=[])
-n_samples = mnist.train.num_examples
-
-# training parameters
-batch_size = 100
-lr = 0.0002
-n_epochs = 20
-
-def lrelu(x, th=0.2):
-    return tf.maximum(th * x, x)
-
-# D(x)
-def discriminator(x, isTrain=True, reuse=False):
-    with tf.variable_scope('discriminator', reuse=reuse):
-        # 1st hidden layer
-        conv = tf.layers.conv2d(x, 64, [4, 4], strides=(2, 2), padding='same')
-        lrelu_ = lrelu(conv, 0.2)
-        
-        # 2nd hidden layer
-        
-        
-        # output layer
-        
-        
-        return out, conv
-
-# G(z)
-def generator(z, isTrain=True):
-    with tf.variable_scope('generator'):
-        # 1st hidden layer
-        conv = tf.layers.conv2d_transpose(z, 512, [4, 4], strides=(1, 1), padding='valid')
-        lrelu_ = lrelu(tf.layers.batch_normalization(conv, training=isTrain))
-        
-        # 2nd hidden layer
-        
-        # 3rd hidden layer
-        
-        # output layer
-
-        
-        return out
-
-def show_generated(G, N, shape=(32,32), stat_shape=(10,10), interpolation="bilinear"):
-    """Visualization of generated samples
-     G - generated samples
-     N - number of samples
-     shape - dimensions of samples eg (32,32)
-     stat_shape - dimension for 2D sample display (eg for 100 samples (10,10)
-    """
+    test_loader = torch.utils.data.DataLoader(
+        torchvision.datasets.MNIST('./files', train=False, download=True,
+                                   transform=torchvision.transforms.Compose([
+                                   torchvision.transforms.Resize((64, 64)),
+                                       torchvision.transforms.ToTensor()
+                                   ])), batch_size=batch_size)
     
-    image = (tile_raster_images(
-        X=G,
-        img_shape=shape,
-        tile_shape=(int(math.ceil(N/stat_shape[0])), stat_shape[0]),
-        tile_spacing=(1, 1)))
-    plt.figure(figsize=(10, 14))
-    plt.imshow(image, interpolation=interpolation)
-    plt.axis('off')
-    plt.show()
-    
+    return train_loader, test_loader
 
-def gen_z(N, batch_size):
-    z = np.random.normal(0, 1, (batch_size, 1, 1, N))
-    return z
+class Generator(nn.Module):
+    def __init__(self, latent_size):
+        super().__init__()
 
-# input variables
-x = tf.placeholder(tf.float32, shape=(None, 32, 32, 1))
-z = tf.placeholder(tf.float32, shape=(None, 1, 1, 100))
-isTrain = tf.placeholder(dtype=tf.bool)
-    
-# generator
-G_z = generator(z, isTrain)
-    
-# discriminator
-# real
-D_real, D_real_logits = discriminator(x, isTrain)
-# fake
-...
-
-
-# labels for learning
-true_labels = tf.ones([batch_size, 1, 1, 1]
-true_labels = tf.zeros([batch_size, 1, 1, 1]
-# loss for each network                       
-D_loss_real =
-D_loss_fake =
-D_loss = D_loss_real + D_loss_fake
-G_loss = 
-
-# trainable variables for each network
-T_vars = tf.trainable_variables()
-D_vars = [var for var in T_vars if var.name.startswith('discriminator')]
-G_vars = [var for var in T_vars if var.name.startswith('generator')]
-
-# optimizer for each network
-with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):
-    D_optim = tf.train.AdamOptimizer(lr, beta1=0.3).minimize(D_loss, var_list=D_vars)
-    G_optim = tf.train.AdamOptimizer(lr, beta1=0.3).minimize(G_loss, var_list=G_vars)
-
-
-# open session and initialize all variables
-config = tf.ConfigProto()
-config.gpu_options.allow_growth=True
-sess = tf.InteractiveSession(config=config)
-tf.global_variables_initializer().run()
-
-# MNIST resize and normalization
-train_set = tf.image.resize_images(mnist.train.images, [32, 32]).eval()
-# input normalization
-...
-
-#fixed_z_ = np.random.uniform(-1, 1, (100, 1, 1, 100))
-fixed_z_ = gen_z(100, 100)
-total_batch = int(n_samples / batch_size)
-
-for epoch in range(n_epochs):
-    for iter in range(total_batch):
-        # update discriminator
-        x_ = train_set[iter*batch_size:(iter+1)*batch_size]
+        self.latent_size = latent_size
         
-        # update discriminator
-        
-        z_ = gen_z(100, batch_size)
-        loss_d_, _ = sess.run([D_loss, D_optim], {x: x_, z: z_, isTrain: True})
-                
+        ???
 
-        # update generator
-        ...
+
+    def forward(self, x):
+        ???
+
+        return x
+
+class Discriminator(nn.Module):
+    def __init__(self):
+        super().__init__()
+        
+        ???
+
+    def forward(self, x):
+        ???
+
+        return x
+
+def weights_init(w):
+    classname = w.__class__.__name__
+    if classname.find('conv') != -1:
+        nn.init.normal_(w.weight.data, 0.0, 0.02)
+    elif classname.find('bn') != -1:
+        nn.init.normal_(w.weight.data, 1.0, 0.02)
+        nn.init.constant_(w.bias.data, 0)
+
+dmodel = Discriminator()
+gmodel = Generator(100)
+
+dmodel.apply(weights_init)
+gmodel.apply(weights_init)
+
+def train(gmodel: Generator, dmodel: Discriminator, n_epochs=10, log_epochs=1, batch_size=32, learning_rate=1e-3, device='cpu'):
+    train_loader, test_loader = prepare_data_loaders(batch_size=batch_size)
+    
+    gmodel = gmodel.to(device)
+    dmodel = dmodel.to(device)
+    
+    gmodel.train()
+    dmodel.train()
+    
+    criterion = nn.BCELoss()
+    
+    g_optim = optim.Adam(gmodel.parameters(), lr=learning_rate, betas=(0.5, 0.999))
+    d_optim = optim.Adam(dmodel.parameters(), lr=learning_rate, betas=(0.5, 0.999))
+    
+    for epoch_idx in range(0, n_epochs):
+        
+        g_loss, d_loss = 0, 0
+        
+        for image_data, _ in tqdm.tqdm(train_loader):
+            # discriminator update
+            dmodel.zero_grad()
             
-    print('[%d/%d] loss_d: %.3f, loss_g: %.3f' % ((epoch + 1), n_epochs, loss_d_, loss_g_))
+            # real data pass
+            image_data = image_data.to(device)
+            
+            batch_size = image_data.shape[0]
+            labels = torch.ones(batch_size, device=device).float()
+            
+            d_output = dmodel(image_data)
+            d_err_real = criterion(d_output, labels)
+            d_err_real.backward()
+            d_loss += d_err_real.item() / batch_size
+            
+            # fake data pass
+            noise = torch.randn(batch_size, gmodel.latent_size, 1, 1, device=device)
+            fake_image_data = gmodel(noise)
+            labels = torch.zeros(batch_size, device=device).float()
+            
+            d_output = dmodel(fake_image_data.detach())
+            d_error_fake = criterion(d_output, labels)
+            d_error_fake.backward()
+            d_loss += d_error_fake.item() / batch_size
     
-    test_images = sess.run(G_z, {z: fixed_z_, isTrain: False})
-    show_generated(test_images, 100)
+            d_optim.step()
+            
+            # generator update
+            gmodel.zero_grad()
+            
+            labels = torch.ones(batch_size, device=device)
+            d_output = dmodel(fake_image_data)
+            g_error = criterion(d_output, labels)
+            g_error.backward()
+            g_loss += g_error.item() / batch_size 
+            g_optim.step()
+            
+        if (epoch_idx + 1) % log_epochs == 0:
+            print(f"[{epoch_idx+1}/{n_epochs}]: d_loss = {d_loss:.2f} g_loss {g_loss:.2f}")
+
+    gmodel.eval()
+    dmodel.eval()
+    
+    return gmodel, dmodel
+
+gmodel, dmodel = train(gmodel, dmodel, n_epochs=15, batch_size=256, device='cuda')
+
+random_sample = gmodel(torch.randn(100, 100, 1, 1).to('cuda')).view(100, 64, 64).data.cpu().numpy()
+
+plt.figure(figsize=(16, 16))
+for idx in range(0, 100):
+    plt.subplot(10, 10, idx+1)
+    plt.imshow(random_sample[idx, ...])
+    plt.clim(0, 1)
+    plt.axis('off')
 ```
 
