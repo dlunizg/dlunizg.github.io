@@ -394,6 +394,22 @@ Način i format zapisa rezultata je namjerno ostavljen otvoren. Cilj vježbe nij
 
 **Broj epoha** je namjerno nedefiniran zbog različitih kapaciteta hardvera na vašim osobnim računalima. Skup podataka SST je odabran najviše jer je malen i čak ni izvođenje na CPU ne uzima previše vremena. Idejno bi se svaki eksperiment trebao pokrenuti na barem 5 epoha. Ukoliko vam to hardver vremenski ili prostorno ne dopušta, molimo vas da nam to javite.
 
-### Bonus zadataci: napredni baseline modeli i pozornost (max 20% bodova)
+### Bonus zadatak: pozornost (max 20% bodova)
 
-Coming soon!
+Dodatan zadatak biti će implementacija Bahdanau pozornosti za klasifikaciju slijeda. Konkretno, izbacujemo upit iz formulacije pozornosti, kao nelinearnost koristimo tangens hiperbolni a skrivena stanja (izlazi naše povratne neuronske mreže) će nam istovremeno služiti kao ključevi i vrijednosti.
+
+Težine pozorosti računamo na idući način:
+$$
+a^{(t)} = w_2 tanh(W_1 h^{(t)}) \quad \alpha = \text{softmax} (a)
+$$
+
+A potom ih koristimo u težinskom sažimanju skrivenih stanja na idući način:
+
+$$
+out_{attn} = \sum_t^T \alpha_t h^{(t)}
+$$
+
+te izlaz algoritma pozornosti koristimo kao ulaz našem izlaznom sloju.
+Kao dimenziju skrivenog stanja algoritma pozornosti (izlazna dimenzija matrice \[W_1\]) koristite polovicu dimenzionalnosti skrivenog stanja vaše povratne neuronske mreže.
+
+Neka u vašoj implementaciji korištenje algoritma pozornosti za povratnu neuronsku mrežu bude opcionalno (hiperparametar). Provjerite koliko pozornost doprinosi rezultatima svake neuronske ćelije. Pokrenite modele sa i bez algoritma pozornosti te zapišite prosjek i devijaciju svih praćenih metrika.
