@@ -399,6 +399,7 @@ Način i format zapisa rezultata je namjerno ostavljen otvoren. Cilj vježbe nij
 Dodatan zadatak biti će implementacija Bahdanau pozornosti za klasifikaciju slijeda. Konkretno, izbacujemo upit iz formulacije pozornosti, kao nelinearnost koristimo tangens hiperbolni a skrivena stanja (izlazi naše povratne neuronske mreže) će nam istovremeno služiti kao ključevi i vrijednosti.
 
 Težine pozorosti računamo na idući način:
+
 $$
 a^{(t)} = w_2 tanh(W_1 h^{(t)}) \quad \alpha = \text{softmax} (a)
 $$
