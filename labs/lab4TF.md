@@ -1,7 +1,7 @@
 ---
 layout: page
 mathjax: true
-permalink: /lab4_tf/
+permalink: /lab4tf/
 ---
 - [Generativni modeli](#gm)
 - [Ograničeni Boltzmanov stroj](#rbm)
