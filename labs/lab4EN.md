@@ -16,7 +16,9 @@ permalink: /lab4en/
 <a name='gm'></a>
 
 ## Lab assignment 4: Generative Models (GM)
-_v1.3-2020_
+_v1.4-2020_
+
+**NOTE: An error in the sample ˙walk_in_latent_space(...)` has been corrected. If you didn't write your own funciton, please take note of the change. The change affects only one plot, and it does not change anything fundamentally about the exercise.**
 
 NOTE: If the execution time for some assignments is taking too long due to a lack of access to GPU compute resources, we want to point out that Google offers Google Colab as a free service which offers GPU compute for free.
 
@@ -1313,19 +1315,19 @@ def plot_data_boxplots(df_mu, df_logvar, df_dec1_weights, baseline_figsize=(1.2,
     plt.title("Weights going to decoder from latent space")
 
 def walk_in_latent_space(latent_space_abs_limit=3, sqrt_sample_count=20, latent_size=2, dimensions_to_walk=(0, 1), figsize=(16, 16)):
-    dim1, dim2 = dimensions_to_walk
     canvas = np.zeros((sqrt_sample_count * 28, sqrt_sample_count * 28))
 
-    synthetic_representations = np.zeros((sqrt_sample_count * sqrt_sample_count, latent_size))
+    d1 = np.linspace(-latent_space_abs_limit, latent_space_abs_limit, num=sqrt_sample_count)
+    d2 = np.linspace(-latent_space_abs_limit, latent_space_abs_limit, num=sqrt_sample_count)
+    D1, D2 = np.meshgrid(d1, d2)
+    synthetic_representations = np.array([D1.flatten(), D2.flatten()]).T
 
-    synthetic_representations[..., dim1] = np.linspace(-latent_space_abs_limit, latent_space_abs_limit, num=sqrt_sample_count * sqrt_sample_count)
-    synthetic_representations[..., dim2] = np.linspace(-latent_space_abs_limit, latent_space_abs_limit, num=sqrt_sample_count * sqrt_sample_count)
-
-    recons = model.decode(torch.from_numpy(synthetic_representations).float().to('cuda'))
+    recons = model.decode(torch.from_numpy(synthetic_representations).float())
 
     for idx in range(0, sqrt_sample_count * sqrt_sample_count):
         x, y = np.unravel_index(idx, (sqrt_sample_count, sqrt_sample_count))
-        canvas[y*28:((y+1) * 28), x*28:((x+1) * 28)] = recons[idx, ...].view(28, 28).data.cpu().numpy()
+        canvas[(sqrt_sample_count - 1 - x) * 28:((sqrt_sample_count - 1 - x + 1) * 28), y * 28:((y + 1) * 28)] = \
+            recons[idx, ...].view(28, 28).data.cpu().numpy()
 
     plt.figure(figsize=figsize)
     plt.imshow(canvas)
@@ -1401,7 +1403,7 @@ Implement a DCGAN with the following architecture:
     * Layer 4 - Broj izlaznih konvolucija = 512, kernel size = 4, stride = 2, padding = 1
     * Layer 5 - Broj izlaznih konvolucija = 1, kernel size = 4, stride = 1, padding = 0
 
-Use kernel size [4,4] in all convolutions except for the output layer of the discriminator. The number of channels from the input to the output layers should be G: 512, 256, 128, 1 and D: 64, 128, Generator input $$\mathbf z$$ should have 100 elements obeying the normal distribution $$ N (0,1) $$. Use MNIST numbers scaled to size 32x32 as training set and train the network for at least 20 epochs. In each iteration, perform optimization of the generator and one optimization of the discriminator with one mini-batch each. Use a tanh activation function for the generator output and sigmoid activation for the discriminator output.
+Use kernel size [4,4] in all convolutions except for the output layer of the discriminator. The number of channels from the input to the output layers should be G: 512, 256, 128, 1 and D: 64, 128, Generator input $$\mathbf z$$ should have 100 elements obeying the normal distribution $$ N (0,1) $$. Use MNIST numbers scaled to size 64x64 as training set and train the network for at least 20 epochs. In each iteration, perform optimization of the generator and one optimization of the discriminator with one mini-batch each. Use a tanh activation function for the generator output and sigmoid activation for the discriminator output.
 
 **Subtasks:**
 

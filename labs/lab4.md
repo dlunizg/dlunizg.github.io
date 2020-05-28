@@ -18,7 +18,9 @@ permalink: /lab4/
 <a name='gm'></a>
 
 ## 4. vježba: Generativni modeli (GM)
-_v1.3-2020_
+_v1.4-2020_
+
+**NAPOMENA: Ispravljena je pogreška u primjeru funkcije ˙walk_in_latent_space(...)`. Ukoliko niste napisali svoju varijantu, preuzime novu verziju. Radi se o ispravku jednog grafa, zadatak se sam po sebi ne mjenja.**
 
 NAPOMENA: Ukoliko brzina izvršavanja zadataka predstavlja problem zbog nedostpunosti GPUa, napominjemo da Google unutar svoje Google Colab usluge nudi besplatno GPU na korištenje.
 
@@ -1308,19 +1310,18 @@ def plot_data_boxplots(df_mu, df_logvar, df_dec1_weights, baseline_figsize=(1.2,
     plt.title("Weights going to decoder from latent space")
 
 def walk_in_latent_space(latent_space_abs_limit=3, sqrt_sample_count=20, latent_size=2, dimensions_to_walk=(0, 1), figsize=(16, 16)):
-    dim1, dim2 = dimensions_to_walk
     canvas = np.zeros((sqrt_sample_count * 28, sqrt_sample_count * 28))
 
-    synthetic_representations = np.zeros((sqrt_sample_count * sqrt_sample_count, latent_size))
+    d1 = np.linspace(-latent_space_abs_limit, latent_space_abs_limit, num=sqrt_sample_count)
+    d2 = np.linspace(-latent_space_abs_limit, latent_space_abs_limit, num=sqrt_sample_count)
+    D1, D2 = np.meshgrid(d1, d2)
+    synthetic_representations = np.array([D1.flatten(), D2.flatten()]).T
 
-    synthetic_representations[..., dim1] = np.linspace(-latent_space_abs_limit, latent_space_abs_limit, num=sqrt_sample_count * sqrt_sample_count)
-    synthetic_representations[..., dim2] = np.linspace(-latent_space_abs_limit, latent_space_abs_limit, num=sqrt_sample_count * sqrt_sample_count)
-
-    recons = model.decode(torch.from_numpy(synthetic_representations).float().to('cuda'))
+    recons = model.decode(torch.from_numpy(synthetic_representations).float())
 
     for idx in range(0, sqrt_sample_count * sqrt_sample_count):
         x, y = np.unravel_index(idx, (sqrt_sample_count, sqrt_sample_count))
-        canvas[y*28:((y+1) * 28), x*28:((x+1) * 28)] = recons[idx, ...].view(28, 28).data.cpu().numpy()
+        canvas[(sqrt_sample_count - 1 - x) * 28:((sqrt_sample_count - 1 - x + 1) * 28), y * 28:((y + 1) * 28)] = recons[idx, ...].view(28, 28).data.cpu().numpy()
 
     plt.figure(figsize=figsize)
     plt.imshow(canvas)
@@ -1379,7 +1380,7 @@ Kod generiranja slika uspješnim se pokazao Deep Convolutional GAN (DCGAN) koji 
 
 ### 5. Zadatak
 
-Implementirajte DCGAN s generatorom (4 konvolucijska sloja) i diskriminatorom (3 konvolucijska sloja). Arhitekura treba biti:
+Implementirajte DCGAN s generatorom i diskriminatorom. Arhitekura treba biti:
     
 * Generator
     * Sloj 1 - Broj izlaznih kanala = 512, veličina jezgre = 4, veličina koraka = 1
@@ -1395,7 +1396,7 @@ Implementirajte DCGAN s generatorom (4 konvolucijska sloja) i diskriminatorom (3
     * Sloj 4 - Broj izlaznih konvolucija = 512, veličina jezgre = 4, veličina koraka = 2, padding = 1
     * Sloj 5 - Broj izlaznih konvolucija = 1, veličina jezgre = 4, veličina koraka = 1, padding = 0
 
-Ulaz u generator $$\mathbf z$$ neka ima 100 elemenata prema normalnoj distribuciji $$N(0,1)$$. Ulazni podaci neka su MNIST brojevi skalirani na veličinu 32x32 te treniranje provedite kroz barem 20 epoha. U jednoj iteraciji provedite jednu optimizaciju generatora i jednu optimizaciju diskriminatora s po jednom mini grupom. Koristite tanh aktivacijsku funkciju za izlaz generatora i sigmoid aktivaciju za izlaz diskriminator, a za ostaje slojeve "propustljivi" ReLU sa "negative_slope" parametrom od 0.2. Batch noramlizacija (jedan od podzadataka) ide iza svakog sloja.
+Ulaz u generator $$\mathbf z$$ neka ima 100 elemenata prema normalnoj distribuciji $$N(0,1)$$. Ulazni podaci neka su MNIST brojevi skalirani na veličinu 64x64 te treniranje provedite kroz barem 20 epoha. U jednoj iteraciji provedite jednu optimizaciju generatora i jednu optimizaciju diskriminatora s po jednom mini grupom. Koristite tanh aktivacijsku funkciju za izlaz generatora i sigmoid aktivaciju za izlaz diskriminator, a za ostaje slojeve "propustljivi" ReLU sa "negative_slope" parametrom od 0.2. Batch noramlizacija (jedan od podzadataka) ide iza svakog sloja.
 
 **Podzadaci:**
 
