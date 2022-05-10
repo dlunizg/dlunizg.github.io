@@ -262,7 +262,7 @@ Zbog "syntactic sugara" koji prati treniranje i evaluaciju Pytorch modela, imple
         - **[Opcionalno]** `torch.nn.utils.clip_grad_norm_(model.parameters(), clip_value)`- podrezivanje gradijenata po normi
         - `optimizer.step()`- ažuriranje parametara na temelju optimizacijskog algoritma i vrijednosti gradijenata 
 3. Petlja za evaluaciju
-  - `evaluate` metoda koja izvrcd šava jednu epohu na skupu za validaciju ili testiranje
+  - `evaluate` metoda koja izvršava jednu epohu na skupu za validaciju ili testiranje
   - Syntactic sugar:
         - `with torch.no_grad():`- gradijenti se ne prate (memorijska i vremenska efikasnost)
         - `model.eval()`- onemogućava dropout
