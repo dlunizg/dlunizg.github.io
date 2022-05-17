@@ -1,7 +1,7 @@
 ---
 layout: page
 mathjax: true
-permalink: /lab3en_old/
+permalink: /lab3en/
 ---
 
 ## Exercise 3: Sequence modelling with recurrent neural networks
