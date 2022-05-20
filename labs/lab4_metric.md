@@ -137,7 +137,12 @@ To znači da za dodavanje slojeva u konstruktoru
 možete koristiti metodu `append`.
 
 #### c) metričko ugrađivanje
-Definirajte konačnu arhitekturu modela za metričko ugrađivanje. Model za metričko ugrađivanje se sastoji od 3 `BNReLUConv` bloka (veličina jezgre je 3, broj konvolucijskih jezgara jednak je `emb_size`) između kojih se koristi sažimanje maksimumom s veličinom jezgre 3 i korakom 2. Konačne ugrađivanje slike dobivamo globalnim sažimanjem prosjekom.
+Dovršite definiciju modela za metričko ugrađivanje. 
+Neka se taj model sastoji od 3 `BNReLUConv` bloka 
+(neka veličina jezgre je 3, a broj mapa značajki - `emb_size`) 
+između kojih postavite sažimanje maksimumom 
+s veličinom jezgre 3 i korakom 2. 
+Konačne ugrađivanje slike dobivamo globalnim sažimanjem prosjekom.
 Pripazite da izlazni tenzor u metodi `get_features` zadrži prvu dimenziju koja označava veličinu minigrupe, čak i kada je ona jednaka 1. 
 
 <a name='3zad'></a>
