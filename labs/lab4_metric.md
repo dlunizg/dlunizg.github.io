@@ -231,7 +231,7 @@ class IdentityModel(nn.Module):
         return feats
 ```
 
-Implementirajte klasu `IdentityModel` koja sliku pretvara u vektor i modificirajte skriptu za učenje tako da provodi klasifikaciju u prostoru slike. Primjetite da se `IdentyModel` ne može trenirati. Izmjerite točnost klasifikacije na MNIST skupu za validaciju.
+Implementirajte klasu `IdentityModel` koja sliku pretvara u vektor i modificirajte skriptu za učenje tako da provodi klasifikaciju u prostoru slike. Primjetite da se `IdentityModel` ne može trenirati. Izmjerite točnost klasifikacije na MNIST skupu za validaciju.
 
 
 #### c) Pohranjivanje parametara modela
