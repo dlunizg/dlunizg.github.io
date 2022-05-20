@@ -75,9 +75,15 @@ class MNISTMetricDataset(Dataset):
         return len(self.images)
 ```
 
-Implementirajte metode `_sample_positive` i `_sample_negative` tako da povratna vrijednost odgovara indeksu uzorkovane slike u listi self.images.
-Za potrebe ove vježbe dovoljno je implementirati jednostavno uzorkovanje koje će za pozitivni primjer uzorkovati slučajnu sliku koja pripada istom razredu kao sidro,
-a za negativni primjer slučajnu sliku koja pripada bilo kojem razredu različitom od razreda sidra.
+
+Implementirajte metode `_sample_positive` i `_sample_negative` 
+tako da njihove povratne vrijednosti odgovaraju 
+indeksu uzorkovane slike u listi self.images.
+Za potrebe ove vježbe dovoljno je implementirati jednostavno uzorkovanje 
+koje će za pozitivni primjer uzorkovati slučajnu sliku 
+koja pripada istom razredu kao sidro,
+a za negativni primjer slučajnu sliku koja pripada 
+bilo kojem razredu različitom od razreda sidra.
 
 <a name='2zad'></a>
 
