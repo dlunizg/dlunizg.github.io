@@ -321,9 +321,7 @@ Modificirajte konstruktor `MNISTMetricDataset` tako da se omogući uklanjanje pr
             self.target2indices[self.targets[i].item()] += [i]
 ```
 
-Iz MNIST skupa za treniranje uklonite jedan od razreda te istrenirajte novu sijamsku mrežu iz zadatka 2. Klasificirajte sve slike iz MNIST skupa za validaciju na temelju sličnosti u prostoru značajki.
-
-
+Iz MNIST skupa za treniranje uklonite razred 0 te istrenirajte novu sijamsku mrežu iz zadatka 2. Klasificirajte sve slike (uključujući i razred 0) iz MNIST skupa za validaciju na temelju sličnosti u prostoru značajki.
 
 
 
