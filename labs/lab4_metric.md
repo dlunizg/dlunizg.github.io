@@ -127,8 +127,14 @@ Nadopunite kod:
 Implementirajte trojni gubitak po uzoru na pytorchev [`TripletMarginLoss`](https://pytorch.org/docs/stable/generated/torch.nn.TripletMarginLoss.html).
 
 #### b) blok BNReLUConv
-U praksi je često praktično grupirati sekvence slojeva koje se često ponavljaju u zajednički gradivni blok. Napravite `BNReLUConv` blok u kojem se najprije izvodi normalizacija po podacima, zatim ReLU i konačno kovolucija.
-Primijetite da predložak koda nasljeđuje razred [Sequential](https://pytorch.org/docs/stable/generated/torch.nn.Sequential.html), a za dodavanje slojeva u konstruktoru možete koristiti njegove metodu `append`.
+U praksi je često praktično grupirati sekvence slojeva 
+koje se često ponavljaju u zajednički gradivni blok. 
+Oblikujte gradivni blok `BNReLUConv` koji se sastoji od 
+normalizacije po grupi, aktivacije ReLU i konačno konvolucije.
+Primijetite da naš predložak nasljeđuje razred 
+[Sequential](https://pytorch.org/docs/stable/generated/torch.nn.Sequential.html).
+To znači da za dodavanje slojeva u konstruktoru 
+možete koristiti metodu `append`.
 
 #### c) metričko ugrađivanje
 Definirajte konačnu arhitekturu modela za metričko ugrađivanje. Model za metričko ugrađivanje se sastoji od 3 `BNReLUConv` bloka (veličina jezgre je 3, broj konvolucijskih jezgara jednak je `emb_size`) između kojih se koristi sažimanje maksimumom s veličinom jezgre 3 i korakom 2. Konačne ugrađivanje slike dobivamo globalnim sažimanjem prosjekom.
