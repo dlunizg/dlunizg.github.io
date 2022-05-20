@@ -124,16 +124,18 @@ class SimpleMetricEmbedding(nn.Module):
         loss = ...
         return loss
 ```
-Nadopunite predloženi kod prema sljedećim uputama.
+Nadopunite naš predložak prema sljedećim uputama.
 
 #### a) gubitak
 Implementirajte trojni gubitak po uzoru na pytorchev [`TripletMarginLoss`](https://pytorch.org/docs/stable/generated/torch.nn.TripletMarginLoss.html).
 
 #### b) blok BNReLUConv
-U praksi je često praktično grupirati sekvence slojeva 
-koje se često ponavljaju u zajednički gradivni blok. 
-Oblikujte gradivni blok `BNReLUConv` koji se sastoji od 
-normalizacije po grupi, aktivacije ReLU i konačno konvolucije.
+U praksi je praktično izdvojiti 
+dijelove modela koji se često ponavljaju 
+u zajednički gradivni blok. 
+Oblikujte gradivni blok `BNReLUConv` 
+koji se sastoji od normalizacije po grupi, 
+aktivacije ReLU i konvolucije.
 Primijetite da naš predložak nasljeđuje razred 
 [Sequential](https://pytorch.org/docs/stable/generated/torch.nn.Sequential.html).
 To znači da za dodavanje slojeva u konstruktoru 
