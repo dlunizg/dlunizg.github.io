@@ -241,13 +241,22 @@ if __name__ == '__main__':
 
 ```
 #### a) Uvod
-Proučite skriptu za treniranje i `utils.py`. Kako se računaju reprezentacije razreda? Kako se provodi klasifikacija primjera? Probajte smisliti alternativne pristupe za klasifikaciju primjera.
+Proučite funkcije za učenje i vrednovanje u modelu `utils.py`. 
+Kako se računaju reprezentacije razreda? 
+Kako se provodi klasifikacija primjera? 
+Probajte smisliti alternativne pristupe za klasifikaciju primjera.
 
 #### b) Klasifikacija na temelju metričkog ugrađivanja
-Na MNIST skupu za treniranje naučite model za metričko ugrađivanje iz zadatka 2.c. Klasificirajte slike iz MNIST skupa za validaciju i izmjerite točnost.
+Naučite model za metričko ugrađivanje iz zadatka 2.c 
+na podskupu za treniranje skupa MNIST. 
+Provedite klasifikaciju slika iz podskupa za validaciju i izmjerite točnost.
 
 #### c) Klasifikacija na temelju udaljenosti u prostoru slike
-Klasificirajte slike iz MNIST skupa za validaciju, ali ovaj put u prostoru slike. Značajke u prostoru slike možete dobiti definiranjem jednostavne mreže za vektorizaciju slike.
+Ponovo provedite klasifikaciju na podskupu za validaciju, 
+ali ovaj put u prostoru slike.
+Ostvarite taj zadatak oblikovanjem
+razreda koji u metodi `get_features` 
+provodi jednostavnu vektorizaciju slike.
 
 ```python
 
