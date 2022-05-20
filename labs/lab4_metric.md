@@ -118,9 +118,9 @@ Nadopunite kod:
 #### a) gubitak
 Implementirajte trojni gubitak po uzoru na pytorchev [`TripletMarginLoss`](https://pytorch.org/docs/stable/generated/torch.nn.TripletMarginLoss.html).
 #### b) blok BNReLUConv
-U praksi je često praktično grupirati sekvence slojeva koje se često ponavljaju u zajednički gradivni blok. Napravite BNReLUConv blok u kojem se najprije izvodi normalizacija po podacima, zatim ReLU i konačno kovolucija.
+U praksi je često praktično grupirati sekvence slojeva koje se često ponavljaju u zajednički gradivni blok. Napravite `BNReLUConv` blok u kojem se najprije izvodi normalizacija po podacima, zatim ReLU i konačno kovolucija.
 #### c) mreža
-Definirajte konačnu arhitekturu mreže. Mreža se sastoji od 3 BNReLUConv bloka (veličina jezgre je 3, broj konvolucijskih jezgara jednak je emb_size) između kojih se koristi sažimanje maksimumom s veličinom jezgre 3 i korakom 2. Konačne značajke za sliku dobiju se globalnim sažimanjem prosjekom.
+Definirajte konačnu arhitekturu mreže. Mreža se sastoji od 3 `BNReLUConv` bloka (veličina jezgre je 3, broj konvolucijskih jezgara jednak je `emb_size`) između kojih se koristi sažimanje maksimumom s veličinom jezgre 3 i korakom 2. Konačne značajke za sliku dobiju se globalnim sažimanjem prosjekom.
 
 <a name='3zad'></a>
 
