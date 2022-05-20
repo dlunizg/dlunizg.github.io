@@ -16,6 +16,8 @@ permalink: /lab4_metric/
 <a name='cnn'></a>
 
 ## 4. vježba: Metričko ugrađivanje
+Predavanje o metričkom ugrađivanju moguće je naći na [neslužbenim stranicama predmeta](http://www.zemris.fer.hr/~ssegvic/du/du7metrics.pdf).
+
 
 <a name='vjezba'></a>
 ## Vježba
