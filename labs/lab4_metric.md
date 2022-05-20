@@ -139,7 +139,7 @@ možete koristiti metodu `append`.
 #### c) metričko ugrađivanje
 Dovršite definiciju modela za metričko ugrađivanje. 
 Neka se taj model sastoji od 3 `BNReLUConv` bloka 
-(neka veličina jezgre je 3, a broj mapa značajki - `emb_size`) 
+(neka veličina jezgre bude 3, a broj mapa značajki - `emb_size`) 
 između kojih postavite sažimanje maksimumom 
 s veličinom jezgre 3 i korakom 2. 
 Konačne ugrađivanje slike dobivamo globalnim sažimanjem prosjekom.
