@@ -80,7 +80,7 @@ a za negativ slučajnu sliku koja pripada bilo kojem razredu različitom od razr
 <a name='2zad'></a>
 
 
-### 2. zadatak: Definicija mreže
+### 2. zadatak: Definicija modela za metričko ugrađivanje
 Zadan je kod kojim se definira struktura modela za metričko ugrađivanje. 
 
 ```python
@@ -128,7 +128,7 @@ Pripazite da izlazni tenzor u metodi `get_features` zadrži prvu dimenziju koja 
 
 <a name='3zad'></a>
 
-### 3. zadatak: Eksperimenti
+### 3. zadatak: Učenje i vrednovanje
 Zadan je kod za klasifikaciju MNIST podataka. Ovaj kod koristi pomoćnu skriptu `utils.py` dostupnu [ovdje](https://github.com/dlunizg/dlunizg.github.io/tree/master/data/lab4/utils.py).
 
 ```python
