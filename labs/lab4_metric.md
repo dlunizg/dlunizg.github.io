@@ -81,7 +81,7 @@ a za negativ slučajnu sliku koja pripada bilo kojem razredu različitom od razr
 
 
 ### 2. zadatak: Definicija mreže
-Zadan je kod kojim se definira struktura sijamske mreže. 
+Zadan je kod kojim se definira struktura modela za metričko ugrađivanje. 
 
 ```python
 import torch
@@ -94,7 +94,7 @@ class _BNReluConv(nn.Sequential):
         super(_BNReluConv, self).__init__()
         # YOUR CODE HERE
 
-class SimpleSiamese(nn.Module):
+class SimpleMetricEmbedding(nn.Module):
     def __init__(self, input_channels, emb_size=32):
         super().__init__()
         self.emb_size = emb_size
@@ -122,8 +122,8 @@ Implementirajte trojni gubitak po uzoru na pytorchev [`TripletMarginLoss`](https
 U praksi je često praktično grupirati sekvence slojeva koje se često ponavljaju u zajednički gradivni blok. Napravite `BNReLUConv` blok u kojem se najprije izvodi normalizacija po podacima, zatim ReLU i konačno kovolucija.
 Primijetite da predložak koda nasljeđuje razred [Sequential](https://pytorch.org/docs/stable/generated/torch.nn.Sequential.html), a za dodavanje slojeva u konstruktoru možete koristiti njegove metodu `append`.
 
-#### c) mreža
-Definirajte konačnu arhitekturu mreže. Mreža se sastoji od 3 `BNReLUConv` bloka (veličina jezgre je 3, broj konvolucijskih jezgara jednak je `emb_size`) između kojih se koristi sažimanje maksimumom s veličinom jezgre 3 i korakom 2. Konačne značajke za sliku dobiju se globalnim sažimanjem prosjekom.
+#### c) metričko ugrađivanje
+Definirajte konačnu arhitekturu modela za metričko ugrađivanje. Model za metričko ugrađivanje se sastoji od 3 `BNReLUConv` bloka (veličina jezgre je 3, broj konvolucijskih jezgara jednak je `emb_size`) između kojih se koristi sažimanje maksimumom s veličinom jezgre 3 i korakom 2. Konačne ugrađivanje slike dobivamo globalnim sažimanjem prosjekom.
 Pripazite da izlazni tenzor u metodi `get_features` zadrži prvu dimenziju koja označava veličinu minigrupe, čak i kada je ona jednaka 1. 
 
 <a name='3zad'></a>
@@ -136,7 +136,7 @@ import time
 import torch.optim
 from dataset import MNISTMetricDataset
 from torch.utils.data import DataLoader
-from model import SimpleSiamese
+from model import SimpleMetricEmbedding
 import torch.nn as nn
 
 from utils import compute_representations, evaluate
@@ -159,7 +159,7 @@ if __name__ == '__main__':
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print(f"= Using device {device}")
 
-    model = # IdentityModel or SimpleSiamese
+    model = # IdentityModel or SimpleMetricEmbedding
 
     # CHANGE ACCORDING TO YOUR PREFERENCE
     mnist_download_root = "./mnist/"
@@ -215,7 +215,7 @@ if __name__ == '__main__':
 Klasificirajte slike iz MNIST skupa za validaciju na temelju udaljenosti od primjera za treniranje. Klasifikaciju napravite u prostoru slike. Dopunite kod za mrežu `IdentityModel` koja kao značajke vraća vektoriziranu sliku. Izmjerite točnost takve klasifikacije.
 
 #### b) Klasifikacija na temelju metričkog ugrađivanja
-Zadan je kod za treniranje i evaluaciju sijamske mreže.
+Zadan je kod za treniranje i evaluaciju modela za metričko ugrađivanje.
 
 ```python
 
@@ -223,7 +223,7 @@ import time
 import torch.optim
 from dataset import MNISTMetricDataset
 from torch.utils.data import DataLoader
-from model import SimpleSiamese
+from model import SimpleMetricEmbedding
 from utils import train, evaluate, compute_representations
 
 EVAL_ON_TEST = True
@@ -271,7 +271,7 @@ if __name__ == '__main__':
     )
 
     emb_size = 32
-    model = SimpleSiamese(1, emb_size).to(device)
+    model = SimpleMetricEmbedding(1, emb_size).to(device)
     optimizer = torch.optim.Adam(
         model.parameters(),
         lr=1e-3
@@ -299,7 +299,7 @@ if __name__ == '__main__':
 
 ```
 
-Na MNIST skupu za treniranje naučite sijamsku mrežu iz zadatka 2.c. Klasificirajte slike iz MNIST skupa za validaciju, ovaj puta u prostoru značajki.
+Na MNIST skupu za treniranje naučite model za metričko ugrađivanje iz zadatka 2.c. Klasificirajte slike iz MNIST skupa za validaciju, ovaj puta u prostoru značajki.
 
 #### c) Pohranjivanje parametara modela
 U praksi je praktično pohraniti parametre naučenog modela, za kasnije korištenje u fazi zaključivanja. Modificirajte skriptu za treniranje tako da pohranite naučene parametre korištenjem funkcije ['torch.save'](https://pytorch.org/docs/stable/generated/torch.save.html). Iznova istrenirajte model i pohranite dobivene parametre.
@@ -327,7 +327,7 @@ Modificirajte konstruktor `MNISTMetricDataset` tako da se omogući uklanjanje pr
             self.target2indices[self.targets[i].item()] += [i]
 ```
 
-Iz MNIST skupa za treniranje uklonite razred 0 te istrenirajte novu sijamsku mrežu iz zadatka 2. Klasificirajte sve slike (uključujući i razred 0) iz MNIST skupa za validaciju na temelju sličnosti u prostoru značajki. Pohranite parametre naučenog modela.
+Iz MNIST skupa za treniranje uklonite razred 0 te istrenirajte novi model za metričko ugrađivanje iz zadatka 2. Klasificirajte sve slike (uključujući i razred 0) iz MNIST skupa za validaciju na temelju sličnosti u prostoru značajki. Primjetite da ćete trebati imati dva loadera MNIST skupa za treniranje, jedan bez razreda 0 koji ćete koristiti za treniranje modela i drugi sa svim klasama koji ćete iskoristiti za dobivanje prosječne reprezentacije za sve klase. Pohranite parametre naučenog modela.
 
 
 <a name='4zad'></a>
@@ -340,7 +340,7 @@ import numpy as np
 import torch
 
 from dataset import MNISTMetricDataset
-from model import SimpleSiamese
+from model import SimpleMetricEmbedding
 from matplotlib import pyplot as plt
 
 
@@ -364,7 +364,7 @@ if __name__ == '__main__':
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print(f"= Using device {device}")
     emb_size = 32
-    model = SimpleSiamese(1, emb_size).to(device)
+    model = SimpleMetricEmbedding(1, emb_size).to(device)
     # YOUR CODE HERE
     # LOAD TRAINED PARAMS
 
