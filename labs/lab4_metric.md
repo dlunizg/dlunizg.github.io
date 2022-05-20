@@ -24,7 +24,7 @@ permalink: /lab4_metric/
 <a name='1zad'></a>
 
 ### 1. zadatak: Učitavanje podataka
-Potrebno je prilagoditi učitavanje podataka tako da se omogući učenje metričkim ugrađivanjem.
+Izvedite učitavanje podataka tako da se omogući učenje metričkim ugrađivanjem.
 Da bismo to napravili, potrebno je prilagoditi MNIST dataset tako da se prilikom dohvata primjera za
 treniranje (sidra), vraćaju i odgovarajući pozitivan i negativan primjer.
 
