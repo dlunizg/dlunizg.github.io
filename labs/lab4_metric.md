@@ -129,93 +129,8 @@ Pripazite da izlazni tenzor u metodi `get_features` zadrži prvu dimenziju koja 
 <a name='3zad'></a>
 
 ### 3. zadatak: Učenje i vrednovanje
-Zadan je kod za klasifikaciju MNIST podataka. Ovaj kod koristi pomoćnu skriptu `utils.py` dostupnu [ovdje](https://github.com/dlunizg/dlunizg.github.io/tree/master/data/lab4/utils.py).
-
-```python
-import time
-import torch.optim
-from dataset import MNISTMetricDataset
-from torch.utils.data import DataLoader
-from model import SimpleMetricEmbedding
-import torch.nn as nn
-
-from utils import compute_representations, evaluate
-
-EVAL_ON_TEST = True
-EVAL_ON_TRAIN = False
-
-
-class IdentityModel(nn.Module):
-    def __init__(self):
-        super(IdentityModel, self).__init__()
-
-    def get_features(self, img):
-        # YOUR CODE HERE
-        feats = ...
-        return feats
-
-
-if __name__ == '__main__':
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    print(f"= Using device {device}")
-
-    model = # IdentityModel or SimpleMetricEmbedding
-
-    # CHANGE ACCORDING TO YOUR PREFERENCE
-    mnist_download_root = "./mnist/"
-    ds_train = MNISTMetricDataset(mnist_download_root, split='train')
-    ds_test = MNISTMetricDataset(mnist_download_root, split='test')
-    ds_traineval = MNISTMetricDataset(mnist_download_root, split='traineval')
-
-    num_classes = 10
-
-    print(f"> Loaded {len(ds_train)} training images!")
-    print(f"> Loaded {len(ds_test)} validation images!")
-
-    train_loader = DataLoader(
-        ds_train,
-        batch_size=64,
-        shuffle=True,
-        pin_memory=True,
-        num_workers=4,
-        drop_last=True
-    )
-
-    test_loader = DataLoader(
-        ds_test,
-        batch_size=1,
-        shuffle=False,
-        pin_memory=True,
-        num_workers=1
-    )
-
-    traineval_loader = DataLoader(
-        ds_traineval,
-        batch_size=1,
-        shuffle=False,
-        pin_memory=True,
-        num_workers=1
-    )
-
-    emb_size = 28 * 28
-
-    print("Computing mean representations for evaluation...")
-    representations = compute_representations(model, train_loader, num_classes, emb_size, device)
-    if EVAL_ON_TRAIN:
-        print("Evaluating on training set...")
-        acc1 = evaluate(model, representations, traineval_loader, device)
-        print(f"Train Top1 Acc: {round(acc1 * 100, 2)}%")
-    if EVAL_ON_TEST:
-        print("Evaluating on test set...")
-        acc1 = evaluate(model, representations, test_loader, device)
-        print(f"Test Accuracy: {acc1 * 100:.2f}%")
-```
-
-#### a) Klasifikacija na temelju udaljenosti u prostoru slike
-Klasificirajte slike iz MNIST skupa za validaciju na temelju udaljenosti od primjera za treniranje. Klasifikaciju napravite u prostoru slike. Dopunite kod za mrežu `IdentityModel` koja kao značajke vraća vektoriziranu sliku. Izmjerite točnost takve klasifikacije.
-
 #### b) Klasifikacija na temelju metričkog ugrađivanja
-Zadan je kod za treniranje i evaluaciju modela za metričko ugrađivanje.
+Zadan je kod za učenje modela za metričko ugrađivanje na MNIST podatacima. Ovaj kod koristi pomoćnu skriptu `utils.py` dostupnu [ovdje](https://github.com/dlunizg/dlunizg.github.io/tree/master/data/lab4/utils.py).
 
 ```python
 
@@ -299,7 +214,25 @@ if __name__ == '__main__':
 
 ```
 
-Na MNIST skupu za treniranje naučite model za metričko ugrađivanje iz zadatka 2.c. Klasificirajte slike iz MNIST skupa za validaciju, ovaj puta u prostoru značajki.
+Na MNIST skupu za treniranje naučite model za metričko ugrađivanje iz zadatka 2.c. Klasificirajte slike iz MNIST skupa za validaciju i izmjerite točnost.
+
+#### b) Klasifikacija na temelju udaljenosti u prostoru slike
+Klasificirajte slike iz MNIST skupa za validaciju, ali ovaj put u prostoru slike. Značajke u prostoru slike možete dobiti definiranjem jednostavne mreže za vektorizaciju slike.
+
+```python
+
+class IdentityModel(nn.Module):
+    def __init__(self):
+        super(IdentityModel, self).__init__()
+
+    def get_features(self, img):
+        # YOUR CODE HERE
+        feats = ...
+        return feats
+```
+
+Implementirajte klasu `IdentityModel` koja sliku pretvara u vektor i modificirajte skriptu za učenje tako da provodi klasifikaciju u prostoru slike. Primjetite da se `IdentyModel` ne može trenirati. Izmjerite točnost klasifikacije na MNIST skupu za validaciju.
+
 
 #### c) Pohranjivanje parametara modela
 U praksi je praktično pohraniti parametre naučenog modela, za kasnije korištenje u fazi zaključivanja. Modificirajte skriptu za treniranje tako da pohranite naučene parametre korištenjem funkcije ['torch.save'](https://pytorch.org/docs/stable/generated/torch.save.html). Iznova istrenirajte model i pohranite dobivene parametre.
