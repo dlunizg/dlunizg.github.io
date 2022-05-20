@@ -24,8 +24,11 @@ permalink: /lab4_metric/
 <a name='1zad'></a>
 
 ### 1. zadatak
-Zadana je klasa dataset koja učitava podatke:
-'''python
+Potrebno je prilagoditi učitavanje podataka tako da se omogući učenje metričkim ugrađivanjem.
+Da bi smo to napravili, potrebno je prilagoditi MNIST dataset tako da se prilikom dohvata primjera za
+treniranje (sidra), vraćaju i odgovarajući pozitivan i negativan primjer.
+
+```python
 from torch.utils.data import Dataset
 from collections import defaultdict
 from random import choice
@@ -33,7 +36,7 @@ import torchvision
 
 
 class MNISTMetricDataset(Dataset):
-    def __init__(self, root="/tmp/mnist/", split='train', remove_class=None):
+    def __init__(self, root="/tmp/mnist/", split='train'):
         super().__init__()
         assert split in ['train', 'test', 'traineval']
         self.root = root
@@ -41,10 +44,6 @@ class MNISTMetricDataset(Dataset):
         mnist_ds = torchvision.datasets.MNIST(self.root, train='train' in split, download=True)
         self.images, self.targets = mnist_ds.data.float() / 255., mnist_ds.targets
         self.classes = list(range(10))
-
-        if remove_class is not None:
-            # Filter out images with target class equal to remove_class
-            # YOUR CODE HERE
 
         self.target2indices = defaultdict(list)
         for i in range(len(self.images)):
@@ -72,7 +71,8 @@ class MNISTMetricDataset(Dataset):
 
     def __len__(self):
         return len(self.images)
-'''
+```
+
 Implementirajte metode `_sample_positive` i `_sample_negative`
 
 <a name='2zad'></a>
