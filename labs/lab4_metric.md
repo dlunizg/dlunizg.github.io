@@ -78,7 +78,7 @@ class MNISTMetricDataset(Dataset):
 
 Implementirajte metode `_sample_positive` i `_sample_negative` 
 tako da njihove povratne vrijednosti odgovaraju 
-indeksima uzorkovanih slika u listi self.images.
+indeksima uzorkovanih slika u listi `self.images`.
 Za potrebe ove vježbe dovoljno je implementirati jednostavno uzorkovanje 
 koje će za pozitivni primjer uzorkovati slučajnu sliku 
 koja pripada istom razredu kao sidro,
@@ -127,9 +127,7 @@ Nadopunite kod:
 Implementirajte trojni gubitak po uzoru na pytorchev [`TripletMarginLoss`](https://pytorch.org/docs/stable/generated/torch.nn.TripletMarginLoss.html).
 
 #### b) blok BNReLUConv
-U praksi je često praktično grupirati sekvence slojeva koje se često ponavljaju u zajednički gradivni blok. 
-Oblikujte gradivni blok `BNReLUConv` koji se sastoji od 
-normalizacije po podacima, aktivacije ReLU i konačno konvolucije.
+U praksi je često praktično grupirati sekvence slojeva koje se često ponavljaju u zajednički gradivni blok. Napravite `BNReLUConv` blok u kojem se najprije izvodi normalizacija po podacima, zatim ReLU i konačno kovolucija.
 Primijetite da predložak koda nasljeđuje razred [Sequential](https://pytorch.org/docs/stable/generated/torch.nn.Sequential.html), a za dodavanje slojeva u konstruktoru možete koristiti njegove metodu `append`.
 
 #### c) metričko ugrađivanje
@@ -139,7 +137,7 @@ Pripazite da izlazni tenzor u metodi `get_features` zadrži prvu dimenziju koja 
 <a name='3zad'></a>
 
 ### 3. zadatak: Učenje i vrednovanje
-#### a) Klasifikacija na temelju metričkog ugrađivanja
+
 Zadan je kod za učenje modela za metričko ugrađivanje na MNIST podatacima. Ovaj kod koristi pomoćnu skriptu `utils.py` dostupnu [ovdje](https://github.com/dlunizg/dlunizg.github.io/tree/master/data/lab4/utils.py).
 
 ```python
@@ -223,10 +221,13 @@ if __name__ == '__main__':
         print(f"Epoch time (sec): {(t1-t0)/10**9:.1f}")
 
 ```
+#### a) Uvod
+Proučite skriptu za treniranje i `utils.py`. Kako se računaju reprezentacije razreda? Kako se provodi klasifikacija primjera? Probajte smisliti alternativne pristupe za klasifikaciju primjera.
 
+#### b) Klasifikacija na temelju metričkog ugrađivanja
 Na MNIST skupu za treniranje naučite model za metričko ugrađivanje iz zadatka 2.c. Klasificirajte slike iz MNIST skupa za validaciju i izmjerite točnost.
 
-#### b) Klasifikacija na temelju udaljenosti u prostoru slike
+#### c) Klasifikacija na temelju udaljenosti u prostoru slike
 Klasificirajte slike iz MNIST skupa za validaciju, ali ovaj put u prostoru slike. Značajke u prostoru slike možete dobiti definiranjem jednostavne mreže za vektorizaciju slike.
 
 ```python
@@ -244,10 +245,10 @@ class IdentityModel(nn.Module):
 Implementirajte klasu `IdentityModel` koja sliku pretvara u vektor i modificirajte skriptu za učenje tako da provodi klasifikaciju u prostoru slike. Primjetite da se `IdentityModel` ne može trenirati. Izmjerite točnost klasifikacije na MNIST skupu za validaciju.
 
 
-#### c) Pohranjivanje parametara modela
+#### d) Pohranjivanje parametara modela
 U praksi je praktično pohraniti parametre naučenog modela, za kasnije korištenje u fazi zaključivanja. Modificirajte skriptu za treniranje tako da pohranite naučene parametre korištenjem funkcije ['torch.save'](https://pytorch.org/docs/stable/generated/torch.save.html). Iznova istrenirajte model za metričko ugrađivanje i pohranite dobivene parametre.
 
-#### d) Klasifikacija neviđenih razreda
+#### e) Klasifikacija neviđenih razreda
 Jedna od prednosti učenja metričkim ugrađivanjem nad standardnim klasifikacijskim modelima jest mogućnost dodavanja novih klasa u skup za evaluaciju.
 Modificirajte konstruktor `MNISTMetricDataset` tako da se omogući uklanjanje primjera odabrane klase iz skupa za učenje:
 
