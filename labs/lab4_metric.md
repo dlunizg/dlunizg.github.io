@@ -147,7 +147,7 @@ Neka se vaš model sastoji od 3 `BNReLUConv` bloka
 (neka veličina jezgre bude 3, a broj mapa značajki - `emb_size`) 
 razdvojenih sažimanjem maksimumom 
 s veličinom jezgre 3 i korakom 2. 
-Konačno ugrađivanje slike dobivamo 
+Konačno ugrađivanje slike izlučite 
 globalnim sažimanjem prosjekom.
 Pripazite da izlazni tenzor u metodi `get_features` 
 zadrži prvu dimenziju koja označava veličinu minigrupe, 
