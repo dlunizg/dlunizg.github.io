@@ -123,7 +123,7 @@ Definirajte konačnu arhitekturu mreže. Mreža se sastoji od 3 BNReLUConv bloka
 <a name='3zad'></a>
 
 ### 3. zadatak: Eksperimenti
-Zadan je kod za klasifikaciju MNIST podataka.
+Zadan je kod za klasifikaciju MNIST podataka. Ovaj kod koristi pomoćnu skriptu `utils.py` dostupnu [ovdje](https://github.com/dlunizg/dlunizg.github.io/tree/master/data/lab4/utils.py).
 
 ```python
 import time
@@ -209,7 +209,7 @@ if __name__ == '__main__':
 Klasificirajte slike iz MNIST skupa za validaciju na temelju udaljenosti od primjera za treniranje. Klasifikaciju napravite u prostoru slike. Dopunite kod za mrežu `IdentityModel` koja kao značajke vraća vektoriziranu sliku. Izmjerite točnost takve klasifikacije.
 
 #### b) Klasifikacija na temelju metričkog ugrađivanja
-Zadan je kod za treniranje i evaluaciju sijamske mreže
+Zadan je kod za treniranje i evaluaciju sijamske mreže.
 
 ```python
 
@@ -296,7 +296,7 @@ if __name__ == '__main__':
 Na MNIST skupu za treniranje naučite sijamsku mrežu iz zadatka 2.c. Klasificirajte slike iz MNIST skupa za validaciju, ovaj puta u prostoru značajki.
 
 #### c) Pohranjivanje parametara modela
-U praksi je praktično pohraniti parametre naučenog modela, za kasnije korištenje u fazi zaključivanja. Modificirajte skriptu za treniranje tako da pohranite naučene parametre korištenjem funkcije ['torch.save'](https://pytorch.org/docs/stable/generated/torch.save.html).
+U praksi je praktično pohraniti parametre naučenog modela, za kasnije korištenje u fazi zaključivanja. Modificirajte skriptu za treniranje tako da pohranite naučene parametre korištenjem funkcije ['torch.save'](https://pytorch.org/docs/stable/generated/torch.save.html). Iznova istrenirajte model i pohranite dobivene parametre.
 
 #### d) Klasifikacija neviđenih razreda
 Jedna od prednosti učenja metričkim ugrađivanjem nad standardnim klasifikacijskim modelima jest mogućnost dodavanja novih klasa u skup za evaluaciju.
@@ -321,8 +321,7 @@ Modificirajte konstruktor `MNISTMetricDataset` tako da se omogući uklanjanje pr
             self.target2indices[self.targets[i].item()] += [i]
 ```
 
-Iz MNIST skupa za treniranje uklonite razred 0 te istrenirajte novu sijamsku mrežu iz zadatka 2. Klasificirajte sve slike (uključujući i razred 0) iz MNIST skupa za validaciju na temelju sličnosti u prostoru značajki.
-
+Iz MNIST skupa za treniranje uklonite razred 0 te istrenirajte novu sijamsku mrežu iz zadatka 2. Klasificirajte sve slike (uključujući i razred 0) iz MNIST skupa za validaciju na temelju sličnosti u prostoru značajki. Pohranite parametre naučenog modela.
 
 
 <a name='4zad'></a>
