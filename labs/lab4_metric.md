@@ -117,10 +117,14 @@ class SimpleSiamese(nn.Module):
 Nadopunite kod:
 #### a) gubitak
 Implementirajte trojni gubitak po uzoru na pytorchev [`TripletMarginLoss`](https://pytorch.org/docs/stable/generated/torch.nn.TripletMarginLoss.html).
+
 #### b) blok BNReLUConv
 U praksi je često praktično grupirati sekvence slojeva koje se često ponavljaju u zajednički gradivni blok. Napravite `BNReLUConv` blok u kojem se najprije izvodi normalizacija po podacima, zatim ReLU i konačno kovolucija.
+Primijetite da predložak koda nasljeđuje razred [Sequential](https://pytorch.org/docs/stable/generated/torch.nn.Sequential.html), a za dodavanje slojeva u konstruktoru možete koristiti njegove metodu `append`.
+
 #### c) mreža
 Definirajte konačnu arhitekturu mreže. Mreža se sastoji od 3 `BNReLUConv` bloka (veličina jezgre je 3, broj konvolucijskih jezgara jednak je `emb_size`) između kojih se koristi sažimanje maksimumom s veličinom jezgre 3 i korakom 2. Konačne značajke za sliku dobiju se globalnim sažimanjem prosjekom.
+Pripazite da izlazni tenzor u metodi `get_features` zadrži prvu dimenziju koja označava veličinu minigrupe, čak i kada je ona jednaka 1. 
 
 <a name='3zad'></a>
 
