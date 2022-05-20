@@ -129,7 +129,7 @@ Pripazite da izlazni tenzor u metodi `get_features` zadrži prvu dimenziju koja 
 <a name='3zad'></a>
 
 ### 3. zadatak: Učenje i vrednovanje
-#### b) Klasifikacija na temelju metričkog ugrađivanja
+#### a) Klasifikacija na temelju metričkog ugrađivanja
 Zadan je kod za učenje modela za metričko ugrađivanje na MNIST podatacima. Ovaj kod koristi pomoćnu skriptu `utils.py` dostupnu [ovdje](https://github.com/dlunizg/dlunizg.github.io/tree/master/data/lab4/utils.py).
 
 ```python
