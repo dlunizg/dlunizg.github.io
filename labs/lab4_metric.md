@@ -89,7 +89,9 @@ bilo kojem razredu različitom od razreda sidra.
 
 
 ### 2. zadatak: Definicija modela za metričko ugrađivanje
-Zadan je kod kojim se definira struktura modela za metričko ugrađivanje. 
+
+Zadan je kod koji definira grubu strukturu 
+modela za metričko ugrađivanje. 
 
 ```python
 import torch
@@ -122,7 +124,8 @@ class SimpleMetricEmbedding(nn.Module):
         loss = ...
         return loss
 ```
-Nadopunite kod:
+Nadopunite predloženi kod prema sljedećim uputama.
+
 #### a) gubitak
 Implementirajte trojni gubitak po uzoru na pytorchev [`TripletMarginLoss`](https://pytorch.org/docs/stable/generated/torch.nn.TripletMarginLoss.html).
 
