@@ -240,7 +240,7 @@ if __name__ == '__main__':
         print(f"Epoch time (sec): {(t1-t0)/10**9:.1f}")
 
 ```
-#### a) Uvod
+#### a) Analiza modula `utils.py`
 Proučite funkcije za učenje i vrednovanje u modelu `utils.py`. 
 Kako se računaju reprezentacije razreda? 
 Kako se provodi klasifikacija primjera? 
@@ -270,7 +270,12 @@ class IdentityModel(nn.Module):
         return feats
 ```
 
-Implementirajte klasu `IdentityModel` koja sliku pretvara u vektor i modificirajte skriptu za učenje tako da provodi klasifikaciju u prostoru slike. Primjetite da se `IdentityModel` ne može trenirati. Izmjerite točnost klasifikacije na MNIST skupu za validaciju.
+Implementirajte razred `IdentityModel`
+prema prikazanom predlošku. 
+Modificirajte funkciju za učenje tako da se 
+klasifikacija provodi u prostoru slike. 
+Primijetite da se `IdentityModel` ne može trenirati. 
+Izmjerite točnost klasifikacije na podskupu za validaciju.
 
 
 #### d) Pohranjivanje parametara modela
