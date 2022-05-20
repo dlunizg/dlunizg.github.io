@@ -279,11 +279,23 @@ Izmjerite točnost klasifikacije na podskupu za validaciju.
 
 
 #### d) Pohranjivanje parametara modela
-U praksi je praktično pohraniti parametre naučenog modela, za kasnije korištenje u fazi zaključivanja. Modificirajte skriptu za treniranje tako da pohranite naučene parametre korištenjem funkcije ['torch.save'](https://pytorch.org/docs/stable/generated/torch.save.html). Iznova istrenirajte model za metričko ugrađivanje i pohranite dobivene parametre.
+
+U praksi je praktično pohraniti parametre naučenog modela 
+za kasnije korištenje u fazi zaključivanja. 
+Modificirajte funkciju za učenje 
+tako da pohranite naučene parametre 
+korištenjem funkcije ['torch.save'](https://pytorch.org/docs/stable/generated/torch.save.html). 
+Iznova naučite model za metričko ugrađivanje 
+i pohranite dobivene parametre.
 
 #### e) Klasifikacija neviđenih razreda
-Jedna od prednosti učenja metričkim ugrađivanjem nad standardnim klasifikacijskim modelima jest mogućnost dodavanja novih klasa u skup za evaluaciju.
-Modificirajte konstruktor `MNISTMetricDataset` tako da se omogući uklanjanje primjera odabrane klase iz skupa za učenje:
+
+Jedna od prednosti učenja metričkog ugrađivanja 
+nad standardnim klasifikacijskim modelima jest 
+mogućnost dodavanja novih klasa u fazi zaključivanja.
+Modificirajte konstruktor `MNISTMetricDataset` 
+tako da se omogući uklanjanje primjera 
+odabrane klase iz skupa za učenje:
 
 ```python
     def __init__(self, root="/tmp/mnist/", split='train', remove_class=None):
@@ -304,7 +316,18 @@ Modificirajte konstruktor `MNISTMetricDataset` tako da se omogući uklanjanje pr
             self.target2indices[self.targets[i].item()] += [i]
 ```
 
-Iz MNIST skupa za treniranje uklonite razred 0 te istrenirajte novi model za metričko ugrađivanje iz zadatka 2. Klasificirajte sve slike (uključujući i razred 0) iz MNIST skupa za validaciju na temelju sličnosti u prostoru značajki. Primjetite da ćete trebati imati dva loadera MNIST skupa za treniranje, jedan bez razreda 0 koji ćete koristiti za treniranje modela i drugi sa svim klasama koji ćete iskoristiti za dobivanje prosječne reprezentacije za sve klase. Pohranite parametre naučenog modela.
+Iz podskupa za treniranje uklonite razred 0 
+te istrenirajte novi model za metričko ugrađivanje iz zadatka 2. 
+Klasificirajte sve slike (uključujući i razred 0) iz podskupa za validaciju 
+na temelju sličnosti u prostoru značajki. 
+Primijetite da ćete trebati imati dva loadera podskupa za učenje.
+Prvi razred će ignorirati slike znamenke 0, 
+a koristit ćete ga za učenje modela.
+Drugi razred će čitati slike sa svim znamenkama,
+a iskoristit ćete ga za dobivanje 
+prosječne reprezentacije znamenki svih razreda. 
+Pohranite parametre naučenog modela
+i prikažite postignutu klasifikacijsku točnost.
 
 
 <a name='4zad'></a>
