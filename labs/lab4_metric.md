@@ -127,7 +127,9 @@ Nadopunite kod:
 Implementirajte trojni gubitak po uzoru na pytorchev [`TripletMarginLoss`](https://pytorch.org/docs/stable/generated/torch.nn.TripletMarginLoss.html).
 
 #### b) blok BNReLUConv
-U praksi je često praktično grupirati sekvence slojeva koje se često ponavljaju u zajednički gradivni blok. Napravite `BNReLUConv` blok u kojem se najprije izvodi normalizacija po podacima, zatim ReLU i konačno kovolucija.
+U praksi je često praktično grupirati sekvence slojeva koje se često ponavljaju u zajednički gradivni blok. 
+Oblikujte gradivni blok `BNReLUConv` koji se sastoji od 
+normalizacije po podacima, aktivacije ReLU i konačno konvolucije.
 Primijetite da predložak koda nasljeđuje razred [Sequential](https://pytorch.org/docs/stable/generated/torch.nn.Sequential.html), a za dodavanje slojeva u konstruktoru možete koristiti njegove metodu `append`.
 
 #### c) metričko ugrađivanje
