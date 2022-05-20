@@ -333,7 +333,15 @@ i prikažite postignutu klasifikacijsku točnost.
 <a name='4zad'></a>
 
 ### 4. zadatak: Vizualizacija podataka
-Zanimljivo je pogledati razmještaj podataka u prostoru značajki i prostoru slike. S obzirom da je visokodimenzionalne podatke nemoguće vizualizirati u originalnom prostoru, potrebno je primjere prebaciti u 2D prostor značajki. Ovo možemo napraviti [analizom glavnih komponenti](https://en.wikipedia.org/wiki/Principal_component_analysis). U torchu je dostupna gotova implementacija [pca_lowrank](https://pytorch.org/docs/stable/generated/torch.pca_lowrank.html).
+
+Kvalitetu metričkog ugrađivanja možemo i kvalitativno procijeniti
+uspordbom razmještaja podataka u prostoru značajki i prostoru slike. 
+S obzirom na to da je visokodimenzionalne podatke 
+nemoguće vizualizirati u originalnom prostoru, 
+primjere je potrebno prebaciti u 2D prostor. 
+Ovo možemo provesti [analizom svojstvenih komponenti](https://en.wikipedia.org/wiki/Principal_component_analysis). 
+Obratite pažnju na to da torchu nudi 
+gotovu implementaciju kroz funkciju [pca_lowrank](https://pytorch.org/docs/stable/generated/torch.pca_lowrank.html).
 
 ```python
 import numpy as np
@@ -388,7 +396,14 @@ if __name__ == '__main__':
         plt.show()
 ```
 
-Modificirajte kod tako da učitava parametre naučene u prethodnom zadatku. Više o pohrani i učitavanju parametara možete naći na [pytorch stranicama](https://pytorch.org/tutorials/beginner/saving_loading_models.html). Vizualizirajte primjere u prostoru značajki (za model koji je učen sa svi klasama i model koji je učen bez da je vidio 0) i prostoru slike.
+Modificirajte kod tako da učitava parametre naučene u prethodnom zadatku. 
+Više o pohrani i učitavanju parametara možete naći u 
+[dokumentaciji pytorcha](https://pytorch.org/tutorials/beginner/saving_loading_models.html). 
+Vizualizirajte primjere u prostoru slike
+te u prostoru značajki 
+za model koji je učen sa svim znamenkama i 
+za model koji prilikom učenja 
+nije vidio slike sa znamenkom 0.
 
 <a name='add'></a>
 
