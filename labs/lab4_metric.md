@@ -123,11 +123,16 @@ Definirajte konačnu arhitekturu mreže. Mreža se sastoji od 3 BNReLUConv bloka
 <a name='3zad'></a>
 
 ### 3. zadatak: Eksperimenti
-
+#### a) Klasifikacija na temelju udaljenosti u prostoru slike
+Klasificirajte slike iz MNIST skupa za validaciju na temelju udaljenosti primjera 
+#### b) Klasifikacija na temelju metričkog ugrađivanja
+#### c) Klasifikacija neviđenih razreda
+#### d) Pohranjivanje parametara modela
 
 <a name='4zad'></a>
 
-### 4. zadatak
+### 4. zadatak: Vizualizacija podataka
+
 
 <a name='add'></a>
 
