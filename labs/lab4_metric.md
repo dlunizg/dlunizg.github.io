@@ -235,7 +235,7 @@ Implementirajte klasu `IdentityModel` koja sliku pretvara u vektor i modificiraj
 
 
 #### c) Pohranjivanje parametara modela
-U praksi je praktično pohraniti parametre naučenog modela, za kasnije korištenje u fazi zaključivanja. Modificirajte skriptu za treniranje tako da pohranite naučene parametre korištenjem funkcije ['torch.save'](https://pytorch.org/docs/stable/generated/torch.save.html). Iznova istrenirajte model i pohranite dobivene parametre.
+U praksi je praktično pohraniti parametre naučenog modela, za kasnije korištenje u fazi zaključivanja. Modificirajte skriptu za treniranje tako da pohranite naučene parametre korištenjem funkcije ['torch.save'](https://pytorch.org/docs/stable/generated/torch.save.html). Iznova istrenirajte model za metričko ugrađivanje i pohranite dobivene parametre.
 
 #### d) Klasifikacija neviđenih razreda
 Jedna od prednosti učenja metričkim ugrađivanjem nad standardnim klasifikacijskim modelima jest mogućnost dodavanja novih klasa u skup za evaluaciju.
