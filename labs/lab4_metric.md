@@ -382,7 +382,7 @@ if __name__ == '__main__':
         plt.show()
 ```
 
-Modificirajte kod tako da učitava parametre naučene u prethodnom zadatku. Vizualizirajte primjere u prostoru značajki (za model koji je učen sa svi klasama i model koji je učen bez da je vidio 0) i prostoru slike.
+Modificirajte kod tako da učitava parametre naučene u prethodnom zadatku. Više o pohrani i učitavanju parametara možete naći na [pytorch stranicama](https://pytorch.org/tutorials/beginner/saving_loading_models.html). Vizualizirajte primjere u prostoru značajki (za model koji je učen sa svi klasama i model koji je učen bez da je vidio 0) i prostoru slike.
 
 <a name='add'></a>
 
