@@ -329,7 +329,7 @@ Iz MNIST skupa za treniranje uklonite razred 0 te istrenirajte novu sijamsku mre
 <a name='4zad'></a>
 
 ### 4. zadatak: Vizualizacija podataka
-Zanimljivo je pogledati razmještaj podataka u prostoru značajki i prostoru slike. S obzirom da je visokodimenzionalne podatke nemoguće vizualizirati u originalnom prostoru, potrebno je primjere prebaciti u 2D prostor značajki. Ovo možemo napraviti [analizom glavnih komponenti](https://en.wikipedia.org/wiki/Principal_component_analysis). U torchu je dostpuna gotova implementacija [pca_lowrank](https://pytorch.org/docs/stable/generated/torch.pca_lowrank.html).
+Zanimljivo je pogledati razmještaj podataka u prostoru značajki i prostoru slike. S obzirom da je visokodimenzionalne podatke nemoguće vizualizirati u originalnom prostoru, potrebno je primjere prebaciti u 2D prostor značajki. Ovo možemo napraviti [analizom glavnih komponenti](https://en.wikipedia.org/wiki/Principal_component_analysis). U torchu je dostupna gotova implementacija [pca_lowrank](https://pytorch.org/docs/stable/generated/torch.pca_lowrank.html).
 
 ```python
 import numpy as np
