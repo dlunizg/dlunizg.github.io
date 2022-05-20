@@ -131,7 +131,7 @@ Implementirajte trojni gubitak po uzoru na pytorchev [`TripletMarginLoss`](https
 
 #### b) blok BNReLUConv
 U praksi je praktično izdvojiti 
-dijelove modela koji se često ponavljaju 
+dio modela koji se često ponavlja 
 u zajednički gradivni blok. 
 Oblikujte gradivni blok `BNReLUConv` 
 koji se sastoji od normalizacije po grupi, 
