@@ -408,5 +408,3 @@ za model koji prilikom učenja
 nije vidio slike sa znamenkom 0.
 
 <a name='add'></a>
-
-### Dodatni materijali
