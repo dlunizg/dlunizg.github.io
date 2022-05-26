@@ -15,7 +15,7 @@ permalink: /lab4_metric/
 
 <a name='cnn'></a>
 
-## 4. vježba: Metričko ugrađivanje
+## 4. vježba: Metričko ugrađivanje (10%)
 Predavanje o metričkom ugrađivanju moguće je naći na [neslužbenim stranicama predmeta](http://www.zemris.fer.hr/~ssegvic/du/du7metrics.pdf).
 
 
@@ -90,7 +90,7 @@ bilo kojem razredu različitom od razreda sidra.
 <a name='2zad'></a>
 
 
-### 2. zadatak: Definicija modela za metričko ugrađivanje
+### 2. zadatak: Definicija modela za metričko ugrađivanje (40%)
 
 Zadan je kod koji definira grubu strukturu 
 modela za metričko ugrađivanje. 
@@ -157,7 +157,7 @@ zadrži prvu dimenziju koja označava veličinu minigrupe,
 
 <a name='3zad'></a>
 
-### 3. zadatak: Učenje i vrednovanje
+### 3. zadatak: Učenje i vrednovanje (40%)
 
 Zadan je kod za učenje modela za metričko ugrađivanje na MNIST podatacima. Ovaj kod koristi pomoćnu skriptu `utils.py` dostupnu [ovdje](https://github.com/dlunizg/dlunizg.github.io/tree/master/data/lab4/utils.py).
 
@@ -334,7 +334,7 @@ i prikažite postignutu klasifikacijsku točnost.
 
 <a name='4zad'></a>
 
-### 4. zadatak: Vizualizacija podataka
+### 4. zadatak: Vizualizacija podataka (10%)
 
 Kvalitetu metričkog ugrađivanja možemo i kvalitativno procijeniti
 uspordbom razmještaja podataka u prostoru značajki i prostoru slike. 
