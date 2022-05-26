@@ -10,7 +10,6 @@ permalink: /lab4_metric/
   - [2. zadatak](#2zad)
   - [3. zadatak](#3zad)
   - [4. zadatak](#4zad)
-- [Dodatni materijali](#add)
 
 
 <a name='cnn'></a>
@@ -406,5 +405,3 @@ te u prostoru značajki
 za model koji je učen sa svim znamenkama i 
 za model koji prilikom učenja 
 nije vidio slike sa znamenkom 0.
-
-<a name='add'></a>
