@@ -14,7 +14,7 @@ permalink: /lab4_metric/
 
 <a name='cnn'></a>
 
-## 4. vježba: Metričko ugrađivanje (10%)
+## 4. vježba: Metričko ugrađivanje
 Predavanje o metričkom ugrađivanju moguće je naći na [neslužbenim stranicama predmeta](http://www.zemris.fer.hr/~ssegvic/du/du7metrics.pdf).
 
 
@@ -24,7 +24,7 @@ Predavanje o metričkom ugrađivanju moguće je naći na [neslužbenim stranicam
 
 <a name='1zad'></a>
 
-### 1. zadatak: Učitavanje podataka
+### 1. zadatak: Učitavanje podataka (10%)
 Izvedite učitavanje podataka tako da se omogući 
 učenje modela za metričko ugrađivanje trojnim gubitkom.
 Da bismo to napravili, potrebno je prilagoditi MNIST dataset 
@@ -130,11 +130,11 @@ Nadopunite naš predložak prema sljedećim uputama.
 #### a) gubitak
 Implementirajte trojni gubitak po uzoru na pytorchev [`TripletMarginLoss`](https://pytorch.org/docs/stable/generated/torch.nn.TripletMarginLoss.html).
 
-#### b) blok BNReLUConv
+#### b) konvolucijska jedinica BNReLUConv
 U praksi je praktično izdvojiti 
 dio modela koji se često ponavlja 
-u zajednički gradivni blok. 
-Oblikujte gradivni blok `BNReLUConv` 
+u dijeljeni diferencijabilni modul. 
+Oblikujte konvolucijsku jedinicu `BNReLUConv` 
 koji se sastoji od normalizacije po grupi, 
 aktivacije ReLU i konvolucije.
 Primijetite da naš predložak nasljeđuje razred 
@@ -144,7 +144,7 @@ možete koristiti metodu `append`.
 
 #### c) metričko ugrađivanje
 Dovršite izvedbu modela za metričko ugrađivanje. 
-Neka se vaš model sastoji od 3 uzastopna `BNReLUConv` bloka 
+Neka se vaš model sastoji od 3 uzastopne konvoluijske jedinice `BNReLUConv` 
 (neka veličina jezgre bude 3, a broj mapa značajki - `emb_size`) 
 razdvojena sažimanjem maksimumom 
 s veličinom jezgre 3 i korakom 2. 
