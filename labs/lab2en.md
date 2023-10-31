@@ -449,7 +449,7 @@ and graph the average loss, the training rate
 and overall classification accuracy.
 We recommend that function receives
 the data, the correct class indices,
-and the required tensorflow operations.
+and the required pytorch operations.
 Be careful not to invoke the training operation.
 The function should output
 the recovered indicators to the console.
