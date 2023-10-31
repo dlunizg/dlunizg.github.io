@@ -10,13 +10,13 @@ permalink: /lab2en/
 - [Exercise overview](#vjezba)
 - [Task 1: backprop through FC, ReLU and log softmax](#1zad)
 - [Task 2: regularization](#2zad)
-- [Task 3: PyTorch MNIST](#3zad)
-- [Task 4: Pytorch CIFAR-10](#4zad)
+- [Task 3: Tensorflow MNIST](#3zad)
+- [Task 4: Tensorflow CIFAR-10](#4zad)
 - [Bonus tasks](#add)
 
 
 <a name='intro'></a>
-## Exercise 2: Convolutional models (CNN)
+## Introduction
 
 This exercise considers convolutional models.
 Such models are appropriate for structured
@@ -84,7 +84,7 @@ discourage overfitting and promote generalization.
 
 <div class="fig figcenter fighighlight">
   <img src="/assets/lab2/convnet1.png" width="100%">
-  <!--<img src="/assets/lab2/convnet2.png" width="30%">-->
+  <img src="/assets/lab2/convnet2.png" width="30%">
   <div class="figcaption figcenter">A typical
     convolutional model for image classification
     contains a succession of convolutions and poolings.
@@ -99,7 +99,7 @@ discourage overfitting and promote generalization.
 ## Exercise overview
 
 The required dependencies are:
-PyTorch, NumPy, [Cython](http://cython.org),
+Tensorflow, NumPy, [Cython](http://cython.org),
 [matplotlib](http://matplotlib.org/) and
 [scikit-image](http://scikit-image.org/).
 Be careful to pick versions for Python 3.
@@ -211,37 +211,18 @@ set the appropriate paths in variables
 `DATA_DIR` and `SAVE_DIR` and compile
 the cython module `im2col_cython.pyx` 
 with `python3 setup_cython.py build_ext --inplace`.
-Go over the impementations of functions `col2im_cython`
-and `im2col_cython` and find out how these
-functions are used.
 
 Test implementations of your layers
 by invoking the script `check_grads.py`.
 A satisfactory error should be less than \\(10^{-5}\\)
 if you use double precision.
-Examine the source code of that script
-because it will be very useful for the third exercise.
-Consider why, when training deep models, 
-we prefer to use analytical gradients rather than numerical gradients.
-
-
-Examine and outline the model
-defined by the object `net` in the script `train.py`.
-Determine the tensor sizes and
-the number of parameters in each layer. 
-Calculate the size of the feature receptive
-field in the last (second) convolutional layer.
-Estimate the total amount of memory
-required to store activations needed 
-for backpropagation when training 
-with mini-batches of 50 images.
-
 Finally, start the training of a convolutional model
 by invoking the script `train.py`.
 The script will download the MNIST dataset
 to the `SAVE_DIR` directory.
+
 During training you can monitor the visualization
-of the learnt filters which are saved
+of the learned filters which are saved
 in the `SAVE_DIR` directory.
 Since each weight correspond to a single image pixel,
 we recommend to turn off antialiasing
@@ -283,75 +264,67 @@ konvolucijskih i potpuno povezanih slojeva.
 
 <a name='3zad'></a>
 
-### Task 3 - PyTorch MNIST
-In PyTorch, define and train a model equivalent
-to the regularized model specified in the 2nd task.
-Use the same architecture and learning parameters
-to reproduce the results.
-Implement the convolution using [`torch.nn.Conv2d`](https://pytorch.org/docs/stable/nn.html#torch.nn.Conv2d)
-or [`torch.nn.functional.conv2d`](https://pytorch.org/docs/stable/nn.functional.html#torch.nn.functional.conv2d).
-Below, we provide an example of using the `torch.nn.Conv2d` class for convolution.
+### Task 3 - Tensorflow MNIST
+
+Define and train a tensorflow model which is
+equivalent to the regularized model from Task 2.
+Define an identical architecture and training parameters
+in order to reproduce the results.
+Use the convolution operations from
+`tf.nn.conv2d` or `tf.contrib.layers.convolution2d`.
+Study the official documentation for the 
+[convolution](https://www.tensorflow.org/versions/master/api_docs/python/nn.html#convolution)
+suport in Tensorflow.
+Visualize the trained filters from the first layer
+during training, as in Task 2.
+
+<!---
+Dodajte u model normalizaciju podataka po slojevima nakon svakog konvolucijskog sloja ([Batch
+normalization](https://arxiv.org/abs/1502.03167)). To najlakše možete
+napraviti tako da konvoluciji zadate `tf.contrib.layers.batch_norm`
+kao parametar normalizacije kako je prikazano ispod:
+-->
+
+An example of using convolutions defined
+in the `tf.contrib` package is shown below.
+If you prefer to use `tf.nn.conv2d`, please consult
+the official [tutorial](https://www.tensorflow.org/versions/master/tutorials/mnist/pros/index.html#build-a-multilayer-convolutional-network).
 
 ```python
-import torch
-from torch import nn
- 
-class CovolutionalModel(nn.Module):
-  def __init__(self, in_channels, conv1_width, ..., fc1_width, class_count):
-    self.conv1 = nn.Conv2d(in_channels, conv1_width, kernel_size=5, stride=1, padding=2, bias=True)
-    # ostatak konvolucijskih slojeva i slojeva sažimanja
+import tensorflow.contrib.layers as layers
+
+def build_model(inputs, labels, num_classes):
+  weight_decay = ...
+  conv1sz = ...
+  fc3sz = ...
+  with tf.contrib.framework.arg_scope([layers.convolution2d],
+      kernel_size=5, stride=1, padding='SAME', activation_fn=tf.nn.relu,
+      weights_initializer=layers.variance_scaling_initializer(),
+      weights_regularizer=layers.l2_regularizer(weight_decay)):
+
+    net = layers.convolution2d(inputs, conv1sz, scope='conv1')
+    # ostatak konvolucijskih i pooling slojeva
     ...
-    # potpuno povezani slojevi
-    self.fc1 = nn.Linear(..., fc1_width, bias=True)
-    self.fc_logits = nn.Linear(fc1_width, class_count, bias=True)
 
-    # parametri su već inicijalizirani pozivima Conv2d i Linear
-    # ali možemo ih drugačije inicijalizirati
-    self.reset_parameters()
+  with tf.contrib.framework.arg_scope([layers.fully_connected],
+      activation_fn=tf.nn.relu,
+      weights_initializer=layers.variance_scaling_initializer(),
+      weights_regularizer=layers.l2_regularizer(weight_decay)):
 
-  def reset_parameters(self)
-    for m in self.modules():
-      if isinstance(m, nn.Conv2d):
-        nn.init.kaiming_normal_(m.weight, mode='fan_in', nonlinearity='relu')
-        nn.init.constant_(m.bias, 0)
-      elif isinstance(m, nn.Linear) and m is not self.fc_logits:
-        nn.init.kaiming_normal_(m.weight, mode='fan_in', nonlinearity='relu')
-        nn.init.constant_(m.bias, 0)
-    self.fc_logits.reset_parameters()
+    # sada definiramo potpuno povezane slojeve
+    # ali najprije prebacimo 4D tenzor u matricu
+    net = layers.flatten(inputs)
+    net = layers.fully_connected(net, fc3sz, scope='fc3')
 
-  def forward(self, x):
-    h = self.conv1(x)
-    ...
-    h = torch.relu(h)  # može i h.relu() ili nn.functional.relu(h)
-    ...
-    h = h.view(h.shape[0], -1)
-    h = self.fc1(h)
-    h = torch.relu(h)
-    logits = self.fc_logits(h)
-    return logits
+  logits = layers.fully_connected(net, num_classes, activation_fn=None, scope='logits')
+  loss = ...
 
+  return logits, loss
 ```
-
-If you want to use `torch.nn.functional.conv2d`,
-pay attention to manually defining the parameters of 
-type [`torch.nn.Parameter`](https://pytorch.org/docs/stable/nn.html#torch.nn.Parameter).
-You can refer to the following [example](https://pytorch.org/docs/stable/notes/extending.html#adding-a-module).
-Ensure the appropriate tensor dimensionality for the convolution kernels and bias tensors.
-
-During the training, visualize the filters in the first layer
-as in the previous exercise. 
-After each epoch, store the filters and loss in a file
-(or use [Tensorboard](https://pytorch.org/docs/stable/tensorboard.html)).
-
-At the end of the training, show the loss evolution across epochs using Matplotlib.
-
-Unlike Exercise 1, you can use `torch.nn.data.DataLoader`
- for iterating and sampling mini-batches.
-You can find more information [here](https://pytorch.org/docs/stable/data.html) .
 
 <a name='4zad'></a>
 
-### Task 4: PyTorch CIFAR 10
+### Task 4: Tensorflow CIFAR 10
 
 [CIFAR-10](https://www.cs.toronto.edu/~kriz/cifar.html)
 dataset contains 50000 images for training and validation,
@@ -359,9 +332,8 @@ and 10000 test images.
 The images have dimensions 32x32
 and they belong to 10 classes.
 Download the dataset version for Python
-[here](https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz)
-or by using [`torchvision.datasets.CIFAR10`](https://pytorch.org/docs/stable/torchvision/datasets.html#cifar).
-Use the following code to load and prepare the dataset.
+[here](https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz).
+Use the following code to load and prepair the dataset.
 
 ```python
 import os
@@ -383,10 +355,6 @@ def unpickle(file):
 
 DATA_DIR = '/path/to/data/'
 
-img_height = 32
-img_width = 32
-num_channels = 3
-num_classes = 10
 
 train_x = np.ndarray((0, img_height * img_width * num_channels), dtype=np.float32)
 train_y = []
@@ -394,11 +362,11 @@ for i in range(1, 6):
   subset = unpickle(os.path.join(DATA_DIR, 'data_batch_%d' % i))
   train_x = np.vstack((train_x, subset['data']))
   train_y += subset['labels']
-train_x = train_x.reshape((-1, num_channels, img_height, img_width)).transpose(0, 2, 3, 1)
+train_x = train_x.reshape((-1, num_channels, img_height, img_width)).transpose(0,2,3,1)
 train_y = np.array(train_y, dtype=np.int32)
 
 subset = unpickle(os.path.join(DATA_DIR, 'test_batch'))
-test_x = subset['data'].reshape((-1, num_channels, img_height, img_width)).transpose(0, 2, 3, 1).astype(np.float32)
+test_x = subset['data'].reshape((-1, num_channels, img_height, img_width)).transpose(0,2,3,1).astype(np.float32)
 test_y = np.array(subset['labels'], dtype=np.int32)
 
 valid_size = 5000
@@ -407,20 +375,15 @@ valid_x = train_x[:valid_size, ...]
 valid_y = train_y[:valid_size, ...]
 train_x = train_x[valid_size:, ...]
 train_y = train_y[valid_size:, ...]
-data_mean = train_x.mean((0, 1, 2))
-data_std = train_x.std((0, 1, 2))
+data_mean = train_x.mean((0,1,2))
+data_std = train_x.std((0,1,2))
 
 train_x = (train_x - data_mean) / data_std
 valid_x = (valid_x - data_mean) / data_std
 test_x = (test_x - data_mean) / data_std
-
-train_x = train_x.transpose(0, 3, 1, 2)
-valid_x = valid_x.transpose(0, 3, 1, 2)
-test_x = test_x.transpose(0, 3, 1, 2)
 ```
 
-
-Your task is to train a convolutional model in PyTorch.
+Your task is to train a convolutional model in Tensorflow.
 We propose a simple model which should yield
 about 70\% accuracy in image classification.
 
@@ -456,20 +419,27 @@ the recovered indicators to the console.
 
 <div class="fig figcenter fighighlight">
   <img src="/assets/lab2/training_plot.png" width="100%">
-  <div class="figcaption figcenter">An example of the
-training graph for the given model with a batch size of 50.
+  <div class="figcaption figcenter">A typical loss graph
     when the training proceeds well.</div>
 </div>
 
 Visualize random initializations
-and the trained filters from the first layer, 
-which you can access through `conv.weight`.
+and the trained filters from the first layer.
+You can access the variable which holds
+the weight of the first layer by invoking
+the `tf.contrib.framework.get_variables` method
+with the *scope* in which the variable is used in the model.
 We supply an example of how that might look like below.
+The *scope* will depend on the code
+which you actually used while defining the graph.
 
 ```python
-net = ConvNet()
+sess = tf.Session()
+sess.run(tf.initialize_all_variables())
 
-draw_conv_filters(0, 0, net.conv1.weight.detach().numpy(), SAVE_DIR)
+conv1_var = tf.contrib.framework.get_variables('model/conv1_1/weights:0')[0]
+conv1_weights = conv1_var.eval(session=sess)
+draw_conv_filters(0, 0, conv1_weights, SAVE_DIR)
 ```
 
 We also provide code which you can use
@@ -478,11 +448,11 @@ for visualization:
 ```python
 def draw_conv_filters(epoch, step, weights, save_dir):
   w = weights.copy()
-  num_filters = w.shape[0]
-  num_channels = w.shape[1]
-  k = w.shape[2]
-  assert w.shape[3] == w.shape[2]
-  w = w.transpose(2, 3, 1, 0)
+  num_filters = w.shape[3]
+  num_channels = w.shape[2]
+  k = w.shape[0]
+  assert w.shape[0] == w.shape[1]
+  w = w.reshape(k, k, num_channels, num_filters)
   w -= w.min()
   w /= w.max()
   border = 1
@@ -520,13 +490,13 @@ import skimage as ski
 import skimage.io
 
 def draw_image(img, mean, std):
-  img = img.transpose(1, 2, 0)
   img *= std
   img += mean
   img = img.astype(np.uint8)
   ski.io.imshow(img)
   ski.io.show()
 ```
+
 We provide the code for producing graphs below:
 
 ```python
@@ -557,7 +527,7 @@ def plot_training_progress(save_dir, data):
            linewidth=linewidth, linestyle='-', label='learning_rate')
   ax3.legend(loc='upper left', fontsize=legend_size)
 
-  save_path = os.path.join(save_dir, 'training_plot.png')
+  save_path = os.path.join(save_dir, 'training_plot.pdf')
   print('Plotting in: ', save_path)
   plt.savefig(save_path)
 ```
@@ -569,41 +539,35 @@ plot_data['valid_loss'] = []
 plot_data['train_acc'] = []
 plot_data['valid_acc'] = []
 plot_data['lr'] = []
+for epoch_num in range(1, num_epochs + 1):
+  train_x, train_y = shuffle_data(train_x, train_y)
+  for step in range(num_batches):
+    offset = step * batch_size 
+    # s ovim kodom pazite da je broj primjera djeljiv s batch_size
+    batch_x = train_x[offset:(offset + batch_size), ...]
+    batch_y = train_y[offset:(offset + batch_size)]
+    feed_dict = {node_x: batch_x, node_y: batch_y}
+    start_time = time.time()
+    run_ops = [train_op, loss, logits]
+    ret_val = sess.run(run_ops, feed_dict=feed_dict)
+    _, loss_val, logits_val = ret_val
+    duration = time.time() - start_time
+    if (step+1) % 50 == 0:
+      sec_per_batch = float(duration)
+      format_str = 'epoch %d, step %d / %d, loss = %.2f (%.3f sec/batch)'
+      print(format_str % (epoch_num, step+1, num_batches, loss_val, sec_per_batch))
 
-for epoch in range(num_epochs):
-    X, Yoh = shuffle_data(train_x, train_labels)
-    X = torch.FloatTensor(X)
-    Yoh = torch.FloatTensor(Yoh)
-    for batch in range(n_batch):
-        # broj primjera djeljiv s veličinom grupe bsz
-        batch_X = X[batch*bsz:(batch+1)*bsz, :]
-        batch_Yoh = Yoh[batch*bsz:(batch+1)*bsz, :]
-
-        loss = model.get_loss(batch_X, batch_Yoh)
-        loss.backward()
-        optimizer.step()
-        optimizer.zero_grad()
-
-        if batch%100 == 0:
-            print("epoch: {}, step: {}/{}, batch_loss: {}".format(epoch, batch, n_batch, loss))
-
-        if batch%200 == 0:
-            draw_conv_filters(epoch, batch, model.conv1.weight.detach().cpu().numpy(), SAVE_DIR)
-
-
-    train_loss, train_acc = evaluate(model, train_x, train_labels)
-    val_loss, val_acc = evaluate(model, valid_x, valid_labels)
-
-    plot_data['train_loss'] += [train_loss]
-    plot_data['valid_loss'] += [val_loss]
-    plot_data['train_acc'] += [train_acc]
-    plot_data['valid_acc'] += [val_acc]
-    plot_data['lr'] += [lr_scheduler.get_lr()]
-    lr_scheduler.step()
-
-plot_training_progress(SAVE_DIR, plot_data)
+  print('Train error:')
+  train_loss, train_acc = evaluate(logits, loss, train_x, train_y)
+  print('Validation error:')
+  valid_loss, valid_acc = evaluate(logits, loss, valid_x, valid_y)
+  plot_data['train_loss'] += [train_loss]
+  plot_data['valid_loss'] += [valid_loss]
+  plot_data['train_acc'] += [train_acc]
+  plot_data['valid_acc'] += [valid_acc]
+  plot_data['lr'] += [lr.eval(session=sess)]
+  plot_training_progress(SAVE_DIR, plot_data)
 ```
-
 
 If you have access to a GPU, you might want 
 to try obtaining better results with a
@@ -626,49 +590,26 @@ overall classification accuracy.
 
 
 ### Bonus task - Multiclass hinge loss
-This task considers training a model for CIFAR images
-with an alternative loss formulation
-that was not covered in lectures.
-The goal is to replace the cross-entropy loss
-with a multi-class version of the hinge loss.
-An explanation of this loss can be found 
+
+Read about the multiclass hinge loss 
 [here](http://cs231n.github.io/linear-classify/#svm).
-The task requires solving for all points
-by using basic PyTorch tensor operations
-and comparing the achieved results.
-
-Hint: The interface of the new loss function might look like this:
-
-```
-def multiclass_hinge_loss(logits: torch.Tensor, target: torch.Tensor, delta=1.):  
-    """
-        Args:
-            logits: torch.Tensor with shape (B, C), where B is batch size, and C is number of classes.
-            target: torch.LongTensor with shape (B, ) representing ground truth labels.
-            delta: Hyperparameter.
-        Returns:
-            Loss as scalar torch.Tensor.
-    """
-```
-
-You can start by separating the output
-of the last fully connected layer into
-a vector of logits for the correct classes
-and a matrix of logits for incorrect classes.
-You can accomplish this by using the function
-[torch.masked_select](https://pytorch.org/docs/stable/torch.html#torch.masked_select),
-with the mask specified as the regular or
-inverted version of the matrix with one-hot encoded labels.
-Now, the difference between the matrix of incorrect class
-logits and the vector of correct class logits
-can be computed using simple subtraction
-because PyTorch automatically broadcasts the lower-rank operand.
-Ensure to reshape all tensors into the correct shapes
-as the function `torch.masked_select`
- returns a one-dimensional tensor.
-You can compute the element-wise maximum
-using an appropriate variant of the function
-[torch.max](https://pytorch.org/docs/stable/torch.html#torch.max).
+Study the Tensorflow documentation
+to determine the easiest way
+to replace the cross entropy loss in Task 4
+with the multiclass hinge loss.
+One way would be to detach the logits
+(output of the last fully connected layer)
+on the matrix of logits of incorrect classes
+and the vector of logits of the correct class.
+You can achieve this with operations
+`tf.dynamic_partition` and `tf.one_hot`.
+Then, determine the difference between
+the above matric and the above vector.
+This should be easy since Tensorflow
+tries to perform the broadcasting
+whenever the tensors do not have the same rank.
+When the training is over,
+compare and discuss the results.
 
 <a name='add'></a>
 
