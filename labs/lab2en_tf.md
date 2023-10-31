@@ -1,7 +1,7 @@
 ---
 layout: page_en
 mathjax: true
-permalink: /lab2en/
+permalink: /lab2en_tf/
 ---
 
 ## Exercise 2: convolutional models 
