@@ -1,7 +1,7 @@
 ---
 layout: page
 mathjax: true
-permalink: /lab3/
+permalink: /lab3en/
 ---
 
 # Exercise 3: analysis of sentiment classification
