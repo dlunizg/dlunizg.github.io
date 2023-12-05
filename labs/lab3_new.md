@@ -224,9 +224,9 @@ Alternativno, možete staviti da vam je izlazna dimenzionalnost broj klasa te ko
 
 Kao algoritam optimizacije koristite [Adam](https://pytorch.org/docs/stable/optim.html#torch.optim.Adam).
 
-**Implementirajte** metrike praćenja performansi modela. Osim gubitka na skupu podataka, zanimaju nas **preciznost** (*eng. accuracy*), [**f1 mjera**](https://en.wikipedia.org/wiki/F1_score) i **matrica zabune** (*eng. confusion matrix*). Nakon svake epohe ispišite performanse modela po svim metrikama na skupu za validaciju, a nakon zadnje epohe ispišite performanse modela na skupu za testiranje.
+**Implementirajte** metrike praćenja performansi modela. Osim gubitka na skupu podataka, zanimaju nas **točnost** (*eng. accuracy*), [**f1 mjera**](https://en.wikipedia.org/wiki/F1_score) i **matrica zabune** (*eng. confusion matrix*). Nakon svake epohe ispišite performanse modela po svim metrikama na skupu za validaciju, a nakon zadnje epohe ispišite performanse modela na skupu za testiranje.
 
-Radi usporedbe, naša implementacija osnovnog modela za vokabular koji koristi sve riječi (`max_size=-1, min_freq=1`) te inicijalizira njihove reprezentacije s predtreniranima, `seed=7052020`, `lr=1e-4`, `batch_size=10` na skupu za treniranje i `batch_size=32` na skupovima za validaciju i testiranje ostvaruje iduću preciznost:
+Radi usporedbe, naša implementacija osnovnog modela za vokabular koji koristi sve riječi (`max_size=-1, min_freq=1`) te inicijalizira njihove reprezentacije s predtreniranima, `seed=7052020`, `lr=1e-4`, `batch_size=10` na skupu za treniranje i `batch_size=32` na skupovima za validaciju i testiranje ostvaruje iduću točnost:
 
 ```
 
@@ -311,13 +311,13 @@ def main(args):
 ### Zadatak 3. Implementacija povratne neuronske mreže (25% bodova)
 
 Nakon što ste uspješno implementirali vaš baseline model, vrijeme je da isprobamo neki model baziran na povratnim neuronskim mrežama. Vaš zadatak je implementirati osnovni model povratne neuronske meže **po izboru**. 
-Na izboru su vam iduće ćelije: [["Vanilla" RNN](https://pytorch.org/docs/master/generated/torch.nn.RNN.html#torch.nn.RNN), [GRU](https://pytorch.org/docs/master/generated/torch.nn.GRU.html#torch.nn.GRU), [LSTM](https://pytorch.org/docs/master/generated/torch.nn.LSTM.html#torch.nn.LSTM)].
+Na izboru su vam iduće ćelije: ["Vanilla" RNN](https://pytorch.org/docs/master/generated/torch.nn.RNN.html#torch.nn.RNN), [GRU](https://pytorch.org/docs/master/generated/torch.nn.GRU.html#torch.nn.GRU), [LSTM](https://pytorch.org/docs/master/generated/torch.nn.LSTM.html#torch.nn.LSTM)].
 
 Za odabrani model, detaljno pročitajte njegovu dokumentaciju. U nastavku ćemo vam samo skrenuti pozornost na nekoliko bitnih detalja:
 
 - Svaka RNN mreža kao izlaz svoje `forward` metode vraća (1) niz skrivenih stanja posljednjeg sloja i (2) skriveno stanje (tj., skrivena stanja u slučaju LSTMa) za sve slojeve zadnjeg vremenskog koraka. Kao ulaz u dekoder obično želite staviti skriveno stanje iz zadnjeg sloja u zadnjem vremenskom koraku. Kod LSTMa, to je `h` komponenta dualnog `(h, c)` skrivenog stanja.
 - Radi brzine, RNN mreže preferiraju inpute u `time-first` formatu (budući da je brže *iterirati* po prvoj dimenziji tenzora). Transponirajte ulaze prije nego ih šaljete RNN ćeliji.
-- Tenzori koji su ulaz u RNN ćelije se često "[pakiraju](https://pytorch.org/docs/master/generated/torch.nn.utils.rnn.pack_padded_sequence.html#torch.nn.utils.rnn.pack_padded_sequence)". Pakiranje je zapis tenzora kojemu su pridružene stvarne duljine svakog elementa u batchu. Ako koristite pakiranje, RNN mreža se neće odmatati za vremenske korake koji sadrže padding u elementima batcha. Ovdje osim efikasnosti možete dobiti i na preciznosti, ali ovaj dio **nije** nužan dio vaše implementacije.
+- Tenzori koji su ulaz u RNN ćelije se često "[pakiraju](https://pytorch.org/docs/master/generated/torch.nn.utils.rnn.pack_padded_sequence.html#torch.nn.utils.rnn.pack_padded_sequence)". Pakiranje je zapis tenzora kojemu su pridružene stvarne duljine svakog elementa u batchu. Ako koristite pakiranje, RNN mreža se neće odmatati za vremenske korake koji sadrže padding u elementima batcha. Ovdje osim efikasnosti možete dobiti i na točnosti, ali ovaj dio **nije** nužan dio vaše implementacije.
 - Implementirajte [gradient clipping](https://pytorch.org/docs/master/generated/torch.nn.utils.clip_grad_norm_.html#torch.nn.utils.clip_grad_norm_) prije optimizacijskog koraka
 Osnovni model vaše odabrane RNN ćelije treba izgledati ovako:
 
@@ -327,7 +327,7 @@ rnn(150) -> rnn(150) -> fc(150, 150) -> ReLU() -> fc(150,1)
 
 Vaš osnovni model RNN ćelije bi trebao biti jednosmjeran i imati dva sloja. Za višeslojni RNN iskoristite argument `num_layers` pri konstrukciji RNN mreže.
 
-Radi usporedbe, naša implementacija GRU povratne mreže za vokabular koji koristi sve riječi (`max_size=-1, min_freq=1`) te inicijalizira njihove reprezentacije s predtreniranima, `seed=7052020`, `lr=1e-4`, `batch_size=10`, `gradient_clip=0.25` na skupu za treniranje i `batch_size=32` na skupovima za validaciju i testiranje ostvaruje iduću preciznost:
+Radi usporedbe, naša implementacija GRU povratne mreže za vokabular koji koristi sve riječi (`max_size=-1, min_freq=1`) te inicijalizira njihove reprezentacije s predtreniranima, `seed=7052020`, `lr=1e-4`, `batch_size=10`, `gradient_clip=0.25` na skupu za treniranje i `batch_size=32` na skupovima za validaciju i testiranje ostvaruje iduću točnost:
 
 ```
 Epoch 1: valid accuracy = 67.930
@@ -344,7 +344,7 @@ Neovisno o tome koju ćeliju odaberete, pokrenite postupak učenja barem **5** p
 
 ### Zadatak 4. Usporedba modela i pretraga hiperparametara (25% bodova)
 
-Kao što vidimo, naše incijalne implementacije modela su dosta slične po preciznosti. Kako rezultati pokretanja modela za jedan skup hiperparametara mogu biti čista sreća ili nesreća, u ovom dijelu laboratorijske vježbe ćemo implementirati iscrpnu pretragu kroz varijante modela i njihove hiperparametre.
+Kao što vidimo, naše incijalne implementacije modela su dosta slične po točnosti. Kako rezultati pokretanja modela za jedan skup hiperparametara mogu biti čista sreća ili nesreća, u ovom dijelu laboratorijske vježbe ćemo implementirati iscrpnu pretragu kroz varijante modela i njihove hiperparametre.
 
 #### Usporedba RNN ćelija
 
