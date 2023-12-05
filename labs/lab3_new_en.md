@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: page_en
 mathjax: true
 permalink: /lab3en/
 ---
