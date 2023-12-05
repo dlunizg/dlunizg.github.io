@@ -4,7 +4,7 @@ mathjax: true
 permalink: /lab3en/
 ---
 
-# Exercise 3: analysis of sentiment classification
+## Exercise 3: analysis of sentiment classification
 
 In the third laboratory exercise,
 we are addressing the problem of 
@@ -324,7 +324,7 @@ Broadly speaking, the collate fuction builds the batch tensor for a
 given list of samples.
 You may find the detailed documentation [here](https://pytorch.org/docs/stable/data.html#dataloader-collate-fn).
 
-Your implementation look something like this:
+Your implementation may look something like this:
 
 ```python
 def collate_fn(batch):
