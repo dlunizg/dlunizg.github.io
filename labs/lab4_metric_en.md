@@ -1,21 +1,21 @@
 ---
-layout: page
+layout: page_en
 mathjax: true
 permalink: /lab4_metric_en/
 ---
 
 - [Metric embeddings](#cnn)
-- [Vježba](#vjezba)
-  - [1. zadatak](#1zad)
-  - [2. zadatak](#2zad)
-  - [3. zadatak](#3zad)
-  - [4. zadatak](#4zad)
+- [Exercises](#vjezba)
+  - [Task 1](#1zad)
+  - [Task 2](#2zad)
+  - [Task 3](#3zad)
+  - [Task 4](#4zad)
 
 
 <a name='cnn'></a>
 
 ## Exercise 4: Metric embeddings
-Lectures on metric embeddings will be availabel on [the course website](https://www.zemris.fer.hr/~ssegvic/du/index_en.shtml).
+Lectures on metric embeddings will be available on [the course website](https://www.zemris.fer.hr/~ssegvic/du/index_en.shtml).
 
 
 <a name='vjezba'></a>
@@ -26,7 +26,7 @@ Lectures on metric embeddings will be availabel on [the course website](https://
 
 ### Task 1: Data loading (10%)
 Implement data loading to enable training models
- for metric embedding with triplet loss.
+for metric embedding with triplet loss.
 To accomplish this, 
 it is necessary to adapt the MNIST dataset 
 so that when retrieving training examples (anchors),
@@ -139,8 +139,7 @@ into a shared differentiable module.
 Design the convolutional module `BNReLUConv`
 consisting of group normalization,
 ReLU activation, and convolution.
-Note that our template inherits from the class  
-[Sequential](https://pytorch.org/docs/stable/generated/torch.nn.Sequential.html).
+Note that our template inherits from the class [Sequential](https://pytorch.org/docs/stable/generated/torch.nn.Sequential.html).
 This means that to add layers in the constructor,
 you can use the `append` method.
 
