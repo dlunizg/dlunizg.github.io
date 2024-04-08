@@ -311,8 +311,9 @@ Nakon svake epohe učenja pohranite filtre i gubitak u datoteku (ili koristite [
 
 Na kraju učenja prikažite kretanje gubitka kroz epohe (Matplotlib).
 
-Za razliku od 1. vježbe, u ovoj za iteriranje i uzorkovanje mini-grupa možete koristiti `torch.nn.data.DataLoader`, 
-o kojem [ovdje](https://pytorch.org/docs/stable/data.html) možete naći više.
+Za razliku od 1. vježbe, ovdje za iteriranje i uzorkovanje mini-grupa 
+preporučamo koristiti `torch.utils.data.DataLoader`
+prema sljedećoj [dokumentaciji](https://pytorch.org/docs/stable/data.html).
 
 
 <a name='4zad'></a>
